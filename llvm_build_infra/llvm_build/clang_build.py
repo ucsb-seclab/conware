@@ -1,0 +1,122 @@
+import os
+from multiprocessing import Pool
+from log_stuff import *
+
+# UTILITIES FUNCTION
+# target optimization to be used for llvm
+TARGET_OPTIMIZATION_FLAGS = ['-O0']
+# debug flags to be used by llvm
+DEBUG_INFO_FLAGS = ['-g']
+ARCH_TARGET = '-target'
+# ARM 32 architecture flag for LLVM
+ARM_32_LLVM_ARCH = 'armv7-a'
+# flags to disable some llvm warnings
+DISABLE_WARNINGS = ['-Wno-return-type', '-w']
+# path to the clang binary
+CLANG_PATH = 'clang'
+EMIT_LLVM_FLAG = '-emit-llvm'
+
+
+def _run_program((workdir, cmd_to_run)):
+    """
+        Run the given program with in the provided directory.
+    :return: None
+    """
+    curr_dir = os.getcwd()
+    os.chdir(workdir)
+    os.system(cmd_to_run)
+    os.chdir(curr_dir)
+
+
+def _is_allowed_flag(curr_flag):
+    """
+        Function which checks, if a gcc flag is allowed in llvm command line.
+    :param curr_flag: flag to include in llvm
+    :return: True/False
+    """
+    # if this is a optimization flag, remove it.
+    if str(curr_flag)[:2] == "-O":
+        return False
+
+    return True
+
+
+def _get_clang_build_str(clang_path, build_args, src_build_dir, work_dir,
+                         src_file_path, output_file_path, llvm_bit_code_out):
+    """
+        Given a compilation command from the json, this function returns the clang based build string.
+        assuming that the original was built with gcc
+    :param clang_path: Path to clang.
+    :param build_args: original arguments to the compiler.
+    :param src_build_dir: Path to the original build directory given to arduino builder.
+    :param work_dir: Directory where the original command was run.
+    :param src_file_path: Path to the source file being compiled.
+    :param output_file_path: Path to the original object file.
+    :param llvm_bit_code_out: Folder where all the linked bitcode files should be stored.
+    :return:
+    """
+
+    curr_src_file = src_file_path
+    modified_build_args = list()
+
+    modified_build_args.append(clang_path)
+    modified_build_args.append(EMIT_LLVM_FLAG)
+    # Handle Target flags
+    modified_build_args.append(ARCH_TARGET)
+    modified_build_args.append(ARM_32_LLVM_ARCH)
+
+    # handle debug flags
+    for curr_d_flg in DEBUG_INFO_FLAGS:
+        modified_build_args.append(curr_d_flg)
+    # handle optimization flags
+    for curr_op in TARGET_OPTIMIZATION_FLAGS:
+        modified_build_args.append(curr_op)
+
+    for curr_war_op in DISABLE_WARNINGS:
+        modified_build_args.append(curr_war_op)
+
+    rel_obj_file = output_file_path.split(src_build_dir)[-1]
+    if rel_obj_file.startswith('/'):
+        rel_obj_file = rel_obj_file[1:]
+    target_out_dir = os.path.join(llvm_bit_code_out, os.path.dirname(rel_obj_file))
+    if not os.path.exists(target_out_dir):
+        os.makedirs(target_out_dir)
+    target_bc_file = os.path.join(target_out_dir, os.path.basename(rel_obj_file) + ".bc")
+
+    for curr_op in build_args:
+        if _is_allowed_flag(curr_op):
+            modified_build_args.append(curr_op)
+
+    # tell clang to compile.
+    modified_build_args.append("-c")
+    modified_build_args.append(curr_src_file)
+    modified_build_args.append("-o")
+    modified_build_args.append(target_bc_file)
+
+    return work_dir, ' '.join(modified_build_args)
+
+
+def build_using_clang(compile_commands, original_build_base,
+                      clang_path, llvm_bc_out):
+    output_llvm_sh_file = os.path.join(llvm_bc_out, 'clang_build.sh')
+    fp_out = open(output_llvm_sh_file, 'w')
+    log_info("Writing all compilation commands to", output_llvm_sh_file)
+    all_compilation_commands = []
+    for curr_compilation_command in compile_commands:
+        work_dir, target_command = _get_clang_build_str(clang_path, curr_compilation_command.curr_args,
+                                                        original_build_base,
+                                                        curr_compilation_command.work_dir,
+                                                        curr_compilation_command.src_file,
+                                                        curr_compilation_command.output_file,
+                                                        llvm_bc_out)
+        all_compilation_commands.append((work_dir, target_command))
+        fp_out.write(target_command + "\n")
+    fp_out.close()
+
+    log_info("Got:", len(all_compilation_commands), "commands to process. Running in multiprocessor mode.")
+    p = Pool()
+    p.map(_run_program, all_compilation_commands)
+    log_info("Finished running compilation commands in multiprocessor mode.")
+
+
+

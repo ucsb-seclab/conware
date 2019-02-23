@@ -96,11 +96,20 @@ def get_json_string(compilation_line, work_dir):
     output_files = []
     is_output = False
     input_files = []
-    for curr_p in all_parts[1:]:
-        currp = curr_p.strip()
+    indx = 1
+    while indx < len(all_parts):
+        curr_p = all_parts[indx]
+        indx += 1
+        curr_p = curr_p.strip()
         if is_output:
             output_files.append(curr_p)
             is_output = False
+            continue
+        # workaround to handle space in the arguments
+        if curr_p.startswith("\"-DUSB_MANUFACTURER") or curr_p.startswith("\"-DUSB_PRODUCT"):
+            curr_p = curr_p + " " + all_parts[indx]
+            indx += 1
+            all_options.append(curr_p)
             continue
         if curr_p == "-o":
             is_output = True
