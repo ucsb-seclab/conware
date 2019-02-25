@@ -1,6 +1,7 @@
 import os
 from multiprocessing import Pool
 from log_stuff import *
+import json
 
 # UTILITIES FUNCTION
 # target optimization to be used for llvm
@@ -53,7 +54,11 @@ def _get_clang_build_str(clang_path, build_args, src_build_dir, work_dir,
     :param src_file_path: Path to the source file being compiled.
     :param output_file_path: Path to the original object file.
     :param llvm_bit_code_out: Folder where all the linked bitcode files should be stored.
-    :return:
+    :return: (workdir,
+              original obj file,
+              command to convert into bitcode,
+              command to generate object code,
+              command to generate object code from bitcode)
     """
 
     curr_src_file = src_file_path
@@ -87,30 +92,59 @@ def _get_clang_build_str(clang_path, build_args, src_build_dir, work_dir,
         if _is_allowed_flag(curr_op):
             modified_build_args.append(curr_op)
 
+    to_obj_from_bc_build_args = list(modified_build_args)
+    to_obj_from_bc_build_args.remove(EMIT_LLVM_FLAG)
+
     # tell clang to compile.
     modified_build_args.append("-c")
     modified_build_args.append(curr_src_file)
-    modified_build_args.append("-o")
-    modified_build_args.append(target_bc_file)
 
-    return work_dir, ' '.join(modified_build_args)
+    to_obj_from_bc_build_args.append("-c")
+    to_obj_from_bc_build_args.append(target_bc_file)
+
+    modified_build_args.append("-o")
+    to_obj_from_bc_build_args.append("-o")
+    # to convert into object file directly!?
+    # just remove the emit-llvm flag.
+    to_obj_file_build_args = list(modified_build_args)
+    to_obj_file_build_args.remove(EMIT_LLVM_FLAG)
+    to_obj_file_build_args.append(target_bc_file[:-2] + "llvm.obj")
+
+    modified_build_args.append(target_bc_file)
+    to_obj_from_bc_build_args.append(target_bc_file + "_frombc.obj")
+
+    return work_dir, output_file_path, \
+           ' '.join(modified_build_args), \
+           ' '.join(to_obj_file_build_args), \
+           ' '.join(to_obj_from_bc_build_args)
 
 
 def build_using_clang(compile_commands, original_build_base,
                       clang_path, llvm_bc_out):
-    output_llvm_sh_file = os.path.join(llvm_bc_out, 'clang_build.sh')
+    output_llvm_sh_file = os.path.join(llvm_bc_out, 'clang_build.json')
     fp_out = open(output_llvm_sh_file, 'w')
     log_info("Writing all compilation commands to", output_llvm_sh_file)
     all_compilation_commands = []
+    target_output_commands = []
     for curr_compilation_command in compile_commands:
-        work_dir, target_command = _get_clang_build_str(clang_path, curr_compilation_command.curr_args,
-                                                        original_build_base,
-                                                        curr_compilation_command.work_dir,
-                                                        curr_compilation_command.src_file,
-                                                        curr_compilation_command.output_file,
-                                                        llvm_bc_out)
-        all_compilation_commands.append((work_dir, target_command))
-        fp_out.write(target_command + "\n")
+        work_dir, orig_output, target_command_bc_cmd, \
+        target_obj_cmd, target_bc_to_obj_cmd = _get_clang_build_str(clang_path, curr_compilation_command.curr_args,
+                                                                    original_build_base,
+                                                                    curr_compilation_command.work_dir,
+                                                                    curr_compilation_command.src_file,
+                                                                    curr_compilation_command.output_file,
+                                                                    llvm_bc_out)
+        all_compilation_commands.append((work_dir, target_command_bc_cmd))
+        curr_dict = {}
+        curr_dict["orig_obj_file"] = orig_output
+        curr_dict["to_llvm_bc"] = target_command_bc_cmd
+        curr_dict["to_llvm_obj"] = target_obj_cmd
+        curr_dict["from_llvm_bc_to_obj"] = target_bc_to_obj_cmd
+        target_output_commands.append(curr_dict)
+
+    fp_out.write("{")
+    fp_out.write(json.dumps(target_output_commands, indent=4, sort_keys=True))
+    fp_out.write("}")
     fp_out.close()
 
     log_info("Got:", len(all_compilation_commands), "commands to process. Running in multiprocessor mode.")
