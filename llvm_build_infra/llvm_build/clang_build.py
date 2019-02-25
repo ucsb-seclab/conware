@@ -122,10 +122,15 @@ def _get_clang_build_str(clang_path, build_args, src_build_dir, work_dir,
 def build_using_clang(compile_commands, original_build_base,
                       clang_path, llvm_bc_out):
     output_llvm_sh_file = os.path.join(llvm_bc_out, 'clang_build.json')
+    human_llvm_txt_file = os.path.join(llvm_bc_out, 'clang_build.txt')
     fp_out = open(output_llvm_sh_file, 'w')
-    log_info("Writing all compilation commands to", output_llvm_sh_file)
+    fp_human_out = open(human_llvm_txt_file, 'w')
+    log_info("Writing all compilation commands in json format to", output_llvm_sh_file)
+    log_info("Writing all compilation commands in human usable form to", human_llvm_txt_file)
     all_compilation_commands = []
     target_output_commands = []
+    add_comma = False
+    fp_human_out.write("{")
     for curr_compilation_command in compile_commands:
         work_dir, orig_output, target_command_bc_cmd, \
         target_obj_cmd, target_bc_to_obj_cmd = _get_clang_build_str(clang_path, curr_compilation_command.curr_args,
@@ -140,8 +145,19 @@ def build_using_clang(compile_commands, original_build_base,
         curr_dict["to_llvm_bc"] = target_command_bc_cmd
         curr_dict["to_llvm_obj"] = target_obj_cmd
         curr_dict["from_llvm_bc_to_obj"] = target_bc_to_obj_cmd
+        if add_comma:
+            fp_human_out.write(':')
+        fp_human_out.write("[")
+        fp_human_out.write('"orig_obj_file": \"' + orig_output + '",\n')
+        fp_human_out.write('"to_llvm_bc": \"' + target_command_bc_cmd + '",\n')
+        fp_human_out.write('"to_llvm_obj": \"' + target_obj_cmd + '",\n')
+        fp_human_out.write('"from_llvm_bc_to_obj": \"' + target_bc_to_obj_cmd + '"')
+        fp_human_out.write("]")
+        add_comma = True
         target_output_commands.append(curr_dict)
 
+    fp_human_out.write("}")
+    fp_human_out.close()
     fp_out.write("{")
     fp_out.write(json.dumps(target_output_commands, indent=4, sort_keys=True))
     fp_out.write("}")
