@@ -21,6 +21,8 @@
 #include <llvm/Support/FileSystem.h>
 #include <llvm/IR/Module.h>
 #include <llvm/Support/CommandLine.h>
+#include <set>
+#include "MemAccessFetcher.h"
 
 
 using namespace llvm;
@@ -29,7 +31,9 @@ namespace Conware {
 
 
     /***
-     * The main pass.
+     * The main pass which try to instrument all the target
+     * memory instructions which could read or write
+     * MMIO regions.
      */
     struct MMIOLoggerPass: public ModulePass {
     public:
@@ -41,6 +45,11 @@ namespace Conware {
         ~MMIOLoggerPass() {
         }
 
+        /***
+         * Get the target type embedded into the current type.
+         * @param currType Type whose embedded type needs to be fetched.
+         * @return Target embedded type.
+         */
         Type *getStructureAccessType(Type *currType) {
             if(currType->isPointerTy()) {
                 PointerType *currPtrType = dyn_cast<PointerType>(currType);
@@ -49,7 +58,13 @@ namespace Conware {
             return currType;
         }
 
+        /***
+         * Process the current function.
+         * @param currFunc Target function to process.
+         * @return True if the function is modified.
+         */
         bool processFunction(Function &currFunc) {
+            bool retVal = false;
             for(auto &currBB: currFunc) {
                 for(auto &currIns: currBB) {
                     Instruction *currInstrPtr = &currIns;
@@ -58,17 +73,29 @@ namespace Conware {
                         Type *targetAccType = this->getStructureAccessType(accessedType);
                         if(targetAccType->isStructTy()) {
                             dbgs() << "[*] Target struct name:" << targetAccType->getStructName() << "\n";
+                            std::set<Instruction*> targetMemInstrs;
+                            targetMemInstrs.clear();
+                            // get all the load and store instructions that could use this.
+                            MemAccessFetcher::getTargetMemAccess(targetAccess, targetMemInstrs);
+                            // these are the instructions that need to be instrumented.
+                            for(auto curI: targetMemInstrs) {
+                                dbgs() << "Got Mem Instruction:" << *curI << "\n";
+                                retVal = true;
+                            }
                         }
 
                     }
                 }
             }
+
+            return retVal;
         }
 
 
         bool runOnModule(Module &m) override {
+            bool retVal = false;
             for(auto &currFu: m) {
-                processFunction(currFu);
+                retVal = processFunction(currFu) || retVal;
             }
             return true;
         }

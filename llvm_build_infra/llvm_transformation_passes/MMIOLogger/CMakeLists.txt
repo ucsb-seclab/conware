@@ -1,4 +1,4 @@
-add_library(MMIOLogger MODULE src/MMIOLoggerPass.cpp)
+add_library(MMIOLogger MODULE src/MMIOLoggerPass.cpp src/MemAccessFetcher.cpp include/MemAccessFetcher.h)
 
 include_directories(include)
 
