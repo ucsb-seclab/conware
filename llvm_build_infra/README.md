@@ -114,6 +114,24 @@ All the bitcode files will be present in the folder: `/home/machiry/Desktop/chec
 Also, this script writes all the commands to `/home/machiry/Desktop/checking/clang_build.json`:
 For each object file (`orig_obj_file`), this file contains commands to convert bitcode file to object file (`from_llvm_bc_to_obj`), directly generate object file from clang (`to_llvm_obj`), generate bitcode file (`to_llvm_bc`).
 
+## Modifying a bitcode file using an llvm pass
+An llvm pass is located at: [llvm_transformation_pass](https://git.seclab.cs.ucsb.edu/cspensky/conware/tree/master/llvm_build_infra/llvm_transformation_passes).
+
+Using the llvm pass:
+```
+$ cd llvm_build_infra/llvm_transformation_passes
+$ mkdir build
+$ cd build
+$ cmake ..
+$ make 
+$ cd MMIOLogger
+# using the pass
+$ opt -load ./libMMIOLogger.so -logmmio /home/machiry/Desktop/crap/checking2/core/WInterrupts.c.o.bc
+...
+[*] Target struct name:struct.Pio
+Got Mem Instruction:  store volatile i32 %37, i32* %PIO_ESR, align 4, !dbg !356
+...
+```
 
 ## Converting the bitcode file to object file
 For a given bitcode file, you can refer the above json to get the command (`from_llvm_bc_to_obj`) to convert the bitcode file into object file.
@@ -137,4 +155,3 @@ TADA!!!
 See, how the input is the bitcode file (`.bc`) and the output is the object file (`.obj`).
 
 __Note: The commands generated are machine friendly, however, if you want human runnable commands you can use `clang_build.txt`.__
-
