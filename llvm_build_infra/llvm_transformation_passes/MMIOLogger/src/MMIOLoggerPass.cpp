@@ -41,9 +41,35 @@ namespace Conware {
         ~MMIOLoggerPass() {
         }
 
+        Type *getStructureAccessType(Type *currType) {
+            if(currType->isPointerTy()) {
+                PointerType *currPtrType = dyn_cast<PointerType>(currType);
+                return this->getStructureAccessType(currPtrType->getPointerElementType());
+            }
+            return currType;
+        }
+
+        bool processFunction(Function &currFunc) {
+            for(auto &currBB: currFunc) {
+                for(auto &currIns: currBB) {
+                    Instruction *currInstrPtr = &currIns;
+                    if(GetElementPtrInst *targetAccess = dyn_cast<GetElementPtrInst>(currInstrPtr)) {
+                        Type *accessedType = targetAccess->getPointerOperandType();
+                        Type *targetAccType = this->getStructureAccessType(accessedType);
+                        if(targetAccType->isStructTy()) {
+                            dbgs() << "[*] Target struct name:" << targetAccType->getStructName() << "\n";
+                        }
+
+                    }
+                }
+            }
+        }
+
 
         bool runOnModule(Module &m) override {
-
+            for(auto &currFu: m) {
+                processFunction(currFu);
+            }
             return true;
         }
 
