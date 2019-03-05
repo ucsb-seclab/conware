@@ -14,11 +14,7 @@ Function* InstrumentationHelper::getPrintfFunction() {
         FunctionType *printf_type =
                 TypeBuilder<int(char *, ...), false>::get(this->targetCtx);
 
-        AttributeList newAttrList;
-
-        newAttrList = newAttrList.addAttribute(this->targetCtx, 1, Attribute::NoAlias);
-
-        Function *func = cast<Function>(this->targetModule.getOrInsertFunction("iprintf", printf_type, newAttrList));
+        Function *func = cast<Function>(this->targetModule.getOrInsertFunction("iprintf", printf_type));
 
         func->setCallingConv(CallingConv::ARM_AAPCS);
 
@@ -69,16 +65,9 @@ bool InstrumentationHelper::instrumentLoad(LoadInst *targetInstr) {
     Value *formatString = this->getReadPrintString();
     Value *address = targetInstr->getPointerOperand();
     Value *targetValue = targetInstr;
-    ArrayRef<Value*> argsVal = {formatString, address, targetValue};
-
-    if(targetPrintFunc != nullptr) {
-        dbgs() << "Not Null\n";
-    } else {
-        dbgs() << "NULL\n";
-    }
 
     // insert the call.
-    builder.CreateCall(targetPrintFunc, argsVal);
+    builder.CreateCall(targetPrintFunc, {formatString, address, targetValue});
 }
 
 bool InstrumentationHelper::instrumentStore(StoreInst *targetInstr) {
@@ -94,14 +83,7 @@ bool InstrumentationHelper::instrumentStore(StoreInst *targetInstr) {
     Value *formatString = this->getWritePrintString();
     Value *address = targetInstr->getPointerOperand();
     Value *targetValue = targetInstr->getValueOperand();
-    ArrayRef<Value*> argsVal = {formatString, address, targetValue};
-
-    if(targetPrintFunc != nullptr) {
-        dbgs() << "Not Null\n";
-    } else {
-        dbgs() << "NULL\n";
-    }
 
     // insert the call.
-    builder.CreateCall(targetPrintFunc, argsVal);
+    builder.CreateCall(targetPrintFunc, {formatString, address, targetValue});
 }

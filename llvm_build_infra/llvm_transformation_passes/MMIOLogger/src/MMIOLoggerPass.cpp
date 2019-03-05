@@ -67,26 +67,28 @@ namespace Conware {
          */
         bool processFunction(Function &currFunc) {
             bool retVal = false;
+            unsigned totalLoadsInstrumented = 0;
+            unsigned totalStoresInstrumented = 0;
             for(auto &currBB: currFunc) {
                 for(auto &currIns: currBB) {
                     Instruction *currInstrPtr = &currIns;
                     if(GetElementPtrInst *targetAccess = dyn_cast<GetElementPtrInst>(currInstrPtr)) {
                         Type *accessedType = targetAccess->getPointerOperandType();
                         Type *targetAccType = this->getStructureAccessType(accessedType);
-                        if(targetAccType->isStructTy()) {
-                            dbgs() << "[*] Target struct name:" << targetAccType->getStructName() << "\n";
+                        if(targetAccType->isStructTy() && targetAccType->getStructName().str() == "struct.Pio") {
                             std::set<Instruction*> targetMemInstrs;
                             targetMemInstrs.clear();
                             // get all the load and store instructions that could use this.
                             MemAccessFetcher::getTargetMemAccess(targetAccess, targetMemInstrs);
                             // these are the instructions that need to be instrumented.
                             for(auto curI: targetMemInstrs) {
-                                dbgs() << "Got Mem Instruction:" << *curI << "\n";
-                                /*if(dyn_cast<LoadInst>(curI) != nullptr) {
+                                if(dyn_cast<LoadInst>(curI) != nullptr) {
                                     this->currInstrHelper->instrumentLoad(dyn_cast<LoadInst>(curI));
-                                }*/
+                                    totalLoadsInstrumented++;
+                                }
                                 if(dyn_cast<StoreInst>(curI) != nullptr) {
                                     this->currInstrHelper->instrumentStore(dyn_cast<StoreInst>(curI));
+                                    totalStoresInstrumented++;
                                 }
                                 retVal = true;
                             }
@@ -95,6 +97,10 @@ namespace Conware {
                     }
                 }
             }
+
+            dbgs() << "[*] Function:" << currFunc.getName() << ", Num Loads Instrumented:"
+                   << totalLoadsInstrumented << ", Num Stores Instrumented:"
+                   << totalStoresInstrumented << "\n";
 
             return retVal;
         }
