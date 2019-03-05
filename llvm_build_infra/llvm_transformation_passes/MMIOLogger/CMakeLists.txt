@@ -1,11 +1,12 @@
-add_library(MMIOLogger MODULE src/MMIOLoggerPass.cpp src/MemAccessFetcher.cpp include/MemAccessFetcher.h)
+add_library(MMIOLogger MODULE src/MMIOLoggerPass.cpp src/MemAccessFetcher.cpp
+        include/MemAccessFetcher.h include/InstrumentationHelper.h src/InstrumentationHelper.cpp)
 
 include_directories(include)
 
 target_compile_features(MMIOLogger PRIVATE cxx_range_for cxx_auto_type)
 
 set_target_properties(MMIOLogger PROPERTIES
-        COMPILE_FLAGS "-g"
+        COMPILE_FLAGS "-g -ggdb"
         )
 
 if(APPLE)

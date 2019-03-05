@@ -23,6 +23,7 @@
 #include <llvm/Support/CommandLine.h>
 #include <set>
 #include "MemAccessFetcher.h"
+#include "InstrumentationHelper.h"
 
 
 using namespace llvm;
@@ -38,6 +39,7 @@ namespace Conware {
     struct MMIOLoggerPass: public ModulePass {
     public:
         static char ID;
+        InstrumentationHelper *currInstrHelper;
 
         MMIOLoggerPass() : ModulePass(ID) {
         }
@@ -80,6 +82,12 @@ namespace Conware {
                             // these are the instructions that need to be instrumented.
                             for(auto curI: targetMemInstrs) {
                                 dbgs() << "Got Mem Instruction:" << *curI << "\n";
+                                /*if(dyn_cast<LoadInst>(curI) != nullptr) {
+                                    this->currInstrHelper->instrumentLoad(dyn_cast<LoadInst>(curI));
+                                }*/
+                                if(dyn_cast<StoreInst>(curI) != nullptr) {
+                                    this->currInstrHelper->instrumentStore(dyn_cast<StoreInst>(curI));
+                                }
                                 retVal = true;
                             }
                         }
@@ -94,6 +102,7 @@ namespace Conware {
 
         bool runOnModule(Module &m) override {
             bool retVal = false;
+            currInstrHelper = new InstrumentationHelper(m);
             for(auto &currFu: m) {
                 retVal = processFunction(currFu) || retVal;
             }
