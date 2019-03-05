@@ -32,20 +32,20 @@ namespace Conware {
         Function *targetPrintFunction;
 
         /***
-         *
-         * @return
+         * Get pointer to the print function that should be called.
+         * @return Pointer to the print function.
          */
         Function* getPrintfFunction();
 
         /***
-         *
-         * @return
+         * Get the format string to be used to print reads to the MMIO regions.
+         * @return Pointer to the format string value.
          */
         Value* getReadPrintString();
 
         /***
-         *
-         * @return
+         * Get the format string to be used to print write to the MMIO regions.
+         * @return Pointer to the format string value.
          */
         Value* getWritePrintString();
 
@@ -62,16 +62,16 @@ namespace Conware {
         virtual ~InstrumentationHelper() { }
 
         /***
-         *
-         * @param targetInstr
-         * @return
+         * Instrument the provided load instruction by calling printf on the loaded value.
+         * @param targetInstr Instruction to be instrumented.
+         * @return True if everything is fine.
          */
         bool instrumentLoad(LoadInst *targetInstr);
 
         /***
-         *
-         * @param targetInstr
-         * @return
+         * Instrument the provided store instruction by calling printf on the stored value.
+         * @param targetInstr Instruction to be instrumented.
+         * @return True if everything is fine.
          */
         bool instrumentStore(StoreInst *targetInstr);
     };

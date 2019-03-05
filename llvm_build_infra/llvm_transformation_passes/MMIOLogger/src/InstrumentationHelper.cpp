@@ -52,38 +52,53 @@ Value* InstrumentationHelper::getWritePrintString() {
 }
 
 bool InstrumentationHelper::instrumentLoad(LoadInst *targetInstr) {
+    bool retVal = true;
 
-    // set the insertion point to be after the load instruction.
-    auto targetInsertPoint = targetInstr->getIterator();
-    targetInsertPoint++;
-    IRBuilder<> builder(&(*targetInsertPoint));
+    try {
+        // set the insertion point to be after the load instruction.
+        auto targetInsertPoint = targetInstr->getIterator();
+        targetInsertPoint++;
+        IRBuilder<> builder(&(*targetInsertPoint));
 
-    // get the printf function.
-    Function *targetPrintFunc = this->getPrintfFunction();
+        // get the printf function.
+        Function *targetPrintFunc = this->getPrintfFunction();
 
-    // get the arguments for the function.
-    Value *formatString = this->getReadPrintString();
-    Value *address = targetInstr->getPointerOperand();
-    Value *targetValue = targetInstr;
+        // get the arguments for the function.
+        Value *formatString = this->getReadPrintString();
+        Value *address = targetInstr->getPointerOperand();
+        Value *targetValue = targetInstr;
 
-    // insert the call.
-    builder.CreateCall(targetPrintFunc, {formatString, address, targetValue});
+        // insert the call.
+        builder.CreateCall(targetPrintFunc, {formatString, address, targetValue});
+    } catch (const std::exception& e) {
+        dbgs() << "[?] Error occurred while trying to instrument load instruction:" << e.what() << "\n";
+        retVal = false;
+    }
+    return retVal;
 }
 
 bool InstrumentationHelper::instrumentStore(StoreInst *targetInstr) {
-    // set the insertion point to be after the store instruction.
-    auto targetInsertPoint = targetInstr->getIterator();
-    targetInsertPoint++;
-    IRBuilder<> builder(&(*targetInsertPoint));
+    bool retVal = true;
+    try {
+        // set the insertion point to be after the store instruction.
+        auto targetInsertPoint = targetInstr->getIterator();
+        targetInsertPoint++;
+        IRBuilder<> builder(&(*targetInsertPoint));
 
-    // get the printf function.
-    Function *targetPrintFunc = this->getPrintfFunction();
+        // get the printf function.
+        Function *targetPrintFunc = this->getPrintfFunction();
 
-    // get the arguments for the function.
-    Value *formatString = this->getWritePrintString();
-    Value *address = targetInstr->getPointerOperand();
-    Value *targetValue = targetInstr->getValueOperand();
+        // get the arguments for the function.
+        Value *formatString = this->getWritePrintString();
+        Value *address = targetInstr->getPointerOperand();
+        Value *targetValue = targetInstr->getValueOperand();
 
-    // insert the call.
-    builder.CreateCall(targetPrintFunc, {formatString, address, targetValue});
+        // insert the call.
+        builder.CreateCall(targetPrintFunc, {formatString, address, targetValue});
+    } catch (const std::exception& e) {
+        dbgs() << "[?] Error occurred while trying to instrument store instruction:" << e.what() << "\n";
+        retVal = false;
+    }
+    return retVal;
+
 }
