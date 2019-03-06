@@ -60,8 +60,12 @@ def main():
     compile_commands = parse_compile_json(parsed_args.compile_json)
     os.system("mkdir -p " + parsed_args.llvm_bc_out)
     # build everything.
-    build_using_clang(compile_commands, parsed_args.original_build_base,
-                      clang_path, parsed_args.llvm_bc_out)
+    if not parsed_args.do_instrumentation:
+        build_using_clang(compile_commands, parsed_args.original_build_base,
+                          clang_path, parsed_args.llvm_bc_out)
+    else:
+        build_using_clang(compile_commands, parsed_args.original_build_base,
+                          clang_path, parsed_args.llvm_bc_out, transformation_so=llvm_pass_so_path, opt_path=opt_path)
     log_success("Finished generating bitcode files into the directory:", parsed_args.llvm_bc_out)
 
 

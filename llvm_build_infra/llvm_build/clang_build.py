@@ -10,9 +10,9 @@ TARGET_OPTIMIZATION_FLAGS = ['-O0']
 DEBUG_INFO_FLAGS = ['-g']
 ARCH_TARGET = '-target'
 # ARM 32 architecture flag for LLVM
-ARM_32_LLVM_ARCH = 'armv7-a'
+ARM_32_LLVM_ARCH = 'armv7'
 # flags to disable some llvm warnings
-DISABLE_WARNINGS = ['-Wno-return-type', '-w']
+DISABLE_WARNINGS = ['-Wno-return-type', '-w', '-fshort-enums']
 # path to the clang binary
 CLANG_PATH = 'clang'
 EMIT_LLVM_FLAG = '-emit-llvm'
@@ -36,8 +36,8 @@ def _is_allowed_flag(curr_flag):
     :return: True/False
     """
     # if this is a optimization flag, remove it.
-    if str(curr_flag)[:2] == "-O":
-        return False
+    #if str(curr_flag)[:2] == "-O":
+    #    return False
 
     return True
 
@@ -99,6 +99,8 @@ def _get_clang_build_str(clang_path, build_args, src_build_dir, work_dir,
     modified_build_args.append("-c")
     modified_build_args.append(curr_src_file)
 
+    bitcode_to_obj_file_template = list(to_obj_from_bc_build_args)
+
     to_obj_from_bc_build_args.append("-c")
     to_obj_from_bc_build_args.append(target_bc_file)
 
@@ -114,13 +116,15 @@ def _get_clang_build_str(clang_path, build_args, src_build_dir, work_dir,
     to_obj_from_bc_build_args.append(target_bc_file + "_frombc.obj")
 
     return work_dir, output_file_path, \
+           target_bc_file, \
+           ' '.join(bitcode_to_obj_file_template), \
            ' '.join(modified_build_args), \
            ' '.join(to_obj_file_build_args), \
            ' '.join(to_obj_from_bc_build_args)
 
 
 def build_using_clang(compile_commands, original_build_base,
-                      clang_path, llvm_bc_out):
+                      clang_path, llvm_bc_out, transformation_so=None, opt_path=None):
     output_llvm_sh_file = os.path.join(llvm_bc_out, 'clang_build.json')
     human_llvm_txt_file = os.path.join(llvm_bc_out, 'clang_build.txt')
     fp_out = open(output_llvm_sh_file, 'w')
@@ -131,8 +135,10 @@ def build_using_clang(compile_commands, original_build_base,
     target_output_commands = []
     add_comma = False
     fp_human_out.write("{")
+    transformation_info = {}
     for curr_compilation_command in compile_commands:
-        work_dir, orig_output, target_command_bc_cmd, \
+        work_dir, orig_output, target_bc_file, \
+        bitcode_to_obj_file_template, target_command_bc_cmd, \
         target_obj_cmd, target_bc_to_obj_cmd = _get_clang_build_str(clang_path, curr_compilation_command.curr_args,
                                                                     original_build_base,
                                                                     curr_compilation_command.work_dir,
@@ -145,6 +151,7 @@ def build_using_clang(compile_commands, original_build_base,
         curr_dict["to_llvm_bc"] = target_command_bc_cmd
         curr_dict["to_llvm_obj"] = target_obj_cmd
         curr_dict["from_llvm_bc_to_obj"] = target_bc_to_obj_cmd
+        transformation_info[orig_output] = (target_bc_file, bitcode_to_obj_file_template)
         if add_comma:
             fp_human_out.write(':')
         fp_human_out.write("[")
@@ -167,6 +174,27 @@ def build_using_clang(compile_commands, original_build_base,
     p = Pool()
     p.map(_run_program, all_compilation_commands)
     log_info("Finished running compilation commands in multiprocessor mode.")
+
+    if transformation_so is not None and opt_path is not None:
+        log_info("Running transformation and converting it back to obj file.")
+        for curr_output_obj in transformation_info.keys():
+            orig_bc_file = transformation_info[curr_output_obj][0]
+            if os.path.exists(orig_bc_file):
+                fp = open(orig_bc_file, "r")
+                if fp.read(2) == "BC":
+                    transformation_bc_file = orig_bc_file + ".transform.bc"
+                    transformation_command = opt_path + "  -load " + transformation_so + " -logmmio " + \
+                                             orig_bc_file + " -o " + transformation_bc_file
+                    os.system(transformation_command)
+                    bc_to_obj_cmd = transformation_info[curr_output_obj][1] + \
+                                    " -c " + orig_bc_file + \
+                                    " -o " + curr_output_obj
+
+                    os.system(bc_to_obj_cmd)
+                else:
+                    os.system("cp " + orig_bc_file + " " + curr_output_obj)
+                fp.close()
+        log_success("Finished running transformation passes.")
 
 
 

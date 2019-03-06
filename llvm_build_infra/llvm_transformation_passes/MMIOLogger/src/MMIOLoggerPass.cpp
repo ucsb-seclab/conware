@@ -98,7 +98,7 @@ namespace Conware {
                 }
             }
 
-            dbgs() << "[*] Function:" << currFunc.getName() << ", Num Loads Instrumented:"
+            dbgs() << "[*]  Function:" << currFunc.getName() << ", Num Loads Instrumented:"
                    << totalLoadsInstrumented << ", Num Stores Instrumented:"
                    << totalStoresInstrumented << "\n";
 
