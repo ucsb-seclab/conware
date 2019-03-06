@@ -32,7 +32,43 @@ export LLVM_DIR=your_path_to_llvm-7.0.1.obj
 export PATH=$LLVM_DIR/bin:$PATH
 ```
 
-## Generating the build commands
+## Building the llvm transformation pass
+> Build the LLVM Transformation pass (if you have already done, just skip it)
+
+An llvm pass is located at: [llvm_transformation_pass](https://git.seclab.cs.ucsb.edu/cspensky/conware/tree/master/llvm_build_infra/llvm_transformation_passes).
+
+Building the llvm pass:
+```
+$ cd llvm_build_infra/llvm_transformation_passes
+$ mkdir build
+$ cd build
+$ cmake ..
+$ make 
+```
+
+## Running end-end build with instrumentation
+There is a single script that will instrument and build the entire `.elf` file.
+
+```
+python instrument_arduino_project.py --help
+usage: instrument_arduino_project.py [-h] -i SRC_ICO_FILE -b TARGET_BUILD_DIR
+                                     -r ORIGINAL_REPO_DIR
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -i SRC_ICO_FILE       Path to the source ico file.
+  -b TARGET_BUILD_DIR   Path to the build directory.
+  -r ORIGINAL_REPO_DIR  Path to the original repo directory.
+```
+
+Example:
+To build and instrument `ino` file:
+```
+python instrument_arduino_project.py -i /home/machiry/Data/mounts/bigdrive/projects/conware/projects_custom/blink/blink.ino -b /home/machiry/Data/mounts/bigdrive/projects/conware/llvm_build_infra/build_testing -r /home/machiry/Data/mounts/bigdrive/projects/conware
+```
+## More Details
+> These are subcommands and other intermediate steps that are used in above pipeline.
+### Generating the build commands
 First, you need to get the build commands from the arduino system. The way to get it would be to ask the `arduino-builder` dump the compilation commands.
 
 Lets assume you are building an `.ico` file like this:
@@ -53,7 +89,7 @@ Then, you should run the following command to get the build commands for the abo
 [+] Done. All the build commands are written to: all_arduino_build_cmds.txt
 ```
 
-## Generate `compile_commands.json` file
+### Generate `compile_commands.json` file
 Now, we process the captured build commands and process them to emit nice beautified json file with only the compilation commands
 ```
 cd util_scripts
@@ -79,7 +115,7 @@ python parse_arduino_builder_output.py -i ../all_arduino_build_cmds.txt -o compi
 [*]  Writing to output file: compile_commands.json
 ```
 
-## Generating the bitcode files
+### Generating the bitcode files
 Now, from the `compile_commands.json` file and `clang`, we will generate the bitcode files.
 ```
 cd llvm_build
@@ -114,7 +150,7 @@ All the bitcode files will be present in the folder: `/home/machiry/Desktop/chec
 Also, this script writes all the commands to `/home/machiry/Desktop/checking/clang_build.json`:
 For each object file (`orig_obj_file`), this file contains commands to convert bitcode file to object file (`from_llvm_bc_to_obj`), directly generate object file from clang (`to_llvm_obj`), generate bitcode file (`to_llvm_bc`).
 
-## Modifying a bitcode file using an llvm pass
+### Modifying a bitcode file using an llvm pass
 An llvm pass is located at: [llvm_transformation_pass](https://git.seclab.cs.ucsb.edu/cspensky/conware/tree/master/llvm_build_infra/llvm_transformation_passes).
 
 Using the llvm pass:
@@ -133,7 +169,7 @@ Got Mem Instruction:  store volatile i32 %37, i32* %PIO_ESR, align 4, !dbg !356
 ...
 ```
 
-## Converting the bitcode file to object file
+### Converting the bitcode file to object file
 For a given bitcode file, you can refer the above json to get the command (`from_llvm_bc_to_obj`) to convert the bitcode file into object file.
 
 Example, snippet from `clang_build.txt`:
