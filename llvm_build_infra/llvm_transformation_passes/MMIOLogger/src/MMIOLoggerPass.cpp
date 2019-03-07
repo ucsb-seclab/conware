@@ -107,30 +107,34 @@ namespace Conware {
 
         bool runOnFunction(Function &currFunc) override {
             bool retVal = false;
+#ifdef ONLYSANITY
+            return retVal;
+#endif
+
             unsigned totalLoadsInstrumented = 0;
             unsigned totalStoresInstrumented = 0;
 
-            if(MMIOLoggerPass::currInstrHelper == nullptr) {
+            if (MMIOLoggerPass::currInstrHelper == nullptr) {
                 MMIOLoggerPass::currInstrHelper = new InstrumentationHelper(*currFunc.getParent());
             }
-            for(auto &currBB: currFunc) {
-                for(auto &currIns: currBB) {
+            for (auto &currBB: currFunc) {
+                for (auto &currIns: currBB) {
                     Instruction *currInstrPtr = &currIns;
-                    if(GetElementPtrInst *targetAccess = dyn_cast<GetElementPtrInst>(currInstrPtr)) {
+                    if (GetElementPtrInst *targetAccess = dyn_cast<GetElementPtrInst>(currInstrPtr)) {
                         Type *accessedType = targetAccess->getPointerOperandType();
                         Type *targetAccType = this->getStructureAccessType(accessedType);
-                        if(targetAccType->isStructTy() && targetAccType->getStructName().str() == "struct.Pio") {
-                            std::set<Instruction*> targetMemInstrs;
+                        if (targetAccType->isStructTy() && targetAccType->getStructName().str() == "struct.Pio") {
+                            std::set<Instruction *> targetMemInstrs;
                             targetMemInstrs.clear();
                             // get all the load and store instructions that could use this.
                             MemAccessFetcher::getTargetMemAccess(targetAccess, targetMemInstrs);
                             // these are the instructions that need to be instrumented.
-                            for(auto curI: targetMemInstrs) {
-                                if(dyn_cast<LoadInst>(curI) != nullptr) {
+                            for (auto curI: targetMemInstrs) {
+                                if (dyn_cast<LoadInst>(curI) != nullptr) {
                                     this->currInstrHelper->instrumentLoad(dyn_cast<LoadInst>(curI));
                                     totalLoadsInstrumented++;
                                 }
-                                if(dyn_cast<StoreInst>(curI) != nullptr) {
+                                if (dyn_cast<StoreInst>(curI) != nullptr) {
                                     this->currInstrHelper->instrumentStore(dyn_cast<StoreInst>(curI));
                                     totalStoresInstrumented++;
                                 }
