@@ -36,12 +36,12 @@ namespace Conware {
      * memory instructions which could read or write
      * MMIO regions.
      */
-    struct MMIOLoggerPass: public ModulePass {
+    struct MMIOLoggerPass: public FunctionPass {
     public:
         static char ID;
-        InstrumentationHelper *currInstrHelper;
+        static InstrumentationHelper *currInstrHelper;
 
-        MMIOLoggerPass() : ModulePass(ID) {
+        MMIOLoggerPass() : FunctionPass(ID) {
         }
 
         ~MMIOLoggerPass() {
@@ -65,7 +65,7 @@ namespace Conware {
          * @param currFunc Target function to process.
          * @return True if the function is modified.
          */
-        bool processFunction(Function &currFunc) {
+        /*bool processFunction(Function &currFunc) {
             bool retVal = false;
             unsigned totalLoadsInstrumented = 0;
             unsigned totalStoresInstrumented = 0;
@@ -103,25 +103,68 @@ namespace Conware {
                    << totalStoresInstrumented << "\n";
 
             return retVal;
-        }
+        }*/
 
-
-        bool runOnModule(Module &m) override {
+        bool runOnFunction(Function &currFunc) override {
             bool retVal = false;
-            currInstrHelper = new InstrumentationHelper(m);
-            for(auto &currFu: m) {
-                retVal = processFunction(currFu) || retVal;
+            unsigned totalLoadsInstrumented = 0;
+            unsigned totalStoresInstrumented = 0;
+
+            if(MMIOLoggerPass::currInstrHelper == nullptr) {
+                MMIOLoggerPass::currInstrHelper = new InstrumentationHelper(*currFunc.getParent());
             }
-            return true;
+            for(auto &currBB: currFunc) {
+                for(auto &currIns: currBB) {
+                    Instruction *currInstrPtr = &currIns;
+                    if(GetElementPtrInst *targetAccess = dyn_cast<GetElementPtrInst>(currInstrPtr)) {
+                        Type *accessedType = targetAccess->getPointerOperandType();
+                        Type *targetAccType = this->getStructureAccessType(accessedType);
+                        if(targetAccType->isStructTy() && targetAccType->getStructName().str() == "struct.Pio") {
+                            std::set<Instruction*> targetMemInstrs;
+                            targetMemInstrs.clear();
+                            // get all the load and store instructions that could use this.
+                            MemAccessFetcher::getTargetMemAccess(targetAccess, targetMemInstrs);
+                            // these are the instructions that need to be instrumented.
+                            for(auto curI: targetMemInstrs) {
+                                if(dyn_cast<LoadInst>(curI) != nullptr) {
+                                    this->currInstrHelper->instrumentLoad(dyn_cast<LoadInst>(curI));
+                                    totalLoadsInstrumented++;
+                                }
+                                if(dyn_cast<StoreInst>(curI) != nullptr) {
+                                    this->currInstrHelper->instrumentStore(dyn_cast<StoreInst>(curI));
+                                    totalStoresInstrumented++;
+                                }
+                                retVal = true;
+                            }
+                        }
+
+                    }
+                }
+            }
+
+            dbgs() << "[*]  Function:" << currFunc.getName() << ", Num Loads Instrumented:"
+                   << totalLoadsInstrumented << ", Num Stores Instrumented:"
+                   << totalStoresInstrumented << "\n";
+
+            return retVal;
         }
 
-        void getAnalysisUsage(AnalysisUsage &AU) const override {
+        /*void getAnalysisUsage(AnalysisUsage &AU) const override {
             AU.addRequired<CallGraphWrapperPass>();
             AU.addRequired<LoopInfoWrapperPass>();
-        }
+        }*/
 
     };
 
     char MMIOLoggerPass::ID = 0;
+    InstrumentationHelper *MMIOLoggerPass::currInstrHelper = nullptr;
+    static void registerSkeletonPass(const PassManagerBuilder &,
+                                     legacy::PassManagerBase &PM) {
+        PM.add(new MMIOLoggerPass());
+    }
+    static RegisterStandardPasses
+            RegisterMyPass(PassManagerBuilder::EP_EarlyAsPossible,
+                           registerSkeletonPass);
+
     static RegisterPass<MMIOLoggerPass> x("logmmio", "MMIO Logger - Log all reads and writes to MMIO.", false, false);
 }
