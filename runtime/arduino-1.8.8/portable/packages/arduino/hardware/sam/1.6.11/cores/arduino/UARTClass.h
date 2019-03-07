@@ -44,7 +44,7 @@ class UARTClass : public HardwareSerial
     };
     UARTClass(Uart* pUart, IRQn_Type dwIrq, uint32_t dwId, RingBuffer* pRx_buffer, RingBuffer* pTx_buffer);
 
-    virtual void begin(const uint32_t dwBaudRate);
+    virtual void begin(unsigned long dwBaudRate);
     void begin(const uint32_t dwBaudRate, const UARTModes config);
     void end(void);
     int available(void);

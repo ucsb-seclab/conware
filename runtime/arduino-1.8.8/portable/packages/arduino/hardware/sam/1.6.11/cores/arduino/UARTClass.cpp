@@ -35,7 +35,7 @@ UARTClass::UARTClass( Uart *pUart, IRQn_Type dwIrq, uint32_t dwId, RingBuffer *p
 
 // Public Methods //////////////////////////////////////////////////////////////
 
-void UARTClass::begin(const uint32_t dwBaudRate)
+void UARTClass::begin(unsigned long dwBaudRate)
 {
   begin(dwBaudRate, Mode_8N1);
 }
