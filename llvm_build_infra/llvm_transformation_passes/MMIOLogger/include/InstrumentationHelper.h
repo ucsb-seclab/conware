@@ -74,6 +74,8 @@ namespace Conware {
          * @return True if everything is fine.
          */
         bool instrumentStore(StoreInst *targetInstr);
+
+        bool instrumentCommonInstr(Instruction *targetInstr);
     };
 }
 

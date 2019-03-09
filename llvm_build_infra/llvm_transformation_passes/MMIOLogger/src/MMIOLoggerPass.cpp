@@ -117,38 +117,44 @@ namespace Conware {
             if (MMIOLoggerPass::currInstrHelper == nullptr) {
                 MMIOLoggerPass::currInstrHelper = new InstrumentationHelper(*currFunc.getParent());
             }
-            for (auto &currBB: currFunc) {
-                for (auto &currIns: currBB) {
-                    Instruction *currInstrPtr = &currIns;
-                    if (GetElementPtrInst *targetAccess = dyn_cast<GetElementPtrInst>(currInstrPtr)) {
-                        Type *accessedType = targetAccess->getPointerOperandType();
-                        Type *targetAccType = this->getStructureAccessType(accessedType);
-                        if (targetAccType->isStructTy() && targetAccType->getStructName().str() == "struct.Pio") {
-                            std::set<Instruction *> targetMemInstrs;
-                            targetMemInstrs.clear();
-                            // get all the load and store instructions that could use this.
-                            MemAccessFetcher::getTargetMemAccess(targetAccess, targetMemInstrs);
-                            // these are the instructions that need to be instrumented.
-                            for (auto curI: targetMemInstrs) {
-                                if (dyn_cast<LoadInst>(curI) != nullptr) {
-                                    this->currInstrHelper->instrumentLoad(dyn_cast<LoadInst>(curI));
-                                    totalLoadsInstrumented++;
-                                }
-                                if (dyn_cast<StoreInst>(curI) != nullptr) {
-                                    this->currInstrHelper->instrumentStore(dyn_cast<StoreInst>(curI));
-                                    totalStoresInstrumented++;
-                                }
-                                retVal = true;
-                            }
-                        }
 
+            if(currFunc.hasName() && currFunc.getName() == "delay") {
+                for (auto &currBB: currFunc) {
+                    for (auto &currIns: currBB) {
+                        Instruction *currInstrPtr = &currIns;
+                        if (GetElementPtrInst *targetAccess = dyn_cast<GetElementPtrInst>(currInstrPtr)) {
+                            Type *accessedType = targetAccess->getPointerOperandType();
+                            Type *targetAccType = this->getStructureAccessType(accessedType);
+                            if (targetAccType->isStructTy() && targetAccType->getStructName().str() == "struct.Pio") {
+                                std::set<Instruction *> targetMemInstrs;
+                                targetMemInstrs.clear();
+                                // get all the load and store instructions that could use this.
+                                MemAccessFetcher::getTargetMemAccess(targetAccess, targetMemInstrs);
+                                // these are the instructions that need to be instrumented.
+                                for (auto curI: targetMemInstrs) {
+                                    if (dyn_cast<LoadInst>(curI) != nullptr) {
+                                        this->currInstrHelper->instrumentLoad(dyn_cast<LoadInst>(curI));
+                                        totalLoadsInstrumented++;
+                                    }
+                                    if (dyn_cast<StoreInst>(curI) != nullptr) {
+                                        this->currInstrHelper->instrumentStore(dyn_cast<StoreInst>(curI));
+                                        totalStoresInstrumented++;
+                                    }
+                                    retVal = true;
+                                }
+                            }
+
+                        } else {
+                            this->currInstrHelper->instrumentCommonInstr(currInstrPtr);
+                            return true;
+                        }
                     }
                 }
-            }
 
-            dbgs() << "[*]  Function:" << currFunc.getName() << ", Num Loads Instrumented:"
-                   << totalLoadsInstrumented << ", Num Stores Instrumented:"
-                   << totalStoresInstrumented << "\n";
+                dbgs() << "[*]  Function:" << currFunc.getName() << ", Num Loads Instrumented:"
+                       << totalLoadsInstrumented << ", Num Stores Instrumented:"
+                       << totalStoresInstrumented << "\n";
+            }
 
             return retVal;
         }
