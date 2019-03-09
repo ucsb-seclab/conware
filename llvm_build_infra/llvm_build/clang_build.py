@@ -187,7 +187,7 @@ def build_using_clang(compile_commands, original_build_base,
                                              orig_bc_file + " -o " + transformation_bc_file
                     os.system(transformation_command)
                     bc_to_obj_cmd = transformation_info[curr_output_obj][1] + \
-                                    " -c " + orig_bc_file + \
+                                    " -c " + transformation_bc_file + \
                                     " -o " + curr_output_obj
 
                     os.system(bc_to_obj_cmd)
