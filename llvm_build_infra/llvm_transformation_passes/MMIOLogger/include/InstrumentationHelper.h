@@ -30,12 +30,14 @@ namespace Conware {
         Value *readStr;
         Value *writeStr;
         Function *targetPrintFunction;
+        Function *targetLogFunction;
 
         /***
          * Get pointer to the print function that should be called.
          * @return Pointer to the print function.
          */
         Function* getPrintfFunction();
+        Function* getLogFunction();
 
         /***
          * Get the format string to be used to print reads to the MMIO regions.
@@ -56,6 +58,7 @@ namespace Conware {
             this->readStr = nullptr;
             this->writeStr = nullptr;
             this->targetPrintFunction = nullptr;
+            this->targetLogFunction = nullptr;
 
         }
 

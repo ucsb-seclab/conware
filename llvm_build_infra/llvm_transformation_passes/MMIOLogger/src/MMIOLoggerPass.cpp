@@ -118,7 +118,7 @@ namespace Conware {
                 MMIOLoggerPass::currInstrHelper = new InstrumentationHelper(*currFunc.getParent());
             }
 
-            if(currFunc.hasName() && currFunc.getName() == "delay") {
+            if(currFunc.hasName() && currFunc.getName() == "delay" || true) {
                 for (auto &currBB: currFunc) {
                     for (auto &currIns: currBB) {
                         Instruction *currInstrPtr = &currIns;
@@ -145,8 +145,8 @@ namespace Conware {
                             }
 
                         } else {
-                            this->currInstrHelper->instrumentCommonInstr(currInstrPtr);
-                            return true;
+//                            this->currInstrHelper->instrumentCommonInstr(currInstrPtr);
+//                            return true;
                         }
                     }
                 }
