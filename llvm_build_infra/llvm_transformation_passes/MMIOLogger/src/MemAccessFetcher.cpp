@@ -36,6 +36,6 @@ namespace Conware {
 
     bool MemAccessFetcher::hasConstantOperand(Value *pointerOperand) {
         Value *stripPtrOp = pointerOperand->stripPointerCasts();
-        return dyn_cast<Constant>(stripPtrOp) != nullptr;
+        return dyn_cast<Constant>(stripPtrOp) != nullptr && dyn_cast<GlobalVariable>(stripPtrOp) == nullptr;
     }
 }

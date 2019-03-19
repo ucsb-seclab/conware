@@ -69,6 +69,9 @@ Value* InstrumentationHelper::createPointerToVoidPtrCast(IRBuilder<> &targetBuil
 }
 
 Value* InstrumentationHelper::createValueToUnsignedIntCast(IRBuilder<> &targetBuilder, Value *valueOp) {
+    if(valueOp->getType()->isPointerTy()) {
+        valueOp = targetBuilder.CreatePtrToInt(valueOp, IntegerType::getInt32Ty(this->targetCtx));
+    }
     return targetBuilder.CreateIntCast(valueOp, IntegerType::getInt32Ty(this->targetCtx), false);
 }
 
