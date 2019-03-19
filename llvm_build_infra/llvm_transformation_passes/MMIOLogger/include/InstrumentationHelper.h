@@ -17,6 +17,7 @@
 #include <llvm/Support/Debug.h>
 #include <llvm/Analysis/CFGPrinter.h>
 #include <llvm/IR/Module.h>
+#include <llvm/IR/IRBuilder.h>
 #include <set>
 
 using namespace llvm;
@@ -51,6 +52,22 @@ namespace Conware {
          */
         Value* getWritePrintString();
 
+        /***
+         * Create a cast from pointer to void* and return the void* value.
+         * @param targetBuilder IRBuilder to use.
+         * @param pointerOp Pointer operand to cast.
+         * @return Casted void*
+         */
+        Value* createPointerToVoidPtrCast(IRBuilder<> &targetBuilder, Value *pointerOp);
+
+        /***
+         * Create a cast from the given value to unsigned int.
+         * @param targetBuilder IRBuilder to use.
+         * @param valueOp Value to cast.
+         * @return Casted Value
+         */
+        Value* createValueToUnsignedIntCast(IRBuilder<> &targetBuilder, Value *valueOp);
+
     public:
         InstrumentationHelper(Module &currMod):
         targetModule(currMod),
@@ -79,6 +96,8 @@ namespace Conware {
         bool instrumentStore(StoreInst *targetInstr);
 
         bool instrumentCommonInstr(Instruction *targetInstr);
+
+
     };
 }
 

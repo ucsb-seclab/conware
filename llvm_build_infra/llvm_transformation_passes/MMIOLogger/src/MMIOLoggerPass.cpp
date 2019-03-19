@@ -60,6 +60,10 @@ namespace Conware {
             return currType;
         }
 
+        bool isAlreadyProcessed(std::set<Value*> &processedInstructions, Value *currInstr) {
+            return processedInstructions.find(currInstr) != processedInstructions.end();
+        }
+
         /***
          * Process the current function.
          * @param currFunc Target function to process.
@@ -107,12 +111,14 @@ namespace Conware {
 
         bool runOnFunction(Function &currFunc) override {
             bool retVal = false;
+            std::set<Value*> processedInstructions;
 #ifdef ONLYSANITY
             return retVal;
 #endif
 
             unsigned totalLoadsInstrumented = 0;
             unsigned totalStoresInstrumented = 0;
+            processedInstructions.clear();
 
             if (MMIOLoggerPass::currInstrHelper == nullptr) {
                 MMIOLoggerPass::currInstrHelper = new InstrumentationHelper(*currFunc.getParent());
@@ -122,6 +128,9 @@ namespace Conware {
                 for (auto &currBB: currFunc) {
                     for (auto &currIns: currBB) {
                         Instruction *currInstrPtr = &currIns;
+                        if(isAlreadyProcessed(processedInstructions, currInstrPtr)) {
+                            continue;
+                        }
                         if (GetElementPtrInst *targetAccess = dyn_cast<GetElementPtrInst>(currInstrPtr)) {
                             Type *accessedType = targetAccess->getPointerOperandType();
                             Type *targetAccType = this->getStructureAccessType(accessedType);
@@ -132,11 +141,16 @@ namespace Conware {
                                 MemAccessFetcher::getTargetMemAccess(targetAccess, targetMemInstrs);
                                 // these are the instructions that need to be instrumented.
                                 for (auto curI: targetMemInstrs) {
+                                    if(isAlreadyProcessed(processedInstructions, curI)) {
+                                        continue;
+                                    }
                                     if (dyn_cast<LoadInst>(curI) != nullptr) {
+                                        processedInstructions.insert(dyn_cast<LoadInst>(curI));
                                         this->currInstrHelper->instrumentLoad(dyn_cast<LoadInst>(curI));
                                         totalLoadsInstrumented++;
                                     }
                                     if (dyn_cast<StoreInst>(curI) != nullptr) {
+                                        processedInstructions.insert(dyn_cast<StoreInst>(curI));
                                         this->currInstrHelper->instrumentStore(dyn_cast<StoreInst>(curI));
                                         totalStoresInstrumented++;
                                     }
@@ -145,6 +159,22 @@ namespace Conware {
                             }
 
                         } else {
+                            LoadInst *currLDInstr = dyn_cast<LoadInst>(currInstrPtr);
+                            if (currLDInstr != nullptr &&
+                                MemAccessFetcher::hasConstantOperand(currLDInstr->getPointerOperand())) {
+                                processedInstructions.insert(currLDInstr);
+                                this->currInstrHelper->instrumentLoad(currLDInstr);
+                                totalLoadsInstrumented++;
+                            }
+
+                            StoreInst *currStInstr = dyn_cast<StoreInst>(currInstrPtr);
+
+                            if (currStInstr != nullptr &&
+                                MemAccessFetcher::hasConstantOperand(currStInstr->getPointerOperand())) {
+                                processedInstructions.insert(currStInstr);
+                                this->currInstrHelper->instrumentStore(currStInstr);
+                                totalStoresInstrumented++;
+                            }
 //                            this->currInstrHelper->instrumentCommonInstr(currInstrPtr);
 //                            return true;
                         }

@@ -5,7 +5,6 @@
 #include "InstrumentationHelper.h"
 #include <llvm/IR/TypeBuilder.h>
 #include <llvm/IR/LLVMContext.h>
-#include <llvm/IR/IRBuilder.h>
 
 using namespace Conware;
 
@@ -26,7 +25,7 @@ Function* InstrumentationHelper::getPrintfFunction() {
 Function* InstrumentationHelper::getLogFunction() {
     if(this->targetLogFunction == nullptr) {
         FunctionType *conware_log_type =
-                TypeBuilder<int(int *, int, int), false>::get(this->targetCtx);
+                TypeBuilder<int(void *, unsigned, unsigned), false>::get(this->targetCtx);
 
         Function *func = cast<Function>(this->targetModule.getOrInsertFunction("conware_log", conware_log_type));
 
@@ -65,6 +64,14 @@ Value* InstrumentationHelper::getWritePrintString() {
     return this->writeStr;
 }
 
+Value* InstrumentationHelper::createPointerToVoidPtrCast(IRBuilder<> &targetBuilder, Value *pointerOp) {
+    return targetBuilder.CreatePointerCast(pointerOp, IntegerType::getInt8PtrTy(this->targetCtx));
+}
+
+Value* InstrumentationHelper::createValueToUnsignedIntCast(IRBuilder<> &targetBuilder, Value *valueOp) {
+    return targetBuilder.CreateIntCast(valueOp, IntegerType::getInt32Ty(this->targetCtx), false);
+}
+
 bool InstrumentationHelper::instrumentLoad(LoadInst *targetInstr) {
     bool retVal = true;
 
@@ -80,6 +87,9 @@ bool InstrumentationHelper::instrumentLoad(LoadInst *targetInstr) {
         // get the arguments for the function.
         Value *address = targetInstr->getPointerOperand();
         Value *targetValue = targetInstr;
+
+        address = this->createPointerToVoidPtrCast(builder, address);
+        targetValue = this->createValueToUnsignedIntCast(builder, targetValue);
 
 //        ConstantInt *readValue = ConstantInt::get(IntegerType::getInt32Ty(this->targetCtx), 1);
         Constant *readValue = Constant::getNullValue(IntegerType::getInt32Ty(this->targetCtx));
@@ -105,6 +115,9 @@ bool InstrumentationHelper::instrumentStore(StoreInst *targetInstr) {
         // get the arguments for the function.
         Value *address = targetInstr->getPointerOperand();
         Value *targetValue = targetInstr->getValueOperand();
+
+        address = this->createPointerToVoidPtrCast(builder, address);
+        targetValue = this->createValueToUnsignedIntCast(builder, targetValue);
 
         ConstantInt *writeValue = ConstantInt::get(IntegerType::getInt32Ty(this->targetCtx), 1);
 //        Constant *zero = Constant::getNullValue(IntegerType::getInt32Ty(this->targetCtx));

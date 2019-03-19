@@ -33,4 +33,9 @@ namespace Conware {
         visitedInstrs.clear();
         return MemAccessFetcher::getTargetMemAccessRecursive(srcInstr, visitedInstrs, targetMemAccesses);
     }
+
+    bool MemAccessFetcher::hasConstantOperand(Value *pointerOperand) {
+        Value *stripPtrOp = pointerOperand->stripPointerCasts();
+        return dyn_cast<Constant>(stripPtrOp) != nullptr;
+    }
 }
