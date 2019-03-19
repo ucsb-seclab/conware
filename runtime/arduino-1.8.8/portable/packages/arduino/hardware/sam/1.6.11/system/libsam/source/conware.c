@@ -10,6 +10,7 @@
 #define WRITE 1
 
 unsigned int CURRENT_INDEX = 0;
+int * RECORD_TIME[STORAGE_SIZE];
 int * RECORD_ADDRESS[STORAGE_SIZE];
 unsigned int RECORD_VALUE[STORAGE_SIZE];
 bool RECORD_OPERATION[STORAGE_SIZE];
@@ -20,9 +21,11 @@ bool PRINTING = false;
 void conware_print_results() {
     PRINTING = true;
     int x = 0;
+    iprintf("CONWAREDUMP_START\n\r");
     for (;x < STORAGE_SIZE;x++) {
-        iprintf("%d\t%08X\t%08x\n\r", RECORD_OPERATION[x], RECORD_ADDRESS[x], RECORD_VALUE[x]);
+        iprintf("%d\t%d\t%d\t%08X\t%08x\n\r", x, RECORD_TIME[x], RECORD_OPERATION[x], RECORD_ADDRESS[x], RECORD_VALUE[x]);
     }
+    iprintf("CONWAREDUMP_END\n\r");
     CURRENT_INDEX = 0;
     PRINTING = false;
 }
@@ -37,6 +40,7 @@ void conware_log(int * address, unsigned int value, unsigned int operation) {
         return;
 
     if (CURRENT_INDEX < STORAGE_SIZE) {
+        RECORD_TIME[CURRENT_INDEX] = SysTick->VAL;
         RECORD_ADDRESS[CURRENT_INDEX] = address;
         RECORD_VALUE[CURRENT_INDEX] = value;
         RECORD_OPERATION[CURRENT_INDEX] = operation;

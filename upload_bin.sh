@@ -7,4 +7,4 @@ stty -F /dev/$tty $baud
 
 ./runtime/arduino-1.8.8/portable/packages/arduino/tools/bossac/1.6.1-arduino/bossac -i -d --port=$tty -U false -e -w -v -b $1 -R
 
-screen /dev/$tty 9600
+#screen /dev/$tty 9600
