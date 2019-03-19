@@ -53,6 +53,13 @@ namespace Conware {
          */
         static bool getTargetMemAccess(Instruction *srcInstr,
                                        std::set<Instruction*> &targetMemAccesses);
+
+        /***
+         * Check if the provided operand is a constant operand.
+         * @param pointerOperand Operand to be checked.
+         * @return true if constant else false.
+         */
+        static bool hasConstantOperand(Value *pointerOperand);
     };
 }
 #endif //PROJECT_MEMACCESSFETCHER_H

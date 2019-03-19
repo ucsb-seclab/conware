@@ -11,7 +11,7 @@
 
 unsigned int CURRENT_INDEX = 0;
 int * RECORD_TIME[STORAGE_SIZE];
-int * RECORD_ADDRESS[STORAGE_SIZE];
+void * RECORD_ADDRESS[STORAGE_SIZE];
 unsigned int RECORD_VALUE[STORAGE_SIZE];
 bool RECORD_OPERATION[STORAGE_SIZE];
 
@@ -30,7 +30,7 @@ void conware_print_results() {
     PRINTING = false;
 }
 
-void conware_log(int * address, unsigned int value, unsigned int operation) {
+void conware_log(void * address, unsigned int value, unsigned int operation) {
     // Only instrument MMIO
     if (address < 0x40000000 || address > 0x40000000+0x20000000)
         return;
@@ -40,7 +40,7 @@ void conware_log(int * address, unsigned int value, unsigned int operation) {
         return;
 
     if (CURRENT_INDEX < STORAGE_SIZE) {
-        RECORD_TIME[CURRENT_INDEX] = SysTick->VAL;
+        RECORD_TIME[CURRENT_INDEX] = 0;
         RECORD_ADDRESS[CURRENT_INDEX] = address;
         RECORD_VALUE[CURRENT_INDEX] = value;
         RECORD_OPERATION[CURRENT_INDEX] = operation;

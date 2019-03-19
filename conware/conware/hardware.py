@@ -15,7 +15,7 @@ class Arduino:
 
         from subprocess import call
         call(["bossac", "-i", "-d",
-              "--port=%s" % self.device_location, "-U", "false"
+              "--port=%s" % self.device_location, "-U", "false",
                                                         "-e", "-w", "-v", "-b",
               binary_filename, "-R"])
 
@@ -39,6 +39,7 @@ class Arduino:
                     # data = line.split("\t")
                     logger.debug(line)
                     data_log.write(line)
+                    data_log.write("\n")
                     dump_count += 1
                 else:
                     print line
