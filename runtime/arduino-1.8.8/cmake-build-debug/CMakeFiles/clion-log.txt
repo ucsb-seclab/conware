@@ -1,1 +1,1 @@
-CMakeLists.txt not found in /home/cspensky/projects/pretender/arduino/arduino-1.8.8
+CMakeLists.txt not found in /home/cspensky/projects/conware/runtime/arduino-1.8.8

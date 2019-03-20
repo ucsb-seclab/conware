@@ -2,6 +2,8 @@ import serial
 
 import logging
 
+from pretender.logger import LogWriter
+
 logger = logging.getLogger(__name__)
 
 
@@ -23,12 +25,12 @@ class Arduino:
         ser = serial.Serial('/dev/%s' % self.device_location)
 
         dumping = False
-        data_log = open(output_filename, "w+")
+        data_log = LogWriter(output_filename)
         dump_count = 0
         logger.info("Waiting for data to dump...")
         while True:
             try:
-                line = ser.readline().strip()
+                line = ser.readline().strip("\r").strip("\n")
                 if "CONWAREDUMP_START" in line:
                     logger.info("Dumping recording...")
                     dumping = True
@@ -36,13 +38,13 @@ class Arduino:
                     logger.info("Dump done (%d events recorded)." % dump_count)
                     break
                 elif dumping:
-                    # data = line.split("\t")
+                    data = line.split("\t")
                     logger.debug(line)
-                    data_log.write(line)
-                    data_log.write("\n")
+                    data_log.write_row(data)
                     dump_count += 1
                 else:
                     print line
             except KeyboardInterrupt:
                 break
+        data_log.close()
         ser.close()

@@ -5,13 +5,14 @@ git submodule init
 git submodule update --init --recursive
 cd avatar2-pretender
 git checkout master
+git pull
 
 # Install depedencies
 pip install -e .
 
 # Fix keystone
-cp $VIRTUAL_ENV/lib/python2.7/site-packages/keystone/* $VIRTUAL_ENV/lib/python2.7/site-packages/keystone/
-
+#cp $VIRTUAL_ENV/lib/python2.7/site-packages/keystone/* $VIRTUAL_ENV/lib/python2.7/site-packages/keystone/
+cp $VIRTUAL_ENV/lib/python2.7/site-packages$VIRTUAL_ENV/lib/python2.7/site-packages/keystone/* $VIRTUAL_ENV/lib/python2.7/site-packages/keystone/
 # Build qemu
 pwd
 cd ./targets/src/avatar-qemu/
