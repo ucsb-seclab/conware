@@ -41,7 +41,47 @@ namespace Conware {
         static char ID;
         static InstrumentationHelper *currInstrHelper;
 
+        std::set<std::string> structSet;
         MMIOLoggerPass() : FunctionPass(ID) {
+            // Add all of the peripheral structs to be instrumented
+            structSet.insert("struct.Adc");
+            structSet.insert("struct.Can");
+            structSet.insert("struct.CanMb");
+            structSet.insert("struct.Chipid");
+            structSet.insert("struct.Dacc");
+            structSet.insert("struct.Dmac");
+            structSet.insert("struct.DmacCh_num");
+            structSet.insert("struct.Efc");
+            structSet.insert("struct.Emac");
+            structSet.insert("struct.EmacSa");
+            structSet.insert("struct.Gpbr");
+            structSet.insert("struct.Hsmci");
+            structSet.insert("struct.Matrix");
+            structSet.insert("struct.Pdc");
+            structSet.insert("struct.Pio");
+            structSet.insert("struct.Pmc");
+            structSet.insert("struct.Pwm");
+            structSet.insert("struct.PwmCmp");
+            structSet.insert("struct.PwmCh_num");
+            structSet.insert("struct.Rstc");
+            structSet.insert("struct.Rtc");
+            structSet.insert("struct.Rtt");
+            structSet.insert("struct.Sdramc");
+            structSet.insert("struct.Smc");
+            structSet.insert("struct.SmcCs_number");
+            structSet.insert("struct.Spi");
+            structSet.insert("struct.Ssc");
+            structSet.insert("struct.Supc");
+            structSet.insert("struct.Tc");
+            structSet.insert("struct.TcChannel");
+            structSet.insert("struct.Trng");
+            structSet.insert("struct.Twi");
+            structSet.insert("struct.Uart");
+            structSet.insert("struct.Uotghs");
+            structSet.insert("struct.UotghsHstdma");
+            structSet.insert("struct.UotghsDevdma");
+            structSet.insert("struct.Usart");
+            structSet.insert("struct.Wdt");
         }
 
         ~MMIOLoggerPass() {
@@ -134,7 +174,10 @@ namespace Conware {
                         if (GetElementPtrInst *targetAccess = dyn_cast<GetElementPtrInst>(currInstrPtr)) {
                             Type *accessedType = targetAccess->getPointerOperandType();
                             Type *targetAccType = this->getStructureAccessType(accessedType);
-                            if (targetAccType->isStructTy() && targetAccType->getStructName().str() == "struct.Pio") {
+
+                            // Is this one of the structures that maps to a peripheral?
+                            if (targetAccType->isStructTy() &&
+                                    structSet.find(targetAccType->getStructName().str()) != structSet.end()) {
                                 std::set<Instruction *> targetMemInstrs;
                                 targetMemInstrs.clear();
                                 // get all the load and store instructions that could use this.

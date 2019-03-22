@@ -26,7 +26,7 @@ void conware_print_results() {
     for (;x < STORAGE_SIZE;x++) {
 //        iprintf("%d\t%d\t%d\t%08X\t%08x\n\r", x, RECORD_TIME[x], RECORD_OPERATION[x], RECORD_ADDRESS[x], RECORD_VALUE[x]);
         //format: ['Operation', 'Seqn', 'Address', 'Value', 'Value (Model)', 'PC', 'Size', 'Timestamp', 'Model']
-        iprintf("%d\t%d\t%08x\t%08X\t\t%p\t4\t%d\t\n\r",
+        iprintf("%d\t%d\t%08x\t%08x\t\t%p\t4\t%d\t\n\r",
                 RECORD_OPERATION[x],
                 x,
                 RECORD_ADDRESS[x],

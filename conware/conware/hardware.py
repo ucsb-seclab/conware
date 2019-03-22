@@ -39,7 +39,14 @@ class Arduino:
                     break
                 elif dumping:
                     data = line.split("\t")
-                    logger.debug(line)
+                    if data[0] == "1":
+                        data[0] = "WRITE"
+                    elif data[0] == "0":
+                        data[0] = "READ"
+                    else:
+                        logger.error("Got an operation that we don't "
+                                     "recognize! (%s)" % data[0])
+                    logger.debug(data)
                     data_log.write_row(data)
                     dump_count += 1
                 else:
