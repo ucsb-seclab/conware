@@ -18,7 +18,7 @@ class Arduino:
         from subprocess import call
         call(["bossac", "-i", "-d",
               "--port=%s" % self.device_location, "-U", "false",
-                                                        "-e", "-w", "-v", "-b",
+              "-e", "-w", "-v", "-b",
               binary_filename, "-R"])
 
     def log_data(self, output_filename):
@@ -46,8 +46,15 @@ class Arduino:
                     else:
                         logger.error("Got an operation that we don't "
                                      "recognize! (%s)" % data[0])
+
                     logger.debug(data)
-                    data_log.write_row(data)
+                    data_log.write_row(data[:-1])
+
+                    repeated = int(data[-1])
+                    if repeated > 0:
+                        logger.debug("Repeating %d times..." % repeated)
+                    for x in xrange(repeated):
+                        data_log.write_row(data[:-1])
                     dump_count += 1
                 else:
                     print line

@@ -31,3 +31,5 @@ echo "export LLVM_DIR=$PWD/runtime/llvm-7.0.1.obj" >> .envrc
 echo "PATH_add $PWD/runtime/llvm-7.0.1.obj/bin" >> .envrc 
 
 direnv allow .
+
+sudo apt-get install graphviz
