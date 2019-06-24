@@ -5,7 +5,6 @@
 #include "InstrumentationHelper.h"
 #include <llvm/IR/TypeBuilder.h>
 #include <llvm/IR/LLVMContext.h>
-#include <llvm/IR/IRBuilder.h>
 
 using namespace Conware;
 
@@ -23,9 +22,23 @@ Function* InstrumentationHelper::getPrintfFunction() {
     return this->targetPrintFunction;
 }
 
+Function* InstrumentationHelper::getLogFunction() {
+    if(this->targetLogFunction == nullptr) {
+        FunctionType *conware_log_type =
+                TypeBuilder<int(void *, unsigned, unsigned), false>::get(this->targetCtx);
+
+        Function *func = cast<Function>(this->targetModule.getOrInsertFunction("conware_log", conware_log_type));
+
+        func->setCallingConv(CallingConv::ARM_AAPCS);
+
+        this->targetLogFunction = func;
+    }
+    return this->targetLogFunction;
+}
+
 Value* InstrumentationHelper::getReadPrintString() {
     if(this->readStr == nullptr) {
-        Constant *strConstant = ConstantDataArray::getString(this->targetCtx, "Read: %d from MMIO Address: %p\n");
+        Constant *strConstant = ConstantDataArray::getString(this->targetCtx, "Read: from MMIO Address");
         GlobalVariable *GVStr =
                 new GlobalVariable(this->targetModule, strConstant->getType(), true,
                                    GlobalValue::InternalLinkage, strConstant);
@@ -39,7 +52,7 @@ Value* InstrumentationHelper::getReadPrintString() {
 
 Value* InstrumentationHelper::getWritePrintString() {
     if(this->writeStr == nullptr) {
-        Constant *strConstant = ConstantDataArray::getString(this->targetCtx, "Wrote: %d to MMIO Address: %p\n");
+        Constant *strConstant = ConstantDataArray::getString(this->targetCtx, "Wrote: to MMIO Address");
         GlobalVariable *GVStr =
                 new GlobalVariable(this->targetModule, strConstant->getType(), true,
                                    GlobalValue::InternalLinkage, strConstant);
@@ -51,6 +64,17 @@ Value* InstrumentationHelper::getWritePrintString() {
     return this->writeStr;
 }
 
+Value* InstrumentationHelper::createPointerToVoidPtrCast(IRBuilder<> &targetBuilder, Value *pointerOp) {
+    return targetBuilder.CreatePointerCast(pointerOp, IntegerType::getInt8PtrTy(this->targetCtx));
+}
+
+Value* InstrumentationHelper::createValueToUnsignedIntCast(IRBuilder<> &targetBuilder, Value *valueOp) {
+    if(valueOp->getType()->isPointerTy()) {
+        valueOp = targetBuilder.CreatePtrToInt(valueOp, IntegerType::getInt32Ty(this->targetCtx));
+    }
+    return targetBuilder.CreateIntCast(valueOp, IntegerType::getInt32Ty(this->targetCtx), false);
+}
+
 bool InstrumentationHelper::instrumentLoad(LoadInst *targetInstr) {
     bool retVal = true;
 
@@ -60,16 +84,19 @@ bool InstrumentationHelper::instrumentLoad(LoadInst *targetInstr) {
         targetInsertPoint++;
         IRBuilder<> builder(&(*targetInsertPoint));
 
-        // get the printf function.
-        Function *targetPrintFunc = this->getPrintfFunction();
+        // get the log function
+        Function *targetLogFunction = this->getLogFunction();
 
         // get the arguments for the function.
-        Value *formatString = this->getReadPrintString();
         Value *address = targetInstr->getPointerOperand();
         Value *targetValue = targetInstr;
 
-        // insert the call.
-        builder.CreateCall(targetPrintFunc, {formatString, address, targetValue});
+        address = this->createPointerToVoidPtrCast(builder, address);
+        targetValue = this->createValueToUnsignedIntCast(builder, targetValue);
+
+//        ConstantInt *readValue = ConstantInt::get(IntegerType::getInt32Ty(this->targetCtx), 1);
+        Constant *readValue = Constant::getNullValue(IntegerType::getInt32Ty(this->targetCtx));
+        builder.CreateCall(targetLogFunction, {address, targetValue, readValue});
     } catch (const std::exception& e) {
         dbgs() << "[?] Error occurred while trying to instrument load instruction:" << e.what() << "\n";
         retVal = false;
@@ -85,20 +112,45 @@ bool InstrumentationHelper::instrumentStore(StoreInst *targetInstr) {
         targetInsertPoint++;
         IRBuilder<> builder(&(*targetInsertPoint));
 
-        // get the printf function.
-        Function *targetPrintFunc = this->getPrintfFunction();
+        // get the log function
+        Function *targetLogFunction = this->getLogFunction();
 
         // get the arguments for the function.
-        Value *formatString = this->getWritePrintString();
         Value *address = targetInstr->getPointerOperand();
         Value *targetValue = targetInstr->getValueOperand();
 
-        // insert the call.
-        builder.CreateCall(targetPrintFunc, {formatString, address, targetValue});
+        address = this->createPointerToVoidPtrCast(builder, address);
+        targetValue = this->createValueToUnsignedIntCast(builder, targetValue);
+
+        ConstantInt *writeValue = ConstantInt::get(IntegerType::getInt32Ty(this->targetCtx), 1);
+//        Constant *zero = Constant::getNullValue(IntegerType::getInt32Ty(this->targetCtx));
+        builder.CreateCall(targetLogFunction, {address, targetValue, writeValue});
     } catch (const std::exception& e) {
         dbgs() << "[?] Error occurred while trying to instrument store instruction:" << e.what() << "\n";
         retVal = false;
     }
     return retVal;
 
+}
+
+bool InstrumentationHelper::instrumentCommonInstr(Instruction *targetInstr) {
+    bool retVal = true;
+    try {
+        // set the insertion point to be after the store instruction.
+        auto targetInsertPoint = targetInstr->getIterator();
+        targetInsertPoint++;
+        IRBuilder<> builder(targetInstr);
+
+        // get the log function
+        Function *targetLogFunction = this->getLogFunction();
+
+//        builder.CreateCall(targetPrintFunc, {formatString});
+        Constant *zero = Constant::getNullValue(IntegerType::getInt32Ty(this->targetCtx));
+        //builder.CreateCall(targetLogFunction, {zero, zero, zero});
+
+    } catch (const std::exception& e) {
+        dbgs() << "[?] Error occurred while trying to instrument store instruction:" << e.what() << "\n";
+        retVal = false;
+    }
+    return retVal;
 }

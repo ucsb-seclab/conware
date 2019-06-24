@@ -41,7 +41,47 @@ namespace Conware {
         static char ID;
         static InstrumentationHelper *currInstrHelper;
 
+        std::set<std::string> structSet;
         MMIOLoggerPass() : FunctionPass(ID) {
+            // Add all of the peripheral structs to be instrumented
+            structSet.insert("struct.Adc");
+            structSet.insert("struct.Can");
+            structSet.insert("struct.CanMb");
+            structSet.insert("struct.Chipid");
+            structSet.insert("struct.Dacc");
+            structSet.insert("struct.Dmac");
+            structSet.insert("struct.DmacCh_num");
+            structSet.insert("struct.Efc");
+            structSet.insert("struct.Emac");
+            structSet.insert("struct.EmacSa");
+            structSet.insert("struct.Gpbr");
+            structSet.insert("struct.Hsmci");
+            structSet.insert("struct.Matrix");
+            structSet.insert("struct.Pdc");
+            structSet.insert("struct.Pio");
+            structSet.insert("struct.Pmc");
+            structSet.insert("struct.Pwm");
+            structSet.insert("struct.PwmCmp");
+            structSet.insert("struct.PwmCh_num");
+            structSet.insert("struct.Rstc");
+            structSet.insert("struct.Rtc");
+            structSet.insert("struct.Rtt");
+            structSet.insert("struct.Sdramc");
+            structSet.insert("struct.Smc");
+            structSet.insert("struct.SmcCs_number");
+            structSet.insert("struct.Spi");
+            structSet.insert("struct.Ssc");
+            structSet.insert("struct.Supc");
+            structSet.insert("struct.Tc");
+            structSet.insert("struct.TcChannel");
+            structSet.insert("struct.Trng");
+            structSet.insert("struct.Twi");
+            structSet.insert("struct.Uart");
+            structSet.insert("struct.Uotghs");
+            structSet.insert("struct.UotghsHstdma");
+            structSet.insert("struct.UotghsDevdma");
+            structSet.insert("struct.Usart");
+            structSet.insert("struct.Wdt");
         }
 
         ~MMIOLoggerPass() {
@@ -58,6 +98,10 @@ namespace Conware {
                 return this->getStructureAccessType(currPtrType->getPointerElementType());
             }
             return currType;
+        }
+
+        bool isAlreadyProcessed(std::set<Value*> &processedInstructions, Value *currInstr) {
+            return processedInstructions.find(currInstr) != processedInstructions.end();
         }
 
         /***
@@ -107,48 +151,83 @@ namespace Conware {
 
         bool runOnFunction(Function &currFunc) override {
             bool retVal = false;
+            std::set<Value*> processedInstructions;
 #ifdef ONLYSANITY
             return retVal;
 #endif
 
             unsigned totalLoadsInstrumented = 0;
             unsigned totalStoresInstrumented = 0;
+            processedInstructions.clear();
 
             if (MMIOLoggerPass::currInstrHelper == nullptr) {
                 MMIOLoggerPass::currInstrHelper = new InstrumentationHelper(*currFunc.getParent());
             }
-            for (auto &currBB: currFunc) {
-                for (auto &currIns: currBB) {
-                    Instruction *currInstrPtr = &currIns;
-                    if (GetElementPtrInst *targetAccess = dyn_cast<GetElementPtrInst>(currInstrPtr)) {
-                        Type *accessedType = targetAccess->getPointerOperandType();
-                        Type *targetAccType = this->getStructureAccessType(accessedType);
-                        if (targetAccType->isStructTy() && targetAccType->getStructName().str() == "struct.Pio") {
-                            std::set<Instruction *> targetMemInstrs;
-                            targetMemInstrs.clear();
-                            // get all the load and store instructions that could use this.
-                            MemAccessFetcher::getTargetMemAccess(targetAccess, targetMemInstrs);
-                            // these are the instructions that need to be instrumented.
-                            for (auto curI: targetMemInstrs) {
-                                if (dyn_cast<LoadInst>(curI) != nullptr) {
-                                    this->currInstrHelper->instrumentLoad(dyn_cast<LoadInst>(curI));
-                                    totalLoadsInstrumented++;
-                                }
-                                if (dyn_cast<StoreInst>(curI) != nullptr) {
-                                    this->currInstrHelper->instrumentStore(dyn_cast<StoreInst>(curI));
-                                    totalStoresInstrumented++;
-                                }
-                                retVal = true;
-                            }
-                        }
 
+            if(currFunc.hasName() && currFunc.getName() == "delay" || true) {
+                for (auto &currBB: currFunc) {
+                    for (auto &currIns: currBB) {
+                        Instruction *currInstrPtr = &currIns;
+                        if(isAlreadyProcessed(processedInstructions, currInstrPtr)) {
+                            continue;
+                        }
+                        if (GetElementPtrInst *targetAccess = dyn_cast<GetElementPtrInst>(currInstrPtr)) {
+                            Type *accessedType = targetAccess->getPointerOperandType();
+                            Type *targetAccType = this->getStructureAccessType(accessedType);
+
+                            // Is this one of the structures that maps to a peripheral?
+                            if (targetAccType->isStructTy() &&
+                                    structSet.find(targetAccType->getStructName().str()) != structSet.end()) {
+                                std::set<Instruction *> targetMemInstrs;
+                                targetMemInstrs.clear();
+                                // get all the load and store instructions that could use this.
+                                MemAccessFetcher::getTargetMemAccess(targetAccess, targetMemInstrs);
+                                // these are the instructions that need to be instrumented.
+                                for (auto curI: targetMemInstrs) {
+                                    if(isAlreadyProcessed(processedInstructions, curI)) {
+                                        continue;
+                                    }
+                                    if (dyn_cast<LoadInst>(curI) != nullptr) {
+                                        processedInstructions.insert(dyn_cast<LoadInst>(curI));
+                                        this->currInstrHelper->instrumentLoad(dyn_cast<LoadInst>(curI));
+                                        totalLoadsInstrumented++;
+                                    }
+                                    if (dyn_cast<StoreInst>(curI) != nullptr) {
+                                        processedInstructions.insert(dyn_cast<StoreInst>(curI));
+                                        this->currInstrHelper->instrumentStore(dyn_cast<StoreInst>(curI));
+                                        totalStoresInstrumented++;
+                                    }
+                                    retVal = true;
+                                }
+                            }
+
+                        } else {
+                            LoadInst *currLDInstr = dyn_cast<LoadInst>(currInstrPtr);
+                            if (currLDInstr != nullptr &&
+                                MemAccessFetcher::hasConstantOperand(currLDInstr->getPointerOperand())) {
+                                processedInstructions.insert(currLDInstr);
+                                this->currInstrHelper->instrumentLoad(currLDInstr);
+                                totalLoadsInstrumented++;
+                            }
+
+                            StoreInst *currStInstr = dyn_cast<StoreInst>(currInstrPtr);
+
+                            if (currStInstr != nullptr &&
+                                MemAccessFetcher::hasConstantOperand(currStInstr->getPointerOperand())) {
+                                processedInstructions.insert(currStInstr);
+                                this->currInstrHelper->instrumentStore(currStInstr);
+                                totalStoresInstrumented++;
+                            }
+//                            this->currInstrHelper->instrumentCommonInstr(currInstrPtr);
+//                            return true;
+                        }
                     }
                 }
-            }
 
-            dbgs() << "[*]  Function:" << currFunc.getName() << ", Num Loads Instrumented:"
-                   << totalLoadsInstrumented << ", Num Stores Instrumented:"
-                   << totalStoresInstrumented << "\n";
+                dbgs() << "[*]  Function:" << currFunc.getName() << ", Num Loads Instrumented:"
+                       << totalLoadsInstrumented << ", Num Stores Instrumented:"
+                       << totalStoresInstrumented << "\n";
+            }
 
             return retVal;
         }

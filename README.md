@@ -21,3 +21,5 @@ The actual pins are defined in `runtime/arduino-1.8.8/portable/packages/arduino/
 #define SysTick             ((SysTick_Type   *)     SysTick_BASE  )   /*!< SysTick configuration struct       */
 #define NVIC                ((NVIC_Type      *)     NVIC_BASE     )   /*!< NVIC configuration struct          */
 ```
+
+All of the MMIO structures are defined in `sam/system/CMSIS/Device/ATMEL/sam3xa/include/component/`

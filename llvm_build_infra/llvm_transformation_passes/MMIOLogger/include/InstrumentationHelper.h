@@ -17,6 +17,7 @@
 #include <llvm/Support/Debug.h>
 #include <llvm/Analysis/CFGPrinter.h>
 #include <llvm/IR/Module.h>
+#include <llvm/IR/IRBuilder.h>
 #include <set>
 
 using namespace llvm;
@@ -30,12 +31,14 @@ namespace Conware {
         Value *readStr;
         Value *writeStr;
         Function *targetPrintFunction;
+        Function *targetLogFunction;
 
         /***
          * Get pointer to the print function that should be called.
          * @return Pointer to the print function.
          */
         Function* getPrintfFunction();
+        Function* getLogFunction();
 
         /***
          * Get the format string to be used to print reads to the MMIO regions.
@@ -49,6 +52,22 @@ namespace Conware {
          */
         Value* getWritePrintString();
 
+        /***
+         * Create a cast from pointer to void* and return the void* value.
+         * @param targetBuilder IRBuilder to use.
+         * @param pointerOp Pointer operand to cast.
+         * @return Casted void*
+         */
+        Value* createPointerToVoidPtrCast(IRBuilder<> &targetBuilder, Value *pointerOp);
+
+        /***
+         * Create a cast from the given value to unsigned int.
+         * @param targetBuilder IRBuilder to use.
+         * @param valueOp Value to cast.
+         * @return Casted Value
+         */
+        Value* createValueToUnsignedIntCast(IRBuilder<> &targetBuilder, Value *valueOp);
+
     public:
         InstrumentationHelper(Module &currMod):
         targetModule(currMod),
@@ -56,6 +75,7 @@ namespace Conware {
             this->readStr = nullptr;
             this->writeStr = nullptr;
             this->targetPrintFunction = nullptr;
+            this->targetLogFunction = nullptr;
 
         }
 
@@ -74,6 +94,10 @@ namespace Conware {
          * @return True if everything is fine.
          */
         bool instrumentStore(StoreInst *targetInstr);
+
+        bool instrumentCommonInstr(Instruction *targetInstr);
+
+
     };
 }
 
