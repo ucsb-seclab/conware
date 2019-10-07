@@ -34,7 +34,7 @@ sudo make install
 
 # Install pretender dependencies
 cd ../
-cd python-pretender
+cd pretender
 pip install -r requirements.txt
 pip install -e .
 cd ..

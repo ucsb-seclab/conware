@@ -7,11 +7,12 @@ if [ ! -d cmake-3.13.4 ]; then
 	tar -xzvf cmake-3.13.4.tar.gz
 fi
 
-echo "Installing graphviz..."
-sudo apt-get-y install graphviz
+echo "Installing Ubuntu packages..."
+sudo apt-get -y install graphviz direnv
 
 echo "Installing ninja..."
 sudo apt-get -y install ninja-build || (echo "Could not install ninja" && exit 0)
+
 
 if [ ! -d llvm-7.0.1.src ]; then
 	wget http://releases.llvm.org/7.0.1/llvm-7.0.1.src.tar.xz
