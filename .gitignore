@@ -7,3 +7,10 @@ __pycache__/
 *.id*
 *.nam
 *.til
+.*
+*.zip
+*.gz
+*.tar
+*.a
+*.a.txt
+*build*
