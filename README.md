@@ -13,6 +13,26 @@ This log file is then consummed by `pretender-model-generate`, which will genera
 To optimize this model, which is the real power of conware, we execute `pretender-model-optimize`.
 
 
+## Installation
+
+1. we assume that you have [direnv](https://direnv.net/) installed, to help manage all of the environment path variables that must be set.
+Please install it (`sudo apt-get install -y direnv`) and [hook it into your shell](https://direnv.net/docs/hook.htm).
+
+2. We use LLVM and the arduino framework to build and manipulate our firmware.  To install these and setup your environment variables run (this will take a looong time...)
+```bash
+./install_dependencies.sh
+```
+
+3. We use a combination of Avatar^2 and Pretender to model our peripherals.  Too install both of these, we suggest using a [virtualenv](https://virtualenv.pypa.io/en/latest/).  
+Once virtualenv is isntalled and *conware* environment is created, run:
+```bash
+./install_pretender.sh
+```
+
+
+## Example usage
+
+
 ## Directory structure
 
 
