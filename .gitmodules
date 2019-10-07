@@ -3,4 +3,4 @@
 	url = git@git.seclab.cs.ucsb.edu:ahref/pretender.git
 [submodule "avatar2-pretender"]
 	path = avatar2-pretender
-	url = git@github.com:mariusmue/avatar2-pretender
+	url = git@github.com:cspensky/avatar2-pretender
