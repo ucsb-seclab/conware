@@ -7,6 +7,12 @@ if [ ! -d cmake-3.13.4 ]; then
 	tar -xzvf cmake-3.13.4.tar.gz
 fi
 
+echo "Installing graphviz..."
+sudo apt-get-y install graphviz
+
+echo "Installing ninja..."
+sudo apt-get -y install ninja-build || (echo "Could not install ninja" && exit 0)
+
 if [ ! -d llvm-7.0.1.src ]; then
 	wget http://releases.llvm.org/7.0.1/llvm-7.0.1.src.tar.xz
 	wget http://releases.llvm.org/7.0.1/cfe-7.0.1.src.tar.xz
@@ -18,9 +24,9 @@ fi
 
 mkdir -p llvm-7.0.1.obj
 cd llvm-7.0.1.obj
-cmake -DCMAKE_BUILD_TYPE=Debug ../llvm-7.0.1.src
-make -j4
-
+cmake -G Ninja -DCMAKE_BUILD_TYPE=Debug ../llvm-7.0.1.src
+#make -j4
+cmake --build .
 
 cd .. # runtime
 cd .. # back where we started
@@ -39,4 +45,3 @@ echo "PATH_add $PWD/runtime/arduino-1.8.8/portable/packages/arduino/tools/bossac
 
 direnv allow .
 
-sudo apt-get install graphviz
