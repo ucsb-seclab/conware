@@ -1,5 +1,19 @@
+# Conware
+Conware's goal is to automatically model hardware peripherals in software for emulation.
 
-#
+The overall arhitecture is as follows:
+
+
+[Arduino]+[Peripheral] + [LLVM Pass](llvm-transformation-pass/) --> [Log File (TSV)] --> `pretender-model-generate` --> `pretender-model-optimize` --> `pretender-emulate`
+
+The arduino code is instrumented with LLVM to record any MMIO read or write.
+This code is than run on a real arduino with the real peripheral attached.
+After a designated amount of time the log of all of the MMIO accesses are dumped over UART and stored in a log file.
+This log file is then consummed by `pretender-model-generate`, which will generate a _.pickle_ model file which can be consummed by `pretender-emulate` and run on emulated hardware.
+To optimize this model, which is the real power of conware, we execute `pretender-model-optimize`.
+
+
+## Directory structure
 
 
 # Notes
