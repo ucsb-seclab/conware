@@ -80,6 +80,16 @@ pretender-model-visualize -r firmware/custom/blink/
 ```
 The current version will dump PDF files, which can be opened to see the state machine. (e.g., _UART.gv.pdf_)
 
+7. Once the model is optmized, it can be used to rehost the firmware [IN PROGESS]
+```bash
+pretender-emulate
+```
+For example,
+```bash
+pretender-emulate --board-config pretender/configs/due.yaml -s firmware/custom/blink/build/blink.ino.bin  -r firmware/custom/blink -t 30
+```
+will run the firmware for 30 seconds in an emulator
+
 ## Directory structure
 
 
