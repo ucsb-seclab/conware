@@ -22,20 +22,24 @@ mkdir -p build
 mkdir -p build/qemu
 cd build/qemu
 ../../src/avatar-qemu/configure --disable-sdl --target-list=arm-softmmu
-make -j4
+make -j
 
 # install openocd
 cd ../../../../
 cd openocd
+git checkout edb6796
 ./bootstrap
 ./configure --enable-cmsis-dap --enable-jaylink
-make -j4
+make -j
 sudo make install
 
 # Install pretender dependencies
 cd ../
 cd pretender
+git checkout graphFork
 pip install -r requirements.txt
 pip install -e .
 cd ..
+
+pip install -r requirements.txt
 

@@ -33,14 +33,14 @@ cd .. # runtime
 cd .. # back where we started
 
 echo "export LLVM_SRC=$PWD/runtime/llvm-7.0.1.src" > .envrc
-echo "export LLVM_OBJ=$PWD/runtime/llvm-7.0.1.obj" > .envrc
-echo "export LLVM_DIR=$PWD/runtime/llvm-7.0.1.obj" > .envrc
-echo "export ARM_GCC_TOOLCHAIN=$PWD/runtime/arduino-1.8.8/portable/packages/arduino/tools/arm-none-eabi-gcc/4.8.3-2014q1/bin" > .envrc
-echo "export PYTHONPATH=$PYTHONPATH:$PWD/pretender:$PWD/conware:$PWD/avatar2-pretender" > .envrc
-echo "PATH_add $PWD/runtime/llvm-7.0.1.obj/bin" > .envrc
-echo "PATH_add $PWD/runtime/arduino-1.8.8/" > .envrc
-echo "PATH_add $PWD/pretender/bin" > .envrc
-echo "PATH_add $PWD/runtime/arduino-1.8.8/portable/packages/arduino/tools/bossac/1.6.1-arduino" > .envrc
+echo "export LLVM_OBJ=$PWD/runtime/llvm-7.0.1.obj" >> .envrc
+echo "export LLVM_DIR=$PWD/runtime/llvm-7.0.1.obj" >> .envrc
+echo "export ARM_GCC_TOOLCHAIN=$PWD/runtime/arduino-1.8.8/portable/packages/arduino/tools/arm-none-eabi-gcc/4.8.3-2014q1/bin" >> .envrc
+echo "export PYTHONPATH=$PYTHONPATH:$PWD/pretender:$PWD/conware:$PWD/avatar2-pretender" >> .envrc
+echo "PATH_add $PWD/runtime/llvm-7.0.1.obj/bin" >> .envrc
+echo "PATH_add $PWD/runtime/arduino-1.8.8/" >> .envrc
+echo "PATH_add $PWD/pretender/bin" >> .envrc
+echo "PATH_add $PWD/runtime/arduino-1.8.8/portable/packages/arduino/tools/bossac/1.6.1-arduino" >> .envrc
 
 
 
