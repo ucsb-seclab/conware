@@ -4,3 +4,6 @@
 [submodule "avatar2-pretender"]
 	path = avatar2-pretender
 	url = git@github.com:cspensky/avatar2-pretender
+[submodule "openocd"]
+	path = openocd
+	url = https://git.code.sf.net/p/openocd/code
