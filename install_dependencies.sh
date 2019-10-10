@@ -9,6 +9,7 @@ fi
 
 echo "Installing Ubuntu packages..."
 sudo apt-get -y install graphviz direnv
+sudo apt-get install -y libc6-dev-i386 
 
 echo "Installing ninja..."
 sudo apt-get -y install ninja-build || (echo "Could not install ninja" && exit 0)
