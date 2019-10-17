@@ -12,6 +12,8 @@ class PeripheralModel2:
     This class represents an external peripheral
     """
 
+
+    #Might want to mess around with this ID stuff to make merging easier
     global_nodeID = 0
 
     def __init__(self, addresses, name=None):

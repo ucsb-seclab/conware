@@ -27,6 +27,9 @@ class PeripheralModelState2:
         self.read_count = {}
         self.model_per_address_ordered = {}
         self.model_per_address = {}
+
+        #state number imported from old state model, not sure if we need it
+        #was used for visualization purposes, i haven't dove very deep into all of the different visualizations, just UART
         self.state_number = PeripheralModelState2.state_number
         PeripheralModelState2.state_number += 1
 
