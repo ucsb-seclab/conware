@@ -2,7 +2,7 @@ import logging
 import random
 import sys
 import networkx
-from .peripheral_state import PeripheralModelState
+from conware.peripheral_state import PeripheralModelState
 
 logger = logging.getLogger(__name__)
 
@@ -11,7 +11,6 @@ class PeripheralModel:
     """
     This class represents an external peripheral
     """
-
 
     #Might want to mess around with this ID stuff to make merging easier
     global_nodeID = 0
@@ -73,6 +72,48 @@ class PeripheralModel:
 
         for state in self.all_states:
             state.reset()
+
+
+    def _get_edge_lables(self, edge):
+        """
+        Return the (address, value) pair associated with a state transition
+
+        :param edge: Edge Label
+        :return: (address, value)
+        """
+        addresses = networkx.get_edge_attributes(self.graph, 'address')
+        values = networkx.get_edge_attributes(self.graph, 'value')
+        if edge in addresses:
+            return (addresses[edge], values[edge])
+        else:
+            return None
+
+    def _get_state(self, state_id):
+        """ Return the state given the state/node id """
+        return networkx.get_node_attributes(self.graph, 'state')[state_id]
+
+    def _merge_states(self, state_id_1, state_id_2):
+        """
+        merge state 2 into state 1
+        :param state_id_1: ID of the state to keep
+        :param state_id_2: ID of the state to merge into state 1
+        :return: True if merge succeeded, False otherwise
+        """
+        pass
+
+
+    def optimize(self):
+        """
+        This function will optimize the state machine, merging equivalent
+        states.
+        :return:
+        """
+        for e in networkx.dfs_edges(self.graph, self.start_state[0]):
+            print e
+            state = self._get_state(e[1])
+            print state
+            print len(state.reads)
+            print self._get_edge_lables(e)
 
 
 

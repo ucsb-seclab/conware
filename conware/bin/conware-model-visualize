@@ -70,13 +70,14 @@ if __name__ == "__main__":
         logger.info("Graphing %s..." % str(peripheral.name))
 
         if peripheral.name == "UART" or False:
+            peripheral.optimize()
             # for e in peripheral.graph.edges:
             #     print(e[0])
             # import IPython
             #
             # IPython.embed()
-            networkx.draw(peripheral.graph)
-            plt.show()
+            # networkx.draw(peripheral.graph)
+            # plt.show()
             print("Number of Nodes:")
             print(networkx.number_of_nodes(peripheral.graph))
             print("Number of Edges")

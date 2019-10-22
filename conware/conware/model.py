@@ -11,7 +11,7 @@ import numpy
 
 # Avatar 2
 
-from avatar2.peripherals.nucleo_usart import NucleoUSART
+# from avatar2.peripherals.nucleo_usart import NucleoUSART
 
 # Pretender
 import pretender.globals as G
