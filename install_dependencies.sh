@@ -41,6 +41,7 @@ echo "export PYTHONPATH=$PYTHONPATH:$PWD/pretender:$PWD/conware:$PWD/avatar2-pre
 echo "PATH_add $PWD/runtime/llvm-7.0.1.obj/bin" >> .envrc
 echo "PATH_add $PWD/runtime/arduino-1.8.8/" >> .envrc
 echo "PATH_add $PWD/pretender/bin" >> .envrc
+echo "PATH_add $PWD/conware/bin" >> .envrc
 echo "PATH_add $PWD/runtime/arduino-1.8.8/portable/packages/arduino/tools/bossac/1.6.1-arduino" >> .envrc
 
 
