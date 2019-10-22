@@ -1,3 +1,5 @@
+matplotlib
+IPython
 bitstring==3.1.5
 capstone==4.0.1
 configparser==3.7.3
