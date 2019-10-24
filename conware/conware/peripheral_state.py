@@ -15,9 +15,10 @@ class PeripheralModelState:
     """
     state_number = 0
 
-    def __init__(self, address, operation, value):
-        self.name = "%s:%s:%#x" % (operation, hex(address), value)
-        self.operation = operation
+    def __init__(self, address, operation, value, state_id):
+        self.state_id = state_id
+        #self.name = "%s:%s:%#x" % (operation, hex(address), value)
+        #self.operation = operation
         self.value = value
         self.reads = {}
         self.read_count = {}
@@ -41,7 +42,7 @@ class PeripheralModelState:
         if storage:
             m = SimpleStorageModel()
             m.train(read_log)
-            logger.info("Name %s is StorageModel" % self.name)
+            #logger.info("Name %s is StorageModel" % self.name)
 
         # Try Other Models
         if use_time_domain:
@@ -50,14 +51,13 @@ class PeripheralModelState:
                 m = model()
                 logger.debug("Trying model %s" % repr(m))
                 if m.train(read_log):
-                    logger.info(
-                        "Name %s is %s" % (self.name, repr(model)))
+                    #logger.info("Name %s is %s" % (self.name, repr(model)))
                     return m
         else:
             for model in [MarkovModel]:
                 m = model()
                 if m.train(read_log):
-                    logger.info("Name %s is %s" % (self.name, repr(model)))
+                    #logger.info("Name %s is %s" % (self.name, repr(model)))
                     return m
 
     def append_read(self, address, value, pc, size, timestamp):
