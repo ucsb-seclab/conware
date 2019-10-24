@@ -6,7 +6,7 @@ import fnmatch
 import os
 
 import sys
-#sys.path.append("/home/graham/Desktop/conware/conware/")
+sys.path.append("/home/graham/Desktop/conware/conware/")
 
 import logging
 
@@ -86,9 +86,31 @@ if __name__ == "__main__":
 
 
             plt.show()
-            print("Number of Nodes:")
-            print(networkx.number_of_nodes(peripheral.graph))
-            print("Number of Edges")
-            print(networkx.number_of_edges(peripheral.graph))
+            #print("Number of Nodes:")
+            #print(networkx.number_of_nodes(peripheral.graph))
+            #print("Number of Edges")
+            #print(networkx.number_of_edges(peripheral.graph))
+
+            # for node in peripheral.graph.nodes:
+            #     print("Node: " + str(node))
+            #     for key in peripheral.graph.nodes[node]["state"].model_per_address:
+            #         print ("Address: " + str(key))
+            #         print ("Model per Address: ", peripheral.graph.nodes[node]["state"].model_per_address[key])
+            #     for key in peripheral.graph.nodes[node]["state"].model_per_address_ordered:
+            #         print ("Address: " + str(key))
+            #         print ("Model per Address Ordered: ", peripheral.graph.nodes[node]["state"].model_per_address_ordered[key])
+            peripheral.optimize()
+            #state1 = peripheral.graph.nodes[0]
+            #state2 = peripheral.graph.nodes[1]
+            #peripheral.no_reads_merge(state1, state2)
+            print(peripheral.graph.nodes)
+
+            pos = networkx.spring_layout(peripheral.graph, k=.01, iterations=1500)
+            networkx.draw(peripheral.graph, pos, with_labels=True, node_size=200, font_size=6)
+
+            edge_labels = networkx.get_edge_attributes(peripheral.graph, 'r')
+            networkx.draw_networkx_edge_labels(peripheral.graph, pos, labels=edge_labels, font_size=6)
+
+            plt.show()
 
     print model

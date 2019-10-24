@@ -6,9 +6,9 @@ import fnmatch
 import os
 
 import sys
+sys.path.append("/home/graham/Desktop/conware/conware/")
 
 import logging
-
 from conware.model import PretenderModel
 import pretender.globals as G
 import pickle
