@@ -2,8 +2,10 @@ import logging
 import random
 import sys
 import networkx
+import networkx.algorithms.isomorphism as iso
 from conware.peripheral_state import PeripheralModelState
 
+import copy
 logger = logging.getLogger(__name__)
 
 
@@ -12,13 +14,14 @@ class PeripheralModel:
     This class represents an external peripheral
     """
 
+
     #Might want to mess around with this ID stuff to make merging easier
     global_nodeID = 0
 
     def __init__(self, addresses, name=None):
         self.all_states = []
         self.nodeID = 0
-        self.graph = networkx.DiGraph()  # May want to use MultiDiGraph instead, allows parallel edges
+        self.graph = networkx.MultiDiGraph()  # May want to use MultiDiGraph instead, allows parallel edges
         self.addresses = addresses
         self.name = name
         self.current_state = self.create_state(-1, "start", -1)
@@ -29,8 +32,8 @@ class PeripheralModel:
 
     def create_state(self, address, operation, value):
         # create state attributes
-        # state_id = PeripheralModel2.nodeID
-        state_id = (self.nodeID, PeripheralModel.global_nodeID)
+        state_id = self.nodeID
+        #state_id = (self.nodeID, PeripheralModel.global_nodeID) turns out we dont need this pair if all of the peripherals are separate graphs
         PeripheralModel.global_nodeID += 1
         state = PeripheralModelState(address, operation, value)
         attributes = {state_id: {'state': state}}
@@ -72,8 +75,6 @@ class PeripheralModel:
 
         for state in self.all_states:
             state.reset()
-
-
     def _get_edge_lables(self, edge):
         """
         Return the (address, value) pair associated with a state transition

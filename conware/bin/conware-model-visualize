@@ -6,6 +6,7 @@ import fnmatch
 import os
 
 import sys
+#sys.path.append("/home/graham/Desktop/conware/conware/")
 
 import logging
 
@@ -70,14 +71,20 @@ if __name__ == "__main__":
         logger.info("Graphing %s..." % str(peripheral.name))
 
         if peripheral.name == "UART" or False:
-            peripheral.optimize()
             # for e in peripheral.graph.edges:
             #     print(e[0])
             # import IPython
             #
             # IPython.embed()
-            # networkx.draw(peripheral.graph)
-            # plt.show()
+            print(peripheral.graph.nodes)
+            pos = networkx.spring_layout(peripheral.graph, k =.01, iterations=1500)
+            networkx.draw(peripheral.graph, pos, with_labels=True, node_size = 200, font_size = 6)
+
+            edge_labels = networkx.get_edge_attributes(peripheral.graph, 'r')
+            networkx.draw_networkx_edge_labels(peripheral.graph, pos, labels = edge_labels, font_size = 6)
+
+
+            plt.show()
             print("Number of Nodes:")
             print(networkx.number_of_nodes(peripheral.graph))
             print("Number of Edges")
