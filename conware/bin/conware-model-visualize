@@ -76,7 +76,8 @@ if __name__ == "__main__":
             # import IPython
             #
             # IPython.embed()
-            print(peripheral.graph.nodes)
+            # print(peripheral.graph.nodes)
+            peripheral.optimize()
             pos = networkx.spring_layout(peripheral.graph, k =.01, iterations=1500)
             networkx.draw(peripheral.graph, pos, with_labels=True, node_size = 200, font_size = 6)
 

@@ -100,8 +100,18 @@ class PeripheralModel:
         :param state_id_2: ID of the state to merge into state 1
         :return: True if merge succeeded, False otherwise
         """
+
+        self.equiv_states = []
+
         pass
 
+    def _merge_recursive(self, state_id_1, state_id_2):
+        """
+        Recursive call to
+        :param state_id_1:
+        :param state_id_2:
+        :return:
+        """
 
     def optimize(self):
         """
