@@ -17,8 +17,8 @@ class PeripheralModelState:
 
     def __init__(self, address, operation, value, state_id):
         self.state_id = state_id
-        #self.name = "%s:%s:%#x" % (operation, hex(address), value)
-        #self.operation = operation
+        # self.name = "%s:%s:%#x" % (operation, hex(address), value)
+        # self.operation = operation
         self.value = value
         self.reads = {}
         self.read_count = {}
@@ -29,6 +29,23 @@ class PeripheralModelState:
         # was used for visualization purposes, i haven't dove very deep into all of the different visualizations, just UART
         self.state_number = PeripheralModelState.state_number
         PeripheralModelState.state_number += 1
+
+    def __str__(self):
+
+        return str(self.model_per_address)
+
+    def __eq__(self, other_state):
+        for address in self.model_per_address:
+            if address in other_state.model_per_address:
+                if self.model_per_address[address] != \
+                        other_state.model_per_address[address]:
+                    return False
+        # for address in self.model_per_address_ordered:
+        #     if address in other_state.model_per_address_ordered and \
+        #             self.model_per_address_ordered[address] != \
+        #             other_state.model_per_address_ordered[address]:
+        #         return False
+        return True
 
     def _train_model(self, read_log, use_time_domain=True):
         if len(read_log) == 0:
@@ -42,7 +59,7 @@ class PeripheralModelState:
         if storage:
             m = SimpleStorageModel()
             m.train(read_log)
-            #logger.info("Name %s is StorageModel" % self.name)
+            # logger.info("Name %s is StorageModel" % self.name)
 
         # Try Other Models
         if use_time_domain:
@@ -51,13 +68,13 @@ class PeripheralModelState:
                 m = model()
                 logger.debug("Trying model %s" % repr(m))
                 if m.train(read_log):
-                    #logger.info("Name %s is %s" % (self.name, repr(model)))
+                    # logger.info("Name %s is %s" % (self.name, repr(model)))
                     return m
         else:
             for model in [MarkovModel]:
                 m = model()
                 if m.train(read_log):
-                    #logger.info("Name %s is %s" % (self.name, repr(model)))
+                    # logger.info("Name %s is %s" % (self.name, repr(model)))
                     return m
 
     def append_read(self, address, value, pc, size, timestamp):
@@ -94,3 +111,36 @@ class PeripheralModelState:
     def reset(self):
         for addr in self.read_count:
             self.read_count[addr] = 0
+
+    def merge(self, other):
+        """
+
+        :param other: The `other` state to merge
+        :return:
+        """
+        logger.debug("Merging %s into %s" % (other, self))
+        # Are they the same state?
+        if self.state_id == other.state_id:
+            logger.warn("Tried to merge identical states!")
+            return False
+
+        # merge any duplicate address
+        for address in self.model_per_address:
+            if address in other.model_per_address:
+                self.model_per_address[address].merge(
+                    other.model_per_address[address])
+        # for address in self.model_per_address_ordered:
+        #     if address in other.model_per_address_ordered:
+        #         self.model_per_address_ordered[address].merge(
+        #             other.model_per_address_ordered[address])
+
+        # Copy any new addresses
+        for address in other.model_per_address:
+            if address not in self.model_per_address:
+                self.model_per_address[address] = other.model_per_address[
+                    address]
+        # for address in other.model_per_address_ordered:
+        #     if address not in self.model_per_address_ordered:
+        #         self.model_per_address_ordered[address] = \
+        #             other.model_per_address_ordered[address]
+        return True

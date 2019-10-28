@@ -6,6 +6,9 @@ import fnmatch
 import os
 
 import sys
+
+from networkx.drawing.nx_agraph import to_agraph
+
 sys.path.append("/home/graham/Desktop/conware/conware/")
 
 import logging
@@ -77,15 +80,20 @@ if __name__ == "__main__":
             #
             # IPython.embed()
             # print(peripheral.graph.nodes)
-            peripheral.optimize()
-            pos = networkx.spring_layout(peripheral.graph, k =.01, iterations=1500)
-            networkx.draw(peripheral.graph, pos, with_labels=True, node_size = 200, font_size = 6)
+            A = to_agraph(peripheral.graph)
+            A.layout('dot')
+            A.draw('before.png')
+            peripheral.optimize2()
+            # continue
+            # continue
+            # pos = networkx.spring_layout(peripheral.graph, k =.01, iterations=1500)
+            # networkx.draw(peripheral.graph, pos, with_labels=True, node_size = 200, font_size = 6)
+            #
+            # edge_labels = networkx.get_edge_attributes(peripheral.graph, 'r')
+            # networkx.draw_networkx_edge_labels(peripheral.graph, pos, labels = edge_labels, font_size = 6)
 
-            edge_labels = networkx.get_edge_attributes(peripheral.graph, 'r')
-            networkx.draw_networkx_edge_labels(peripheral.graph, pos, labels = edge_labels, font_size = 6)
 
-
-            plt.show()
+            # plt.show()
             #print("Number of Nodes:")
             #print(networkx.number_of_nodes(peripheral.graph))
             #print("Number of Edges")
@@ -99,11 +107,15 @@ if __name__ == "__main__":
             #     for key in peripheral.graph.nodes[node]["state"].model_per_address_ordered:
             #         print ("Address: " + str(key))
             #         print ("Model per Address Ordered: ", peripheral.graph.nodes[node]["state"].model_per_address_ordered[key])
-            peripheral.optimize()
+            # peripheral.optimize()
             #state1 = peripheral.graph.nodes[0]
             #state2 = peripheral.graph.nodes[1]
             #peripheral.no_reads_merge(state1, state2)
-            print(peripheral.graph.nodes)
+            # print(peripheral.graph.nodes)
+
+            A = to_agraph(peripheral.graph)
+            A.layout('dot')
+            A.draw('after.png')
 
             pos = networkx.spring_layout(peripheral.graph, k=.01, iterations=1500)
             networkx.draw(peripheral.graph, pos, with_labels=True, node_size=200, font_size=6)
@@ -111,6 +123,7 @@ if __name__ == "__main__":
             edge_labels = networkx.get_edge_attributes(peripheral.graph, 'r')
             networkx.draw_networkx_edge_labels(peripheral.graph, pos, labels=edge_labels, font_size=6)
 
-            plt.show()
+            # plt.savefig("graph.pdf")
+            # plt.show()
 
     print model
