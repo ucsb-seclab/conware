@@ -65,9 +65,9 @@ class PretenderModel:
             if isinstance(mdl, MMIOGroup):
                 mdl.shutdown()
 
-    def save(self, directory):
+    def save(self, filename):
         """ Save our model to the specified directory """
-        model_file = os.path.join(directory, G.MODEL_FILE)
+        model_file = os.path.join(filename)
         logger.info("Saving model to %s", model_file)
         f = open(model_file, "wb+")
         pickle.dump(self.__dict__, f)

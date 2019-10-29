@@ -148,7 +148,7 @@ class PeripheralModel:
                                        address=address, value=value)
                 else:
                     # Self reference
-                    logger.info("Adding self reference for %d" % new_state_id)
+                    logger.debug("Adding self reference for %d" % new_state_id)
                     for (address, value) in tuples:
                         self._add_edge(new_state_id, new_state_id,
                                        address=address, value=value)
@@ -189,7 +189,7 @@ class PeripheralModel:
         state1 = self._get_state(state_id_1)
         state2 = self._get_state(state_id_2)
         if state1 == state2:
-            logger.info("%d (%s) == %d (%s)" % (state_id_1, state1, state_id_2,
+            logger.debug("%d (%s) == %d (%s)" % (state_id_1, state1, state_id_2,
                                                 state2))
             # logger.info(self.equiv_states)
             for equiv_tuple in self.equiv_states:
@@ -271,7 +271,7 @@ class PeripheralModel:
 
                     self.equiv_states = []
                     if self._merge_recursive(n1, n2):
-                        logger.info("merging %d and %d" % (n1, n2))
+                        logger.info("Merging states %d and %d..." % (n1, n2))
                         self._merge_states(self.equiv_states)
                         merged = True
                         break

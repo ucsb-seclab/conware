@@ -11,7 +11,7 @@ sys.path.append("/home/graham/Desktop/conware/conware/")
 
 import logging
 from conware.model import PretenderModel
-import pretender.globals as G
+from conware import *
 import pickle
 
 logger = logging.getLogger(__name__)
@@ -35,7 +35,7 @@ def merge_partial_model(model, partial_model_fn):
             mdl = m['model']
             if mdl.irq_num and mdl.interrupt_timings and mdl.interrupt_trigger:
                 logger.info("Using partial model for address %#08x %s" % (
-                addr, repr(mdl)))
+                    addr, repr(mdl)))
                 if not addr in model.model_per_address:
                     model.model_per_address[addr] = {}
                 model.model_per_address[addr]['model'] = mdl
@@ -72,7 +72,7 @@ if __name__ == "__main__":
 
     # First, let's just read our log into a nice internal structure
     files = fnmatch.filter(os.listdir(args.recording_dir),
-                           "*.%s" % G.RECORDING_EXTENSION)
+                           "*.%s" % RECORDING_EXTENSION)
     models = []
     for f in files:
         p = PretenderModel()
@@ -91,4 +91,4 @@ if __name__ == "__main__":
         # Merge a partial model
         models[-1] = merge_partial_model(models[-1], args.partial_model)
     print "Saving models..."
-    combined_model.save(args.recording_dir)
+    combined_model.save(os.path.join(args.recording_dir, MODEL_FILE))
