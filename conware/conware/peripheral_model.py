@@ -119,7 +119,7 @@ class PeripheralModel:
         """
         merge state 2 into state 1
         """
-        logger.info("Merging: %s" % str(equiv_states))
+        # logger.info("Merging: %s" % str(equiv_states))
 
         graph = networkx.Graph(equiv_states)
         equiv_classes = [tuple(c) for c in networkx.connected_components(graph)]
@@ -191,27 +191,62 @@ class PeripheralModel:
         if state1 == state2:
             logger.info("%d (%s) == %d (%s)" % (state_id_1, state1, state_id_2,
                                                 state2))
-            logger.info(self.equiv_states)
+            # logger.info(self.equiv_states)
             for equiv_tuple in self.equiv_states:
-                if state_id_1 in equiv_tuple or \
+                if state_id_1 in equiv_tuple and \
                         state_id_2 in equiv_tuple:
                     self.equiv_states.append((state_id_1, state_id_2))
                     return True
             self.equiv_states.append((state_id_1, state_id_2))
+
+            graph = networkx.Graph(self.equiv_states)
+            equiv_classes = [tuple(c) for c in
+                             networkx.connected_components(graph)]
+
+            equiv_edges = set()
+            for equiv_class in equiv_classes:
+                if state_id_1 in equiv_class:
+                    for state_id in equiv_class:
+                        equiv_edges |= set(self.graph.out_edges(state_id))
 
             edges_1 = self.graph.out_edges(state_id_1)
             edges_2 = self.graph.out_edges(state_id_2)
 
             rtn = True
             for e1 in edges_1:
-                for e2 in edges_2:
+                for e2 in equiv_edges:
                     e1_labels = self._get_edge_labels(e1)
                     e2_labels = self._get_edge_labels(e2)
-
                     # Do we have a duplicate edge (i.e., state transition)
                     if e1_labels & e2_labels:
                         rtn &= self._merge_recursive(e1[1], e2[1])
+            if not rtn:
+                return False
 
+            for e1 in edges_2:
+                for e2 in equiv_edges:
+                    e1_labels = self._get_edge_labels(e1)
+                    e2_labels = self._get_edge_labels(e2)
+                    # Do we have a duplicate edge (i.e., state transition)
+                    if e1_labels & e2_labels:
+                        rtn &= self._merge_recursive(e1[1], e2[1])
+            if not rtn:
+                return False
+
+            # rtn = True
+            # for e1 in edges_1:
+            #     for e2 in edges_2:
+            #         e1_labels = self._get_edge_labels(e1)
+            #         e2_labels = self._get_edge_labels(e2)
+            #
+            #         print "--"
+            #         print e1_labels
+            #         print e2_labels
+            #         print "---"
+            #         # Do we have a duplicate edge (i.e., state transition)
+            #         if e1_labels & e2_labels:
+            #             rtn &= self._merge_recursive(e1[1], e2[1])
+            #
             return rtn
         else:
             return False

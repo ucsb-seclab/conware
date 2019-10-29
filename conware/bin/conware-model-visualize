@@ -123,6 +123,7 @@ if __name__ == "__main__":
             edge_labels = networkx.get_edge_attributes(peripheral.graph, 'r')
             networkx.draw_networkx_edge_labels(peripheral.graph, pos, labels=edge_labels, font_size=6)
 
+
             # plt.savefig("graph.pdf")
             # plt.show()
 
