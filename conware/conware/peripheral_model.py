@@ -345,3 +345,25 @@ class PeripheralModel:
                                 address=out_edge_attr[0],
                                 value=out_edge_attr[1])
         return True
+
+
+    def read(self, address, size):
+        """
+        Read a value from the modeled peripheral
+        :param address:
+        :param size:
+        :return:
+        """
+        # TODO: Implement this!
+        return 0
+
+    def write(self, address, size, value):
+        """
+        write a value to the modeled peripheral (i.e., state transition)
+        :param address:
+        :param size:
+        :param value:
+        :return:
+        """
+        # TODO: Implement this!
+        return True

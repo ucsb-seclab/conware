@@ -8,7 +8,7 @@ from collections import defaultdict
 
 ##THIS IS THE SAME AS THE OLD MODEL IN PRETENDER/PRETENDER/MODEL.PY,just altered to use new models (sort of)
 
-from peripheral_model import PeripheralModel2 as PeripheralModel
+from conware.peripheral_model import PeripheralModel
 
 # Numpy
 import numpy
@@ -106,60 +106,19 @@ class PretenderModel:
             return False
 
         # Step 1: Divide the possible addresses into peripherals
-        # self.peripheral_clusters = cluster_peripherals(
-        #     list(self.accessed_addresses))
         used_peripherals = set()
         for addr in self.accessed_addresses:
             peripheral = peripheral_memory_map.get_peripheral(addr)
             if peripheral[0] not in used_peripherals:
                 used_peripherals.add(peripheral[0])
 
-        # for p in used_peripherals:
-        #     print p
-        #
-        # logger.info("* Clusters")
-        # for x in self.peripheral_clusters:
-        #     print "%d:" % x
-        #     for y in self.peripheral_clusters[x]:
-        #         print hex(y)
-        # answer = raw_input("Do these look like reasonable clusters?[y/n]")
-        # if answer not in "Yy":
-        #     return
-
-
-        # import IPython; IPython.embed()
-        ##
-        # Step 2: Associate interrupts, their triggers, and their timings with a
-        #  peripheral
-        ##
-        # l = LogReader(filename)
-        # interrupt_mappings, interrupt_triggers, interrupt_timings, oneshots = \
-        #     self.infer_interrupt_association(l, self.peripheral_clusters)
-        # l.close()
-
 
         # Add our peripheral for each of its memory addresses
         for periph_name in peripheral_memory_map.peripheral_memory:
             if periph_name not in used_peripherals:
                 continue
-            # irq_num = None
-            # interrupt_trigger = None
-            # interrupt_timing = None
             logger.info("Packing peripheral %s" % periph_name)
-            # if periph_id in interrupt_mappings:
-            #     irq_num = interrupt_mappings[periph_id]
-            #
-            # if irq_num in interrupt_triggers:
-            #     interrupt_trigger = interrupt_triggers[irq_num]
-            #
-            # if irq_num in interrupt_timings:
-            #     interrupt_timing = interrupt_timings[irq_num]
-            # if irq_num in oneshots:
-            #     one_shot = True
-            # else:
-            #     one_shot = False
 
-            # import IPython; IPython.embed()
             addrs = peripheral_memory_map.peripheral_memory[periph_name]
             addrs = set(range(addrs[0], addrs[1]))
             peripheral = PeripheralModel(addrs,

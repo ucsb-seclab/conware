@@ -113,12 +113,15 @@ if __name__ == "__main__":
     output_dir = '/tmp/myavatar'
     qemu_executable = os.path.join(os.path.dirname(__file__),
                                    "../../avatar2-pretender/targets/build/qemu/arm-softmmu/qemu-system-arm")
+    board_config = os.path.join(os.path.dirname(__file__),
+                                "..configs/due.yaml")
     gdb_port = 1235
     qemu_port = 23454
 
     # Get user input
     parser = argparse.ArgumentParser()
-    parser.add_argument("--board-config", help="Board config file YAML")
+    parser.add_argument("--board-config", default=board_config,
+                        help="Board config file YAML")
     parser.add_argument('--stimulator', '-S',
                         help="Program to run to stimulate the target")
     parser.add_argument("--sample", "-s", default=sample,
@@ -184,12 +187,6 @@ if __name__ == "__main__":
     # Setup our models
     pretender_model = PretenderModel(filename=model_file)
 
-    peripherals = pretender_model.get_peripherals()
-    for peripheral in peripherals:
-        for state in peripheral.list_states():
-            print state
-            peripheral.state_collapse(state)
-
     # Load our args
     args = load_config(args)
 
@@ -206,43 +203,11 @@ if __name__ == "__main__":
     hardware = build_hardware(avatar, args)
     set_memory_map(avatar, args, model=False)
 
-    #
-    # # Let's setup avatar
-    # l.warning("Creating Avatar")
-    # avatar = Avatar(output_directory=args.output_dir, arch=ARM_CORTEX_M3)
-    #
-    # nucleo = avatar.add_target(OpenOCDTarget, name='nucleo',
-    #                            gdb_executable="arm-none-eabi-gdb",
-    #                            openocd_script=args.openocd_conf)
-    #
-    # qemu = avatar.add_target(QemuTarget, name='qemu',
-    #                          gdb_executable="arm-none-eabi-gdb",
-    #                          firmware=sample,
-    #                          executable=args.qemu_executable)
-    #
-    # qemu.gdb_port = args.qemu_port
-    #
-    # # Setup our memory regions
-    # l.warn("Adding memory ranges")
-    # ivt = avatar.add_memory_range(0, 0x1000)
-    # mmio = avatar.add_memory_range(0x40000000, 0x10000000, name='mmio',
-    #                                forwarded=True, forwarded_to=nucleo)
-    # # mmio = avatar.add_memory_range(0x40000000, 0x10000000, name='mmio',
-    # #                                forwarded=True, forwarded_to=nucleo)
-    # rom = avatar.add_memory_range(0x08000000, 0x80000, name='rom',
-    #                               file=args.sample)
-    # ram = avatar.add_memory_range(0x20000000, 0x00019000, name='ram')
-
-    # Monitor memory reads to forwarded MMIO
-    # l.warning("Adding watchmen")
+    logger.info("Adding watchmen...")
     avatar.watchmen.add_watchman('RemoteMemoryWrite', 'after',
                                  print_write_after)
     avatar.watchmen.add_watchman('RemoteMemoryRead', 'after',
                                  print_read_after)
-    # avatar.watchmen.add_watchman('RemoteMemoryWrite', 'before',
-    #                              print_write_before)
-    # avatar.watchmen.add_watchman('RemoteMemoryRead', 'before',
-    #                              print_read_before)
 
     # Do we have a stimulator?
     stim_proc = None
