@@ -305,32 +305,6 @@ class PeripheralModel:
         """ Return the state given the state/node id """
         return networkx.get_node_attributes(self.graph, 'state')[state_id]
 
-    def optimize(self):
-        """
-        This function will optimize the state machine, merging equivalent
-        states.
-        :return:
-        """
-        merge_node_pairs = []
-
-        # Pass 1
-        # goes through every state and checks if there no reads
-        # if so we add that state and the state before it to be merged
-        # way to merge dynamically in this loop?
-        for e in networkx.dfs_edges(self.graph, self.start_state[0]):
-            state = self._get_state_attributes(e[1])
-
-            num_addr_read = len(state.reads)
-            if (num_addr_read == 0):
-                node1 = self.graph.nodes[e[0]]
-                node2 = self.graph.nodes[e[1]]
-                merge_node_pairs.append((node1, node2))
-
-        for merge_nodes in reversed(merge_node_pairs):
-            print("Attempting merge of no read state: " + str(
-                merge_nodes[1]["state"].state_id) + " with prev state: " + str(
-                merge_nodes[0]["state"].state_id))
-            self.no_reads_merge(merge_nodes[0], merge_nodes[1])
 
     def no_reads_merge(self, state1, state2):
         """
@@ -374,9 +348,19 @@ class PeripheralModel:
         :param address:
         :param size:
         :return:
+        look in model, models per address, figur out which address reading from, read from that model (peripheral state stored)
         """
-        # TODO: Implement this!
-        return 0
+
+        #Assumption: We are in correct current state and expect read address to be there
+
+        if (address not in self.current_state.model_per_address):
+            logger.debug("Couldnt find model for read address")
+            return
+
+
+        return self.current_state.model_per_address[address].read()
+
+
 
     def write(self, address, size, value):
         """
@@ -385,6 +369,19 @@ class PeripheralModel:
         :param size:
         :param value:
         :return:
+        look at edges coming off of current state and transition
         """
-        # TODO: Implement this!
-        return True
+
+        nbunch = self.graph.nodes[self.current_state[0]] #should return corresponding node to current state
+        out_edges = self.graph.out_edges(nbunch)
+        for edge in out_edges:
+            if (self.graph[edge[0]][edge[1]]['address'] == address and self.graph[edge[0]][edge[1]]['value'] == value):
+                logger.debug("Found correct edge transition, updating current state")
+                self.current_state = (self.graph.nodes[edge[1]]["state"].state_id, self.graph.nodes[edge[1]]["state"])
+                return True
+            elif (self.graph[edge[0]][edge[1]]['address'] == address and self.graph[edge[0]][edge[1]]['value'] != value):
+                logger.debug("Found correct write address but incorrect value")
+
+        logger.debug("We couldnt find a transition matching that address and value")
+        return False
+
