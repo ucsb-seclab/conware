@@ -3,12 +3,16 @@
 import argparse
 import os
 import pprint
+import sys
 
 import yaml
+
+sys.path.append("/home/graham/Desktop/conware/avatar2-pretender")
 from avatar2 import *
 
 import logging
 
+sys.path.append("/home/graham/Desktop/conware/conware/")
 from conware.peripherals import Pretender
 
 from pretender.logger import LogWriter
@@ -266,7 +270,7 @@ if __name__ == '__main__':
         qemu_args += ['-d', 'exec', '-D', COVERAGE_LOG]
     # qemu_args += ["-M","lm3s811evb"]
     qemu = avatar.add_target(QemuTarget, name='qemu',
-                             gdb_executable="arm-none-eabi-gdb",
+                             gdb_executable="gdb-multiarch",
                              firmware=args.sample,
                              executable=args.qemu_executable,
                              additional_args=qemu_args,

@@ -353,12 +353,12 @@ class PeripheralModel:
 
         #Assumption: We are in correct current state and expect read address to be there
 
-        if (address not in self.current_state.model_per_address):
+        if (address not in self.current_state[1].model_per_address):
             logger.debug("Couldnt find model for read address")
-            return
+            return -1
 
 
-        return self.current_state.model_per_address[address].read()
+        return self.current_state[1].model_per_address[address].read()
 
 
 
@@ -372,16 +372,24 @@ class PeripheralModel:
         look at edges coming off of current state and transition
         """
 
-        nbunch = self.graph.nodes[self.current_state[0]] #should return corresponding node to current state
-        out_edges = self.graph.out_edges(nbunch)
+        if (value == 79):
+            print("Ascii value 79 found: O")
+        if (value == 78):
+            print("Ascii value 78 found: N")
+        out_edges = self.graph.out_edges(self.graph.nodes[self.current_state[0]])
         for edge in out_edges:
-            if (self.graph[edge[0]][edge[1]]['address'] == address and self.graph[edge[0]][edge[1]]['value'] == value):
+            print("Edge with address: ", self.graph.get_edge_data(*edge))
+            edge_set = self.graph[edge[0]][edge[1]]['tuples']
+
+            edge_tuple = list(edge_set)
+            print(edge_tuple)
+            if (edge_tuple[0][0] == address and edge_tuple[0][1] == value):
                 logger.debug("Found correct edge transition, updating current state")
                 self.current_state = (self.graph.nodes[edge[1]]["state"].state_id, self.graph.nodes[edge[1]]["state"])
                 return True
-            elif (self.graph[edge[0]][edge[1]]['address'] == address and self.graph[edge[0]][edge[1]]['value'] != value):
+            elif (edge_tuple[0][0] == address and edge_tuple[0][1] != value):
                 logger.debug("Found correct write address but incorrect value")
 
-        logger.debug("We couldnt find a transition matching that address and value")
-        return False
+        logger.error("We couldnt find a transition matching that address and value: "+ str(address) +" : " + str(value))
+        return True
 

@@ -62,4 +62,4 @@ if __name__ == "__main__":
     optimized_filename = os.path.join(args.recording_dir, MODEL_FILE_OPTIMIZED)
     logger.info("Saving optimized model to %s" % optimized_filename)
 
-   model.sve(optimized_filename)
+    model.save(optimized_filename)

@@ -74,16 +74,13 @@ if __name__ == "__main__":
         logger.info("Graphing %s..." % str(peripheral.name))
 
         if peripheral.name == "UART" or False:
-            # for e in peripheral.graph.edges:
-            #     print(e[0])
-            # import IPython
-            #
-            # IPython.embed()
-            # print(peripheral.graph.nodes)
+
             peripheral._label_nodes()
             A = to_agraph(peripheral.graph)
             A.layout('dot')
-            A.draw('before.png')
+            A.draw('UART_before.svg')
+            print(peripheral.graph.nodes)
+
 
             peripheral.optimize2()
             # continue
@@ -105,7 +102,8 @@ if __name__ == "__main__":
             #     print("Node: " + str(node))
             #     for key in peripheral.graph.nodes[node]["state"].model_per_address:
             #         print ("Address: " + str(key))
-            #         print ("Model per Address: ", peripheral.graph.nodes[node]["state"].model_per_address[key])
+            #         print ("Read_Count[address]: ", peripheral.graph.nodes[node]["state"].read_count)
+            #         print ("Model per Address: ", peripheral.graph.nodes[node]["state"].model_per_address[key].read())
             #     for key in peripheral.graph.nodes[node]["state"].model_per_address_ordered:
             #         print ("Address: " + str(key))
             #         print ("Model per Address Ordered: ", peripheral.graph.nodes[node]["state"].model_per_address_ordered[key])
@@ -117,7 +115,8 @@ if __name__ == "__main__":
 
             A = to_agraph(peripheral.graph)
             A.layout('dot')
-            A.draw('after.png')
+            A.draw('UART_after.svg')
+            print(peripheral.graph.nodes)
 
             pos = networkx.spring_layout(peripheral.graph, k=.01, iterations=1500)
             networkx.draw(peripheral.graph, pos, with_labels=True, node_size=200, font_size=6)
