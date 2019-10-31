@@ -31,8 +31,12 @@ class PeripheralModelState:
         PeripheralModelState.state_number += 1
 
     def __str__(self):
+        models = []
+        for address in self.model_per_address:
+            models.append(
+                "0x%08X: %s" % (address, self.model_per_address[address]))
 
-        return str(self.model_per_address)
+        return ", ".join(models)
 
     def __eq__(self, other_state):
         for address in self.model_per_address:

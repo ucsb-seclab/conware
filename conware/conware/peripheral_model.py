@@ -39,9 +39,11 @@ class PeripheralModel:
         # PeripheralModel.global_nodeID += 1
         if state is None:
             state = PeripheralModelState(address, operation, value, state_id)
-        attributes = {state_id: {'state': state, 'label': state}}
+
+        attributes = {state_id: {'state': state}}
+
         # create state
-        # check for state existance?
+        # check for state existence?
         if not self.graph.has_node(state_id):
             self.graph.add_node(state_id)
 
@@ -93,7 +95,11 @@ class PeripheralModel:
             networkx.set_edge_attributes(self.graph,
                                          {(s1, s2): {
                                              'tuples': tuples,
-                                             'label': str(tuples)}})
+                                             'label': ", ".join(["(0x%08X,"
+                                                                 "%d)"
+                                                                 % x
+                                                                 for x
+                                                                 in tuples])}})
         else:
             self.graph.add_edge(s1, s2, tuples=set([(address, value)]),
                                 label="(0x%08X,%d)" % (address, value))
@@ -176,6 +182,20 @@ class PeripheralModel:
                 if state_id == self.start_state[0]:
                     self.start_state = (new_state_id, new_state)
 
+    def _label_nodes(self):
+        """ Add labels to all of our nodes """
+        attributes = {}
+        for node in self.graph.nodes:
+            state = self._get_state(node)
+            if node == self.start_state[0]:
+                attributes[node] = {'state': state, 'label': "((%d)) %s" % (
+                    node, state)}
+            else:
+                attributes[node] = {'state': state, 'label': "(%d) %s" % (
+                    node, state)}
+
+        networkx.set_node_attributes(self.graph, attributes)
+
     def _merge_recursive(self, state_id_1, state_id_2):
         """
         Recursive call to
@@ -190,7 +210,7 @@ class PeripheralModel:
         state2 = self._get_state(state_id_2)
         if state1 == state2:
             logger.debug("%d (%s) == %d (%s)" % (state_id_1, state1, state_id_2,
-                                                state2))
+                                                 state2))
             # logger.info(self.equiv_states)
             for equiv_tuple in self.equiv_states:
                 if state_id_1 in equiv_tuple and \
@@ -279,6 +299,8 @@ class PeripheralModel:
                 if merged:
                     break
 
+        self._label_nodes()
+
     def _get_state_attributes(self, state_id):
         """ Return the state given the state/node id """
         return networkx.get_node_attributes(self.graph, 'state')[state_id]
@@ -345,7 +367,6 @@ class PeripheralModel:
                                 address=out_edge_attr[0],
                                 value=out_edge_attr[1])
         return True
-
 
     def read(self, address, size):
         """

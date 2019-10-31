@@ -80,9 +80,11 @@ if __name__ == "__main__":
             #
             # IPython.embed()
             # print(peripheral.graph.nodes)
+            peripheral._label_nodes()
             A = to_agraph(peripheral.graph)
             A.layout('dot')
             A.draw('before.png')
+
             peripheral.optimize2()
             # continue
             # continue
