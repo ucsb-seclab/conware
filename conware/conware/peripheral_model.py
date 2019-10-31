@@ -376,7 +376,9 @@ class PeripheralModel:
             print("Ascii value 79 found: O")
         if (value == 78):
             print("Ascii value 78 found: N")
-        out_edges = self.graph.out_edges(self.graph.nodes[self.current_state[0]])
+        #out_edges = self.graph.edges(self.graph.nodes[self.current_state[0]]["state"].current_state[0])
+        out_edges = self.graph.edges(self.current_state[0])
+        print(out_edges)
         for edge in out_edges:
             print("Edge with address: ", self.graph.get_edge_data(*edge))
             edge_set = self.graph[edge[0]][edge[1]]['tuples']
