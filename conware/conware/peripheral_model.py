@@ -374,18 +374,19 @@ class PeripheralModel:
         """
         uart = False
         if (self.name == 'UART'):
-            print("current peripheral: ", self.name)
+            logger.info("current peripheral: "+ str(self.name))
+            logger.info("current state: " + str(self.current_state[0]))
             uart = True
         if (uart):
-            print("Attempting to write address: ", address, " Value: ", value)
+            logger.info("Attempting to write address: " + str(address) + " Value: " + str(value))
             if (value == 79):
-                print("Ascii value 79 found: O")
+                logger.info("Ascii value 79 found: O")
             if (value == 78):
-                print("Ascii value 78 found: N")
+                logger.info("Ascii value 78 found: N")
             if (value == 13):
-                print("Ascii value 13 found: CARRIAGE RETURN")
+                logger.info("Ascii value 13 found: CARRIAGE RETURN")
             if (value == 10):
-                print("Ascii value 10 found: LINE FEED")
+                logger.info("Ascii value 10 found: LINE FEED")
         current_state_id = self.current_state[0]
         out_edges = self.graph.edges(current_state_id)
         #print("out edges from current state: ", out_edges)
@@ -398,15 +399,15 @@ class PeripheralModel:
             if ((address, value) in edge_tuple):
                 if (uart):
                     #print("What is the new node were going to? ", self.graph.nodes[edge[1]])
-                    print("Found correct edge transition, updating current state to: ")
+                    logger.info("Found correct edge transition, updating current state to: ")
                 self.current_state = (edge[1], self.graph.nodes[edge[1]]["state"])
                 if (uart):
-                    print(self.current_state)
+                    logger.info(str(self.current_state))
                 return True
             elif (edge_tuple[0][0] == address and edge_tuple[0][1] != value):
                 if(uart):
-                    print("Found correct write address but incorrect value")
+                    logger.info("Found correct write address but incorrect value")
 
-        print("We couldnt find a transition matching that address and value: "+ str(address) +" : " + str(value))
+        logger.error("We couldnt find a transition matching that address and value: "+ str(address) +" : " + str(value))
         return True
 
