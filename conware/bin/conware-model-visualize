@@ -53,7 +53,7 @@ if __name__ == "__main__":
         parser.print_help()
         sys.exit(0)
 
-    model_file = os.path.join(args.recording_dir, G.MODEL_FILE)
+    model_file = os.path.join(args.recording_dir, G.MODEL_FILE_OPTIMIZED)
     if not os.path.exists(model_file):
         logger.error("Model file (%s) does not exist.", model_file)
         parser.print_help()
@@ -72,57 +72,30 @@ if __name__ == "__main__":
         # peripheral.reset()
 
         logger.info("Graphing %s..." % str(peripheral.name))
-
-        if peripheral.name == "UART" or False:
-
-            peripheral._label_nodes()
-            A = to_agraph(peripheral.graph)
-            A.layout('dot')
-            A.draw('UART_before.svg')
-            print(peripheral.graph.nodes)
+        A = to_agraph(peripheral.graph)
+        A.layout('dot')
+        A.draw(str(peripheral.name)+ 'optimized.svg')
 
 
-            peripheral.optimize2()
-            # continue
-            # continue
-            # pos = networkx.spring_layout(peripheral.graph, k =.01, iterations=1500)
-            # networkx.draw(peripheral.graph, pos, with_labels=True, node_size = 200, font_size = 6)
-            #
-            # edge_labels = networkx.get_edge_attributes(peripheral.graph, 'r')
-            # networkx.draw_networkx_edge_labels(peripheral.graph, pos, labels = edge_labels, font_size = 6)
-
-
-            # plt.show()
-            #print("Number of Nodes:")
-            #print(networkx.number_of_nodes(peripheral.graph))
-            #print("Number of Edges")
-            #print(networkx.number_of_edges(peripheral.graph))
-
-            # for node in peripheral.graph.nodes:
-            #     print("Node: " + str(node))
-            #     for key in peripheral.graph.nodes[node]["state"].model_per_address:
-            #         print ("Address: " + str(key))
-            #         print ("Read_Count[address]: ", peripheral.graph.nodes[node]["state"].read_count)
-            #         print ("Model per Address: ", peripheral.graph.nodes[node]["state"].model_per_address[key].read())
-            #     for key in peripheral.graph.nodes[node]["state"].model_per_address_ordered:
-            #         print ("Address: " + str(key))
-            #         print ("Model per Address Ordered: ", peripheral.graph.nodes[node]["state"].model_per_address_ordered[key])
-            # peripheral.optimize()
-            #state1 = peripheral.graph.nodes[0]
-            #state2 = peripheral.graph.nodes[1]
-            #peripheral.no_reads_merge(state1, state2)
-            # print(peripheral.graph.nodes)
-
-            A = to_agraph(peripheral.graph)
-            A.layout('dot')
-            A.draw('UART_after.svg')
-            print(peripheral.graph.nodes)
-
-            pos = networkx.spring_layout(peripheral.graph, k=.01, iterations=1500)
-            networkx.draw(peripheral.graph, pos, with_labels=True, node_size=200, font_size=6)
-
-            edge_labels = networkx.get_edge_attributes(peripheral.graph, 'r')
-            networkx.draw_networkx_edge_labels(peripheral.graph, pos, labels=edge_labels, font_size=6)
+        # if peripheral.name == "UART" or False:
+        #
+        #     # peripheral._label_nodes()
+        #     # A = to_agraph(peripheral.graph)
+        #     # A.layout('dot')
+        #     # A.draw('UART_before.svg')
+        #     # print(peripheral.graph.nodes)
+        #     #
+        #     #
+        #     # peripheral.optimize2()
+        #     A = to_agraph(peripheral.graph)
+        #     A.layout('dot')
+        #     A.draw('UART_optimized.svg')
+        #
+        #     pos = networkx.spring_layout(peripheral.graph, k=.01, iterations=1500)
+        #     networkx.draw(peripheral.graph, pos, with_labels=True, node_size=200, font_size=6)
+        #
+        #     edge_labels = networkx.get_edge_attributes(peripheral.graph, 'r')
+        #     networkx.draw_networkx_edge_labels(peripheral.graph, pos, labels=edge_labels, font_size=6)
 
 
             # plt.savefig("graph.pdf")

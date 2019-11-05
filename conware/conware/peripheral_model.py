@@ -21,7 +21,7 @@ class PeripheralModel:
     def __init__(self, addresses, name=None):
         self.all_states = []
         self.nodeID = 0
-        self.graph = networkx.DiGraph()  # May want to use MultiDiGraph instead, allows parallel edges
+        self.graph = networkx.DiGraph()
         self.addresses = addresses
         self.name = name
         self.current_state = self.create_state(-1, "start", -1)
@@ -34,23 +34,25 @@ class PeripheralModel:
     def create_state(self, address=None, operation=None, value=None,
                      state=None):
         # create state attributes
-        state_id = self.update_node_id()
+        new_state_id = self.update_node_id()
         # state_id = (self.nodeID, PeripheralModel.global_nodeID) turns out we dont need this pair if all of the peripherals are separate graphs
         # PeripheralModel.global_nodeID += 1
         if state is None:
-            state = PeripheralModelState(address, operation, value, state_id)
+            state = PeripheralModelState(address, operation, value, new_state_id)
+        else:
+            state.state_id = new_state_id
 
-        attributes = {state_id: {'state': state}}
+        attributes = {new_state_id: {'state': state}}
 
         # create state
         # check for state existence?
-        if not self.graph.has_node(state_id):
-            self.graph.add_node(state_id)
+        if not self.graph.has_node(new_state_id):
+            self.graph.add_node(new_state_id)
 
         networkx.set_node_attributes(self.graph, attributes)
 
         self.all_states.append(state)
-        return state_id, state
+        return new_state_id, state
 
     def train_read(self, address, value, pc, size, timestamp):
         """
@@ -369,29 +371,42 @@ class PeripheralModel:
         :param size:
         :param value:
         :return:
-        look at edges coming off of current state and transition
         """
-
-        if (value == 79):
-            print("Ascii value 79 found: O")
-        if (value == 78):
-            print("Ascii value 78 found: N")
-        #out_edges = self.graph.edges(self.graph.nodes[self.current_state[0]]["state"].current_state[0])
-        out_edges = self.graph.edges(self.current_state[0])
-        print(out_edges)
+        uart = False
+        if (self.name == 'UART'):
+            print("current peripheral: ", self.name)
+            uart = True
+        if (uart):
+            print("Attempting to write address: ", address, " Value: ", value)
+            if (value == 79):
+                print("Ascii value 79 found: O")
+            if (value == 78):
+                print("Ascii value 78 found: N")
+            if (value == 13):
+                print("Ascii value 13 found: CARRIAGE RETURN")
+            if (value == 10):
+                print("Ascii value 10 found: LINE FEED")
+        current_state_id = self.current_state[0]
+        out_edges = self.graph.edges(current_state_id)
+        #print("out edges from current state: ", out_edges)
         for edge in out_edges:
-            print("Edge with address: ", self.graph.get_edge_data(*edge))
             edge_set = self.graph[edge[0]][edge[1]]['tuples']
-
             edge_tuple = list(edge_set)
-            print(edge_tuple)
-            if (edge_tuple[0][0] == address and edge_tuple[0][1] == value):
-                logger.debug("Found correct edge transition, updating current state")
-                self.current_state = (self.graph.nodes[edge[1]]["state"].state_id, self.graph.nodes[edge[1]]["state"])
+
+            #print("looking in edge with values: " , edge_tuple)
+            #if (edge_tuple[0][0] == address and edge_tuple[0][1] == value):
+            if ((address, value) in edge_tuple):
+                if (uart):
+                    #print("What is the new node were going to? ", self.graph.nodes[edge[1]])
+                    print("Found correct edge transition, updating current state to: ")
+                self.current_state = (edge[1], self.graph.nodes[edge[1]]["state"])
+                if (uart):
+                    print(self.current_state)
                 return True
             elif (edge_tuple[0][0] == address and edge_tuple[0][1] != value):
-                logger.debug("Found correct write address but incorrect value")
+                if(uart):
+                    print("Found correct write address but incorrect value")
 
-        logger.error("We couldnt find a transition matching that address and value: "+ str(address) +" : " + str(value))
+        print("We couldnt find a transition matching that address and value: "+ str(address) +" : " + str(value))
         return True
 
