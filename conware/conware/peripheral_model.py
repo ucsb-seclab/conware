@@ -354,12 +354,18 @@ class PeripheralModel:
         """
 
         #Assumption: We are in correct current state and expect read address to be there
+        uart = False
+        if (self.name == 'UART'):
+             uart = True
+             logger.info("UART reading from address: " + str(hex(address)))
 
         if (address not in self.current_state[1].model_per_address):
-            logger.debug("Couldnt find model for read address")
-            return -1
+             if (uart):
+                logger.info("Couldnt find model for read address")
+             return -1
 
-
+        if(uart):
+            logger.info("Found read: " + str(hex(self.current_state[1].model_per_address[address].read())))
         return self.current_state[1].model_per_address[address].read()
 
 
@@ -387,6 +393,13 @@ class PeripheralModel:
                 logger.info("Ascii value 13 found: CARRIAGE RETURN")
             if (value == 10):
                 logger.info("Ascii value 10 found: LINE FEED")
+            if (value == 2):
+                logger.info("Ascii value 2 found: START OF TEXT")
+            if (value == 102):
+                logger.info("Ascii value 102 found: f")
+            if (value == 111):
+                logger.info("Ascii value 111 found: o")
+
         current_state_id = self.current_state[0]
         out_edges = self.graph.edges(current_state_id)
         #print("out edges from current state: ", out_edges)
