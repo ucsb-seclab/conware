@@ -38,7 +38,8 @@ class PeripheralModel:
         # state_id = (self.nodeID, PeripheralModel.global_nodeID) turns out we dont need this pair if all of the peripherals are separate graphs
         # PeripheralModel.global_nodeID += 1
         if state is None:
-            state = PeripheralModelState(address, operation, value, new_state_id)
+            state = PeripheralModelState(address, operation, value,
+                                         new_state_id)
         else:
             state.state_id = new_state_id
 
@@ -307,7 +308,6 @@ class PeripheralModel:
         """ Return the state given the state/node id """
         return networkx.get_node_attributes(self.graph, 'state')[state_id]
 
-
     def no_reads_merge(self, state1, state2):
         """
         Given state1 --> state2 where state 2 has 0 reads, merge state2 into state1
@@ -353,22 +353,21 @@ class PeripheralModel:
         look in model, models per address, figur out which address reading from, read from that model (peripheral state stored)
         """
 
-        #Assumption: We are in correct current state and expect read address to be there
+        # Assumption: We are in correct current state and expect read address to be there
         uart = False
         if (self.name == 'UART'):
-             uart = True
-             logger.info("UART reading from address: " + str(hex(address)))
+            uart = True
+            logger.info("UART reading from address: " + str(hex(address)))
 
         if (address not in self.current_state[1].model_per_address):
-             if (uart):
+            if (uart):
                 logger.info("Couldnt find model for read address")
-             return -1
+            return -1
 
-        if(uart):
-            logger.info("Found read: " + str(hex(self.current_state[1].model_per_address[address].read())))
+        if (uart):
+            logger.info("Found read: " + str(
+                hex(self.current_state[1].model_per_address[address].read())))
         return self.current_state[1].model_per_address[address].read()
-
-
 
     def write(self, address, size, value):
         """
@@ -379,12 +378,13 @@ class PeripheralModel:
         :return:
         """
         uart = False
+        logger.info("current peripheral: " + str(self.name))
+        logger.info("current state: " + str(self.current_state[0]))
+        logger.info("Attempting to write address: " + hex(
+            address) + " Value: " + str(value))
         if (self.name == 'UART'):
-            logger.info("current peripheral: "+ str(self.name))
-            logger.info("current state: " + str(self.current_state[0]))
             uart = True
         if (uart):
-            logger.info("Attempting to write address: " + str(address) + " Value: " + str(value))
             if (value == 79):
                 logger.info("Ascii value 79 found: O")
             if (value == 78):
@@ -402,25 +402,35 @@ class PeripheralModel:
 
         current_state_id = self.current_state[0]
         out_edges = self.graph.edges(current_state_id)
-        #print("out edges from current state: ", out_edges)
+        # print("out edges from current state: ", out_edges)
         for edge in out_edges:
             edge_set = self.graph[edge[0]][edge[1]]['tuples']
             edge_tuple = list(edge_set)
 
-            #print("looking in edge with values: " , edge_tuple)
-            #if (edge_tuple[0][0] == address and edge_tuple[0][1] == value):
+            # print("looking in edge with values: " , edge_tuple)
+            # if (edge_tuple[0][0] == address and edge_tuple[0][1] == value):
             if ((address, value) in edge_tuple):
                 if (uart):
-                    #print("What is the new node were going to? ", self.graph.nodes[edge[1]])
-                    logger.info("Found correct edge transition, updating current state to: ")
-                self.current_state = (edge[1], self.graph.nodes[edge[1]]["state"])
+                    # print("What is the new node were going to? ", self.graph.nodes[edge[1]])
+                    logger.info(
+                        "Found correct edge transition, updating current state to: ")
+                self.current_state = (
+                    edge[1], self.graph.nodes[edge[1]]["state"])
                 if (uart):
                     logger.info(str(self.current_state))
+
+                # Write our value to the model (e.g., SimpleStorage)
+                if address in self.current_state[1].model_per_address:
+                    self.current_state[1].model_per_address[address].write(
+                        value)
+
                 return True
             elif (edge_tuple[0][0] == address and edge_tuple[0][1] != value):
-                if(uart):
-                    logger.info("Found correct write address but incorrect value")
+                if (uart):
+                    logger.info("Found correct write address but incorrect "
+                                "value")
 
-        logger.error("We couldnt find a transition matching that address and value: "+ str(address) +" : " + str(value))
-        return True
-
+        logger.error("%s: We couldn't find a transition matching that address "
+                     "and value: %s : %s" % (self.name, hex(address),
+                                             str(value)))
+        return False

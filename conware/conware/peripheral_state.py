@@ -17,7 +17,7 @@ class PeripheralModelState:
 
     def __init__(self, address, operation, value, state_id):
         self.state_id = state_id
-        # self.name = "%s:%s:%#x" % (operation, hex(address), value)
+        self.name = "%s:%s:%#x" % (operation, hex(address), value)
         # self.operation = operation
         self.value = value
         self.reads = {}
@@ -26,7 +26,8 @@ class PeripheralModelState:
         self.model_per_address = {}
 
         # state number imported from old state model, not sure if we need it
-        # was used for visualization purposes, i haven't dove very deep into all of the different visualizations, just UART
+        # was used for visualization purposes, i haven't dove very deep into all
+        # of the different visualizations, just UART
         self.state_number = PeripheralModelState.state_number
         PeripheralModelState.state_number += 1
 
@@ -58,27 +59,31 @@ class PeripheralModelState:
         # Check if just storage
         storage = True
         for val, pc, size, timestamp in read_log:
-            if val != self.value:
+            if int(val) != int(self.value):
                 storage = False
+            else:
+                logger.info("Found Storage!! %d == %d" % (val,
+                                                          self.value))
         if storage:
             m = SimpleStorageModel()
             m.train(read_log)
-            # logger.info("Name %s is StorageModel" % self.name)
+            logger.debug("State %s is StorageModel" % self.state_id)
+            return m
 
         # Try Other Models
         if use_time_domain:
-            for model in [PatternModel, MarkovPatternModel, IncreasingModel,
+            for model in [PatternModel, IncreasingModel, MarkovPatternModel,
                           MarkovModel]:
                 m = model()
                 logger.debug("Trying model %s" % repr(m))
                 if m.train(read_log):
-                    # logger.info("Name %s is %s" % (self.name, repr(model)))
+                    logger.info("%s is %s" % (self.name, repr(model)))
                     return m
         else:
             for model in [MarkovModel]:
                 m = model()
                 if m.train(read_log):
-                    # logger.info("Name %s is %s" % (self.name, repr(model)))
+                    # logger.info("%s is %s" % (self.name, repr(model)))
                     return m
 
     def append_read(self, address, value, pc, size, timestamp):
@@ -102,11 +107,11 @@ class PeripheralModelState:
             combined_reads = []  # aggregate of all reads
             for read_count in self.reads[address]:
                 combined_reads += self.reads[address][read_count]
-                reads = self.reads[address][read_count]
-
-                # Set Model for ordered Reads
-                m = self._train_model(reads, use_time_domain=False)
-                self.model_per_address_ordered[address][read_count] = m
+            #     reads = self.reads[address][read_count]
+            #
+            #     # Set Model for ordered Reads
+            #     m = self._train_model(reads, use_time_domain=False)
+            #     self.model_per_address_ordered[address][read_count] = m
 
             # Set Model for unordered reads
             m = self._train_model(combined_reads)

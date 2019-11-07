@@ -35,8 +35,8 @@ if __name__ == "__main__":
 
     # Get user input
     parser = argparse.ArgumentParser()
-    parser.add_argument("--recording_dir", "-r", default="recording",
-                        help="Directory containing all of the log files")
+    parser.add_argument("model_filename",
+                        help="Model filename")
     parser.add_argument("--debug", "-d", default=False, action='store_true',
                         help="Enable debug output.")
     args = parser.parse_args()
@@ -49,33 +49,34 @@ if __name__ == "__main__":
     else:
         l.setLevel(logging.INFO)
 
-    if not os.path.exists(args.recording_dir):
+    # if not os.path.exists(args.recording_dir):
+    #     parser.print_help()
+    #     sys.exit(0)
+
+    # model_file = os.path.join(args.recording_dir, G.MODEL_FILE_OPTIMIZED)
+    if not os.path.exists(args.model_filename):
+        logger.error("Model file (%s) does not exist.", args.model_filename)
         parser.print_help()
         sys.exit(0)
 
-    model_file = os.path.join(args.recording_dir, G.MODEL_FILE_OPTIMIZED)
-    if not os.path.exists(model_file):
-        logger.error("Model file (%s) does not exist.", model_file)
-        parser.print_help()
-        sys.exit(0)
-
-    logger.info("Importing model file (%s)..." % model_file)
-    model = PretenderModel(filename=model_file)
+    logger.info("Importing model file (%s)..." % args.model_filename)
+    model = PretenderModel(filename=args.model_filename)
 
     for peripheral in model.peripherals:
-
         # logger.info("Graphing %s..." % str(peripheral.name))
         # dot = Digraph(comment=str(peripheral))
         # bfs_graph(dot, peripheral.start_state)
         # dot.render('test.gv', view=True)
         #
         # peripheral.reset()
-
+        peripheral._label_nodes()
         logger.info("Graphing %s..." % str(peripheral.name))
         A = to_agraph(peripheral.graph)
         A.layout('dot')
-        A.draw(str(peripheral.name)+ 'optimized.svg')
-
+        basename = os.path.splitext(args.model_filename)[0]
+        save_filename = basename + "_" + str(peripheral.name) + '.pdf'
+        logger.info("Saving graph to %s..." % save_filename)
+        A.draw(save_filename)
 
         # if peripheral.name == "UART" or False:
         #
@@ -97,8 +98,7 @@ if __name__ == "__main__":
         #     edge_labels = networkx.get_edge_attributes(peripheral.graph, 'r')
         #     networkx.draw_networkx_edge_labels(peripheral.graph, pos, labels=edge_labels, font_size=6)
 
-
-            # plt.savefig("graph.pdf")
-            # plt.show()
+        # plt.savefig("graph.pdf")
+        # plt.show()
 
     print model
