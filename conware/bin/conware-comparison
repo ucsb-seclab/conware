@@ -4,6 +4,8 @@ import argparse
 import importlib
 import os
 import pprint
+import time
+import sys
 
 from avatar2 import *
 import logging
@@ -162,24 +164,24 @@ if __name__ == "__main__":
 
     # Do all of our checks!
     if not os.path.exists(args.sample):
-        l.error("Sample file (%s) does not exist." % args.sample)
+        logger.error("Sample file (%s) does not exist." % args.sample)
         parser.print_help()
         sys.exit()
 
     if not os.path.exists(args.qemu_executable):
-        l.error("QEMU executable (%s) does not exist." % args.qemu_executable)
+        logger.error("QEMU executable (%s) does not exist." % args.qemu_executable)
         parser.print_help()
         sys.exit()
 
     if not os.path.exists(args.recording_dir):
-        l.error("Recording directory does not exist (%s)." %
+        logger.error("Recording directory does not exist (%s)." %
                 args.recording_dir)
         parser.print_help()
         sys.exit()
 
     model_file = os.path.join(args.recording_dir, G.MODEL_FILE)
     if not os.path.exists(model_file):
-        l.error("No model file found (%s).  Make sure you "
+        logger.error("No model file found (%s).  Make sure you "
                 "trained a model!" % model_file)
         parser.print_help()
         sys.exit()
