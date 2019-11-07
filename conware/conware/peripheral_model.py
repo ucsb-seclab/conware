@@ -3,6 +3,7 @@ import random
 import sys
 import networkx
 import networkx.algorithms.isomorphism as iso
+from pretender.models.simple_storage import SimpleStorageModel
 from conware.peripheral_state import PeripheralModelState
 
 import copy
@@ -354,19 +355,19 @@ class PeripheralModel:
         """
 
         # Assumption: We are in correct current state and expect read address to be there
-        uart = False
-        if (self.name == 'UART'):
-            uart = True
-            logger.info("UART reading from address: " + str(hex(address)))
+        # uart = False
+        # if (self.name == 'UART'):
+        #     uart = True
+        #     logger.info("UART reading from address: " + str(hex(address)))
 
         if (address not in self.current_state[1].model_per_address):
-            if (uart):
-                logger.info("Couldnt find model for read address")
+            # if (uart):
+            #     logger.info("Couldnt find model for read address")
             return -1
 
-        if (uart):
-            logger.info("Found read: " + str(
-                hex(self.current_state[1].model_per_address[address].read())))
+        # if (uart):
+        #     logger.info("Found read: " + str(
+        #         hex(self.current_state[1].model_per_address[address].read())))
         return self.current_state[1].model_per_address[address].read()
 
     def write(self, address, size, value):
@@ -376,14 +377,19 @@ class PeripheralModel:
         :param size:
         :param value:
         :return:
+        1. look for edge
+        2. check if simple storage model in models per address
+        3. BFS for valid edge
         """
         uart = False
-        logger.info("current peripheral: " + str(self.name))
-        logger.info("current state: " + str(self.current_state[0]))
-        logger.info("Attempting to write address: " + hex(
-            address) + " Value: " + str(value))
+        #logger.info("current peripheral: " + str(self.name))
+        #logger.info("current state: " + str(self.current_state[0]))
+        #logger.info("Attempting to write address: " + hex(address) + " Value: " + str(value))
         if (self.name == 'UART'):
             uart = True
+            logger.info("UART")
+            logger.info("Attempting to write address: " + str(address) + " Value: " + str(value))
+
         if (uart):
             if (value == 79):
                 logger.info("Ascii value 79 found: O")
@@ -404,31 +410,55 @@ class PeripheralModel:
         out_edges = self.graph.edges(current_state_id)
         # print("out edges from current state: ", out_edges)
         for edge in out_edges:
-            edge_set = self.graph[edge[0]][edge[1]]['tuples']
-            edge_tuple = list(edge_set)
+            edge_tuple = list(self.graph[edge[0]][edge[1]]['tuples'])
 
-            # print("looking in edge with values: " , edge_tuple)
-            # if (edge_tuple[0][0] == address and edge_tuple[0][1] == value):
             if ((address, value) in edge_tuple):
+                self.current_state = (edge[1], self.graph.nodes[edge[1]]["state"])
                 if (uart):
-                    # print("What is the new node were going to? ", self.graph.nodes[edge[1]])
-                    logger.info(
-                        "Found correct edge transition, updating current state to: ")
-                self.current_state = (
-                    edge[1], self.graph.nodes[edge[1]]["state"])
-                if (uart):
+                    logger.info("Found correct edge transition, updating current state to: ")
                     logger.info(str(self.current_state))
 
                 # Write our value to the model (e.g., SimpleStorage)
                 if address in self.current_state[1].model_per_address:
-                    self.current_state[1].model_per_address[address].write(
-                        value)
-
+                    self.current_state[1].model_per_address[address].write(value)
+                else:
+                    if(uart):
+                        logger.info("Couldnt write address to model because address not found in model per address")
                 return True
+
             elif (edge_tuple[0][0] == address and edge_tuple[0][1] != value):
                 if (uart):
-                    logger.info("Found correct write address but incorrect "
-                                "value")
+                    logger.info("Found correct write address but incorrect value")
+
+        #couldnt find an edge, check if simple storage model
+        if (address in self.current_state[1].model_per_address):
+            if (uart):
+                logger.info("We couldnt find a connecting edge, checking if SimpleStorage")
+            if (type(self.current_state[1].model_per_address[address]) is SimpleStorageModel):
+                if (uart):
+                    logger.info("SimpleStorage!! Writing")
+                #if it is a simple storage model then just write to the address
+                self.current_state[1].model_per_address[address].write(value)
+                return True
+
+        #otherwise start BFS
+        target_edges = list(networkx.bfs_edges(self.graph, source=self.current_state[0]))
+        if (uart):
+            logger.info("Starting BFS with target edges: " + str(target_edges))
+        for edge in target_edges:
+
+            edge_tuple = list(self.graph[edge[0]][edge[1]]['tuples'])
+
+            if (uart):
+                logger.info("BFS edge being considered: " + str(edge) + "; with addr, val: " + str(edge_tuple))
+
+            if ((address, value) in edge_tuple):
+                if (uart):
+                    logger.info("Found good edge in BFS, transitioning to state: " + str(edge[1]))
+                self.current_state = (edge[1], self.graph.nodes[edge[1]]["state"])
+                if address in self.current_state[1].model_per_address:
+                    self.current_state[1].model_per_address[address].write(value)
+                return True
 
         logger.error("%s: We couldn't find a transition matching that address "
                      "and value: %s : %s" % (self.name, hex(address),
