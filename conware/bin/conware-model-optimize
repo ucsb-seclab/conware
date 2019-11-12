@@ -23,7 +23,7 @@ logger = logging.getLogger(__name__)
 
 
 # Increase our recursion limit
-sys.setrecursionlimit(1500)
+sys.setrecursionlimit(3000)
 
 
 if __name__ == "__main__":
