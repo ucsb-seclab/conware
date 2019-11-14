@@ -3,6 +3,7 @@ import random
 import sys
 import networkx
 import networkx.algorithms.isomorphism as iso
+from sets import Set
 from pretender.models.simple_storage import SimpleStorageModel
 from conware.peripheral_state import PeripheralModelState
 
@@ -207,20 +208,21 @@ class PeripheralModel:
         :param state_id_2:
         :return:
         """
+        merge_set = set()
         if state_id_1 == state_id_2:
-            return True
-
+            #return True
+            return merge_set
         state1 = self._get_state(state_id_1)
         state2 = self._get_state(state_id_2)
         if state1 == state2:
-            logger.debug("%d (%s) == %d (%s)" % (state_id_1, state1, state_id_2,
-                                                 state2))
+            logger.info("%d (%s) == %d (%s)" % (state_id_1, state1, state_id_2,state2))
             # logger.info(self.equiv_states)
             for equiv_tuple in self.equiv_states:
                 if state_id_1 in equiv_tuple and \
                         state_id_2 in equiv_tuple:
                     self.equiv_states.append((state_id_1, state_id_2))
-                    return True
+                    #return True
+                    return merge_set
             self.equiv_states.append((state_id_1, state_id_2))
 
             graph = networkx.Graph(self.equiv_states)
@@ -243,8 +245,13 @@ class PeripheralModel:
                     e2_labels = self._get_edge_labels(e2)
                     # Do we have a duplicate edge (i.e., state transition)
                     if e1_labels & e2_labels:
-                        rtn &= self._merge_recursive(e1[1], e2[1])
-            if not rtn:
+                        #rtn &= self._merge_recursive(e1[1], e2[1])
+                        merge_set.add(e1[1])
+                        merge_set.add(e2[1])
+
+            #if not rtn:
+            #    return False
+            if len(merge_set) == 0:
                 return False
 
             for e1 in edges_2:
@@ -253,10 +260,13 @@ class PeripheralModel:
                     e2_labels = self._get_edge_labels(e2)
                     # Do we have a duplicate edge (i.e., state transition)
                     if e1_labels & e2_labels:
-                        rtn &= self._merge_recursive(e1[1], e2[1])
-            if not rtn:
+                        #rtn &= self._merge_recursive(e1[1], e2[1])
+                        merge_set.add(e1[1])
+                        merge_set.add(e2[1])
+            #if not rtn:
+            #    return False
+            if len(merge_set) == 0:
                 return False
-
             # rtn = True
             # for e1 in edges_1:
             #     for e2 in edges_2:
@@ -271,7 +281,10 @@ class PeripheralModel:
             #         if e1_labels & e2_labels:
             #             rtn &= self._merge_recursive(e1[1], e2[1])
             #
-            return rtn
+
+
+            # return rtn
+            return merge_set
         else:
             return False
 
@@ -281,7 +294,6 @@ class PeripheralModel:
         states.
         :return:
         """
-
         merged = True
         while merged:
             merged = False
@@ -294,8 +306,31 @@ class PeripheralModel:
                         continue
 
                     self.equiv_states = []
-                    if self._merge_recursive(n1, n2):
-                        logger.info("Merging states %d and %d..." % (n1, n2))
+
+                    merge_set = self._merge_recursive(n1,n2)
+
+                    while type(merge_set) == set and not len(merge_set) == 0:
+                        a = merge_set.pop()
+                        if len(merge_set) == 0:
+                            b = a
+                        else:
+                            b = merge_set.pop()
+                        set2 = self._merge_recursive(a,b)
+
+                        if set2 == False:
+                            merge_set = False
+
+                        else:
+                            merge_set = merge_set.union(set2)
+
+                        if type(merge_set) == set and len(merge_set) == 0:
+                            merge_set = True
+                    #if self._merge_recursive(n1, n2):
+                    if merge_set == True:
+                        logger.info("Merging States: ")
+                        for state in self.equiv_states:
+                            logger.info(" %d and %d..." % (state[0], state[1]))
+                        logger.info("into one equivalent state")
                         self._merge_states(self.equiv_states)
                         merged = True
                         break
