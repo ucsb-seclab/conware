@@ -201,7 +201,7 @@ class PeripheralModel:
 
         networkx.set_node_attributes(self.graph, attributes)
 
-    def _merge_recursive(self, state_id_1, state_id_2):
+    def _get_merge_constraints(self, state_id_1, state_id_2):
         """
         Recursive call to
         :param state_id_1:
@@ -210,18 +210,18 @@ class PeripheralModel:
         """
         merge_set = set()
         if state_id_1 == state_id_2:
-            #return True
+            # return True
             return merge_set
         state1 = self._get_state(state_id_1)
         state2 = self._get_state(state_id_2)
         if state1 == state2:
-            logger.info("%d (%s) == %d (%s)" % (state_id_1, state1, state_id_2,state2))
+            logger.debug(
+                "%d (%s) == %d (%s)" % (state_id_1, state1, state_id_2, state2))
             # logger.info(self.equiv_states)
             for equiv_tuple in self.equiv_states:
                 if state_id_1 in equiv_tuple and \
                         state_id_2 in equiv_tuple:
                     self.equiv_states.append((state_id_1, state_id_2))
-                    #return True
                     return merge_set
             self.equiv_states.append((state_id_1, state_id_2))
 
@@ -245,14 +245,9 @@ class PeripheralModel:
                     e2_labels = self._get_edge_labels(e2)
                     # Do we have a duplicate edge (i.e., state transition)
                     if e1_labels & e2_labels:
-                        #rtn &= self._merge_recursive(e1[1], e2[1])
-                        merge_set.add(e1[1])
-                        merge_set.add(e2[1])
-
-            #if not rtn:
-            #    return False
-            if len(merge_set) == 0:
-                return False
+                        # rtn &= self._merge_recursive(e1[1], e2[1])
+                        merge_set.add((e1[1], e2[1]))
+                        # merge_set.add(e2[1])
 
             for e1 in edges_2:
                 for e2 in equiv_edges:
@@ -260,13 +255,13 @@ class PeripheralModel:
                     e2_labels = self._get_edge_labels(e2)
                     # Do we have a duplicate edge (i.e., state transition)
                     if e1_labels & e2_labels:
-                        #rtn &= self._merge_recursive(e1[1], e2[1])
-                        merge_set.add(e1[1])
-                        merge_set.add(e2[1])
-            #if not rtn:
+                        # rtn &= self._merge_recursive(e1[1], e2[1])
+                        merge_set.add((e1[1], e2[1]))
+                        # merge_set.add(e2[1])
+            # if not rtn:
             #    return False
-            if len(merge_set) == 0:
-                return False
+            # if len(merge_set) == 0:
+            #     return False
             # rtn = True
             # for e1 in edges_1:
             #     for e2 in edges_2:
@@ -281,7 +276,6 @@ class PeripheralModel:
             #         if e1_labels & e2_labels:
             #             rtn &= self._merge_recursive(e1[1], e2[1])
             #
-
 
             # return rtn
             return merge_set
@@ -302,34 +296,34 @@ class PeripheralModel:
                 for n2 in networkx.dfs_preorder_nodes(self.graph,
                                                       self.start_state[0]):
 
+                    logger.info("Comparing %d and %d" % (n1, n2))
                     if n1 == n2:
                         continue
 
                     self.equiv_states = []
 
-                    merge_set = self._merge_recursive(n1,n2)
+                    merge_set = self._get_merge_constraints(n1, n2)
+                    if merge_set is False:
+                        continue
 
-                    while type(merge_set) == set and not len(merge_set) == 0:
-                        a = merge_set.pop()
-                        if len(merge_set) == 0:
-                            b = a
-                        else:
-                            b = merge_set.pop()
-                        set2 = self._merge_recursive(a,b)
+                    # Ensure that all shared outgoing edges are also mergable
+                    mergable = True
+                    while len(merge_set) != 0:
+                        x, y = merge_set.pop()
 
-                        if set2 == False:
-                            merge_set = False
-
+                        set2 = self._get_merge_constraints(x, y)
+                        if set2 is False:
+                            mergable = False
+                            break
                         else:
                             merge_set = merge_set.union(set2)
 
-                        if type(merge_set) == set and len(merge_set) == 0:
-                            merge_set = True
-                    #if self._merge_recursive(n1, n2):
-                    if merge_set == True:
-                        logger.info("Merging States: ")
+                    # if self._merge_recursive(n1, n2):
+                    if mergable:
+                        logger.info("Merging States: %d and %d" % (n1, n2))
+                        logger.info(self.equiv_states)
                         for state in self.equiv_states:
-                            logger.info(" %d and %d..." % (state[0], state[1]))
+                            logger.debug(" %d and %d..." % (state[0], state[1]))
                         logger.info("into one equivalent state")
                         self._merge_states(self.equiv_states)
                         merged = True
@@ -417,13 +411,14 @@ class PeripheralModel:
         3. BFS for valid edge
         """
         uart = False
-        #logger.info("current peripheral: " + str(self.name))
-        #logger.info("current state: " + str(self.current_state[0]))
-        #logger.info("Attempting to write address: " + hex(address) + " Value: " + str(value))
+        # logger.info("current peripheral: " + str(self.name))
+        # logger.info("current state: " + str(self.current_state[0]))
+        # logger.info("Attempting to write address: " + hex(address) + " Value: " + str(value))
         if (self.name == 'UART'):
             uart = True
             logger.info("UART")
-            logger.info("Attempting to write address: " + str(address) + " Value: " + str(value))
+            logger.info("Attempting to write address: " + str(
+                address) + " Value: " + str(value))
 
         if (uart):
             if (value == 79):
@@ -448,36 +443,44 @@ class PeripheralModel:
             edge_tuple = list(self.graph[edge[0]][edge[1]]['tuples'])
 
             if ((address, value) in edge_tuple):
-                self.current_state = (edge[1], self.graph.nodes[edge[1]]["state"])
+                self.current_state = (
+                edge[1], self.graph.nodes[edge[1]]["state"])
                 if (uart):
-                    logger.info("Found correct edge transition, updating current state to: ")
+                    logger.info(
+                        "Found correct edge transition, updating current state to: ")
                     logger.info(str(self.current_state))
 
                 # Write our value to the model (e.g., SimpleStorage)
                 if address in self.current_state[1].model_per_address:
-                    self.current_state[1].model_per_address[address].write(value)
+                    self.current_state[1].model_per_address[address].write(
+                        value)
                 else:
-                    if(uart):
-                        logger.info("Couldnt write address to model because address not found in model per address")
+                    if (uart):
+                        logger.info(
+                            "Couldnt write address to model because address not found in model per address")
                 return True
 
             elif (edge_tuple[0][0] == address and edge_tuple[0][1] != value):
                 if (uart):
-                    logger.info("Found correct write address but incorrect value")
+                    logger.info(
+                        "Found correct write address but incorrect value")
 
-        #couldnt find an edge, check if simple storage model
+        # couldnt find an edge, check if simple storage model
         if (address in self.current_state[1].model_per_address):
             if (uart):
-                logger.info("We couldnt find a connecting edge, checking if SimpleStorage")
-            if (type(self.current_state[1].model_per_address[address]) is SimpleStorageModel):
+                logger.info(
+                    "We couldnt find a connecting edge, checking if SimpleStorage")
+            if (type(self.current_state[1].model_per_address[
+                         address]) is SimpleStorageModel):
                 if (uart):
                     logger.info("SimpleStorage!! Writing")
-                #if it is a simple storage model then just write to the address
+                # if it is a simple storage model then just write to the address
                 self.current_state[1].model_per_address[address].write(value)
                 return True
 
-        #otherwise start BFS
-        target_edges = list(networkx.bfs_edges(self.graph, source=self.current_state[0]))
+        # otherwise start BFS
+        target_edges = list(
+            networkx.bfs_edges(self.graph, source=self.current_state[0]))
         if (uart):
             logger.info("Starting BFS with target edges: " + str(target_edges))
         for edge in target_edges:
@@ -485,14 +488,19 @@ class PeripheralModel:
             edge_tuple = list(self.graph[edge[0]][edge[1]]['tuples'])
 
             if (uart):
-                logger.info("BFS edge being considered: " + str(edge) + "; with addr, val: " + str(edge_tuple))
+                logger.info("BFS edge being considered: " + str(
+                    edge) + "; with addr, val: " + str(edge_tuple))
 
             if ((address, value) in edge_tuple):
                 if (uart):
-                    logger.info("Found good edge in BFS, transitioning to state: " + str(edge[1]))
-                self.current_state = (edge[1], self.graph.nodes[edge[1]]["state"])
+                    logger.info(
+                        "Found good edge in BFS, transitioning to state: " + str(
+                            edge[1]))
+                self.current_state = (
+                edge[1], self.graph.nodes[edge[1]]["state"])
                 if address in self.current_state[1].model_per_address:
-                    self.current_state[1].model_per_address[address].write(value)
+                    self.current_state[1].model_per_address[address].write(
+                        value)
                 return True
 
         logger.error("%s: We couldn't find a transition matching that address "

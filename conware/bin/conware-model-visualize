@@ -74,7 +74,7 @@ if __name__ == "__main__":
         A = to_agraph(peripheral.graph)
         A.layout('dot')
         basename = os.path.splitext(args.model_filename)[0]
-        save_filename = basename + "_" + str(peripheral.name) + '.svg'
+        save_filename = basename + "_" + str(peripheral.name) + '.pdf'
         logger.info("Saving graph to %s..." % save_filename)
         A.draw(save_filename)
 
