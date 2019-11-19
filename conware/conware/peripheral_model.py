@@ -28,6 +28,7 @@ class PeripheralModel:
         self.name = name
         self.current_state = self.create_state(-1, "start", -1)
         self.start_state = self.current_state
+        self.equiv_states = []
 
     def update_node_id(self):
         self.nodeID += 1
@@ -63,8 +64,6 @@ class PeripheralModel:
         """
         logger.debug("got read %08X %08X" % (address, value))
         self.current_state[1].append_read(address, value, pc, size, timestamp)
-        # attributes = {self.current_state[0]: self.current_state[1].reads}
-        # networkx.set_node_attributes(self.graph, attributes)
 
     def train_write(self, address, value):
         logger.info("got write %08X %08X" % (address, value))
@@ -72,7 +71,6 @@ class PeripheralModel:
         new_state = self.create_state(address, "write", value)
         old_state = self.current_state
         self.current_state = new_state
-        # self.graph.add_edge(self.current_state[0]-1, self.current_state[0], value=value)
         self._add_edge(old_state[0], self.current_state[0],
                        address=address, value=value)
 
@@ -130,8 +128,6 @@ class PeripheralModel:
         """
         merge state 2 into state 1
         """
-        # logger.info("Merging: %s" % str(equiv_states))
-
         graph = networkx.Graph(equiv_states)
         equiv_classes = [tuple(c) for c in networkx.connected_components(graph)]
 
@@ -210,14 +206,15 @@ class PeripheralModel:
         """
         merge_set = set()
         if state_id_1 == state_id_2:
-            # return True
             return merge_set
+
         state1 = self._get_state(state_id_1)
         state2 = self._get_state(state_id_2)
         if state1 == state2:
             logger.debug(
                 "%d (%s) == %d (%s)" % (state_id_1, state1, state_id_2, state2))
-            # logger.info(self.equiv_states)
+            # If these states are already accounted for, we don't need to
+            # keep traversing
             for equiv_tuple in self.equiv_states:
                 if state_id_1 in equiv_tuple and \
                         state_id_2 in equiv_tuple:
@@ -225,6 +222,8 @@ class PeripheralModel:
                     return merge_set
             self.equiv_states.append((state_id_1, state_id_2))
 
+            # Compress our existing nodes into equivalence classes to group
+            # edges
             graph = networkx.Graph(self.equiv_states)
             equiv_classes = [tuple(c) for c in
                              networkx.connected_components(graph)]
@@ -239,45 +238,24 @@ class PeripheralModel:
             edges_2 = self.graph.out_edges(state_id_2)
 
             rtn = True
+            # Check all outgoing edges for node 1
             for e1 in edges_1:
                 for e2 in equiv_edges:
                     e1_labels = self._get_edge_labels(e1)
                     e2_labels = self._get_edge_labels(e2)
                     # Do we have a duplicate edge (i.e., state transition)
                     if e1_labels & e2_labels:
-                        # rtn &= self._merge_recursive(e1[1], e2[1])
                         merge_set.add((e1[1], e2[1]))
-                        # merge_set.add(e2[1])
 
+            # Check all outgoing edges for node 2
             for e1 in edges_2:
                 for e2 in equiv_edges:
                     e1_labels = self._get_edge_labels(e1)
                     e2_labels = self._get_edge_labels(e2)
                     # Do we have a duplicate edge (i.e., state transition)
                     if e1_labels & e2_labels:
-                        # rtn &= self._merge_recursive(e1[1], e2[1])
                         merge_set.add((e1[1], e2[1]))
-                        # merge_set.add(e2[1])
-            # if not rtn:
-            #    return False
-            # if len(merge_set) == 0:
-            #     return False
-            # rtn = True
-            # for e1 in edges_1:
-            #     for e2 in edges_2:
-            #         e1_labels = self._get_edge_labels(e1)
-            #         e2_labels = self._get_edge_labels(e2)
-            #
-            #         print "--"
-            #         print e1_labels
-            #         print e2_labels
-            #         print "---"
-            #         # Do we have a duplicate edge (i.e., state transition)
-            #         if e1_labels & e2_labels:
-            #             rtn &= self._merge_recursive(e1[1], e2[1])
-            #
 
-            # return rtn
             return merge_set
         else:
             return False
@@ -318,13 +296,10 @@ class PeripheralModel:
                         else:
                             merge_set = merge_set.union(set2)
 
-                    # if self._merge_recursive(n1, n2):
+                    # Did everything check out?
                     if mergable:
                         logger.info("Merging States: %d and %d" % (n1, n2))
-                        logger.info(self.equiv_states)
-                        for state in self.equiv_states:
-                            logger.debug(" %d and %d..." % (state[0], state[1]))
-                        logger.info("into one equivalent state")
+                        logger.debug("Equivalent nodes: %s" % self.equiv_states)
                         self._merge_states(self.equiv_states)
                         merged = True
                         break
@@ -347,7 +322,7 @@ class PeripheralModel:
         """
         to_node = None
         out_edge_attr = None
-        if (len(state2["state"].reads) != 0):
+        if len(state2["state"].reads) != 0:
             return False
 
         # check and save outgoing edges of state2
@@ -368,7 +343,7 @@ class PeripheralModel:
         self.graph.remove_node(state2["state"].state_id)
 
         # reconnect outgoing edge
-        if (to_node):
+        if to_node:
             self.graph.add_edge(state1["state"].state_id, to_node,
                                 address=out_edge_attr[0],
                                 value=out_edge_attr[1])
