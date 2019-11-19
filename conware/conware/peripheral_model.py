@@ -269,10 +269,11 @@ class PeripheralModel:
         merged = True
         while merged:
             merged = False
+            visted = set()
             for n1 in networkx.dfs_preorder_nodes(self.graph,
                                                   self.start_state[0]):
                 for n2 in networkx.dfs_preorder_nodes(self.graph,
-                                                      self.start_state[0]):
+                                                      n1):
 
                     logger.info("Comparing %d and %d" % (n1, n2))
                     if n1 == n2:
