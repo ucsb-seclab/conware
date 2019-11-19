@@ -2,14 +2,19 @@
 
 #sudo apt-get install -y llvm>=3.8
 cd runtime 
-if [ ! -d cmake-3.13.4 ]; then 
-	wget https://github.com/Kitware/CMake/releases/download/v3.13.4/cmake-3.13.4.tar.gz
-	tar -xzvf cmake-3.13.4.tar.gz
-fi
+
 
 echo "Installing Ubuntu packages..."
+# if there is no cmake command, install it
+if type cmake >/dev/null 2>&1; then
+	echo "cmake already installed"
+else
+	echo "cmake not installed..."
+	sudo apt-get install -y cmake
+fi
 sudo apt-get -y install graphviz direnv
 sudo apt-get install -y libc6-dev-i386 
+
 
 echo "Installing ninja..."
 sudo apt-get -y install ninja-build || (echo "Could not install ninja" && exit 0)
