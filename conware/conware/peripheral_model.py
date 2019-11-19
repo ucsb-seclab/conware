@@ -1,13 +1,21 @@
+import StringIO
+import atexit
 import logging
+import pstats
 import random
 import sys
 import networkx
+import line_profiler
+import cProfile
 import networkx.algorithms.isomorphism as iso
 from sets import Set
 from pretender.models.simple_storage import SimpleStorageModel
 from conware.peripheral_state import PeripheralModelState
 
 import copy
+
+
+
 
 logger = logging.getLogger(__name__)
 
@@ -29,6 +37,8 @@ class PeripheralModel:
         self.current_state = self.create_state(-1, "start", -1)
         self.start_state = self.current_state
         self.equiv_states = []
+        self.visited = set()
+        self.edge_tuples = networkx.get_edge_attributes(self.graph, "tuples")
 
     def update_node_id(self):
         self.nodeID += 1
@@ -93,6 +103,7 @@ class PeripheralModel:
         :return:
         """
         if (s1, s2) in self.graph.edges:
+            self.edge_tuples = networkx.get_edge_attributes(self.graph, "tuples")
             tuples = self._get_edge_labels((s1, s2))
             tuples |= set([(address, value)])
             networkx.set_edge_attributes(self.graph,
@@ -114,9 +125,9 @@ class PeripheralModel:
         :param edge: Edge Label
         :return: (address, value)
         """
-        tuples = networkx.get_edge_attributes(self.graph, 'tuples')
-        if edge in tuples:
-            return tuples[edge]
+        #tuples = networkx.get_edge_attributes(self.graph, 'tuples')
+        if edge in self.edge_tuples:
+            return self.edge_tuples[edge]
         else:
             return None
 
@@ -148,6 +159,8 @@ class PeripheralModel:
 
             # Update all of our inbound edges
             for e in in_edges:
+                self.edge_tuples = networkx.get_edge_attributes(self.graph, "tuples")
+
                 tuples = self._get_edge_labels(e)
                 if e[0] not in equiv_set:
                     for (address, value) in tuples:
@@ -197,6 +210,12 @@ class PeripheralModel:
 
         networkx.set_node_attributes(self.graph, attributes)
 
+
+
+    profile = line_profiler.LineProfiler()
+    atexit.register(profile.print_stats)
+
+    @profile
     def _get_merge_constraints(self, state_id_1, state_id_2):
         """
         Recursive call to
@@ -215,12 +234,18 @@ class PeripheralModel:
                 "%d (%s) == %d (%s)" % (state_id_1, state1, state_id_2, state2))
             # If these states are already accounted for, we don't need to
             # keep traversing
-            for equiv_tuple in self.equiv_states:
-                if state_id_1 in equiv_tuple and \
-                        state_id_2 in equiv_tuple:
-                    self.equiv_states.append((state_id_1, state_id_2))
-                    return merge_set
+            # for equiv_tuple in self.equiv_states:
+            #     if state_id_1 in equiv_tuple and \
+            #             state_id_2 in equiv_tuple:
+            #         self.equiv_states.append((state_id_1, state_id_2))
+            #         return merge_set
             self.equiv_states.append((state_id_1, state_id_2))
+            if (state_id_1 in self.visited and state_id_2 in self.visited):
+                return merge_set
+
+
+            self.visited.add(state_id_1)
+            self.visited.add(state_id_2)
 
             # Compress our existing nodes into equivalence classes to group
             # edges
@@ -255,10 +280,11 @@ class PeripheralModel:
                     # Do we have a duplicate edge (i.e., state transition)
                     if e1_labels & e2_labels:
                         merge_set.add((e1[1], e2[1]))
-
             return merge_set
         else:
+
             return False
+
 
     def optimize2(self):
         """
@@ -266,6 +292,7 @@ class PeripheralModel:
         states.
         :return:
         """
+        self.edge_tuples = networkx.get_edge_attributes(self.graph, "tuples")
         merged = True
         while merged:
             merged = False
@@ -276,12 +303,17 @@ class PeripheralModel:
                                                       n1):
 
                     logger.info("Comparing %d and %d" % (n1, n2))
+                    # if (n1 == 1488 and n2 == 62):
+                    #     pr = cProfile.Profile()
+                    #     pr.enable()
                     if n1 == n2:
                         continue
 
                     self.equiv_states = []
 
                     merge_set = self._get_merge_constraints(n1, n2)
+
+
                     if merge_set is False:
                         continue
 
@@ -293,6 +325,13 @@ class PeripheralModel:
                         set2 = self._get_merge_constraints(x, y)
                         if set2 is False:
                             mergable = False
+                            # if (n1 == 1488 and n2 == 62):  # 1488 and 62/68/, 1531 and 170
+                            #     pr.disable()
+                            #     s = StringIO.StringIO()
+                            #     sortby = 'cumulative'
+                            #     ps = pstats.Stats(pr, stream=s).sort_stats(sortby)
+                            #     ps.print_stats()
+                            #     print s.getvalue()
                             break
                         else:
                             merge_set = merge_set.union(set2)
@@ -302,10 +341,25 @@ class PeripheralModel:
                         logger.info("Merging States: %d and %d" % (n1, n2))
                         logger.debug("Equivalent nodes: %s" % self.equiv_states)
                         self._merge_states(self.equiv_states)
+                        self.edge_tuples = networkx.get_edge_attributes(self.graph, "tuples")
                         merged = True
+                        # if (n1 == 1488 and n2 == 62):  # 1488 and 62/68/, 1531 and 170
+                        #     pr.disable()
+                        #     s = StringIO.StringIO()
+                        #     sortby = 'cumulative'
+                        #     ps = pstats.Stats(pr, stream=s).sort_stats(sortby)
+                        #     ps.print_stats()
+                        #     print s.getvalue()
                         break
 
                 if merged:
+                    # if (n1 == 1488 and n2 == 62):  # 1488 and 62/68/, 1531 and 170
+                    #     pr.disable()
+                    #     s = StringIO.StringIO()
+                    #     sortby = 'cumulative'
+                    #     ps = pstats.Stats(pr, stream=s).sort_stats(sortby)
+                    #     ps.print_stats()
+                    #     print s.getvalue()
                     break
 
         self._label_nodes()
