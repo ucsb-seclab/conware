@@ -1,0 +1,104 @@
+#!/usr/bin/env python
+
+# Native
+import argparse
+import fnmatch
+import os
+
+import sys
+
+from networkx.drawing.nx_agraph import to_agraph
+
+sys.path.append("/home/graham/Desktop/conware/conware/")
+
+import logging
+
+from conware.model import PretenderModel
+import pretender.globals as G
+import pickle
+
+import networkx
+import matplotlib.pyplot as plt
+
+from graphviz import Digraph
+
+logger = logging.getLogger(__name__)
+
+if __name__ == "__main__":
+    # Default argument values
+    sample = "bins/Nucleo_blink_led.bin"
+    openocd_conf = '/usr/share/openocd/scripts/board/st_nucleo_l1.cfg'
+    output_dir = '/tmp/myavatar'
+    qemu_executable = "../../avatar-pretender/targets/build/qemu/arm-softmmu/qemu-system-arm"
+    gdb_port = 1235
+    qemu_port = 23454
+
+    # Get user input
+    parser = argparse.ArgumentParser()
+    parser.add_argument("model_filename",
+                        help="Model filename")
+    parser.add_argument("--debug", "-d", default=False, action='store_true',
+                        help="Enable debug output.")
+    args = parser.parse_args()
+
+    # Setup Logging
+    logging.basicConfig()
+    l = logging.getLogger()
+    if args.debug:
+        l.setLevel(logging.DEBUG)
+    else:
+        l.setLevel(logging.INFO)
+
+    # if not os.path.exists(args.recording_dir):
+    #     parser.print_help()
+    #     sys.exit(0)
+
+    # model_file = os.path.join(args.recording_dir, G.MODEL_FILE_OPTIMIZED)
+    if not os.path.exists(args.model_filename):
+        logger.error("Model file (%s) does not exist.", args.model_filename)
+        parser.print_help()
+        sys.exit(0)
+
+    logger.info("Importing model file (%s)..." % args.model_filename)
+    model = PretenderModel(filename=args.model_filename)
+
+    for peripheral in model.peripherals:
+        # logger.info("Graphing %s..." % str(peripheral.name))
+        # dot = Digraph(comment=str(peripheral))
+        # bfs_graph(dot, peripheral.start_state)
+        # dot.render('test.gv', view=True)
+        #
+        # peripheral.reset()
+        peripheral._label_nodes()
+        logger.info("Graphing %s..." % str(peripheral.name))
+        A = to_agraph(peripheral.graph)
+        A.layout('dot')
+        basename = os.path.splitext(args.model_filename)[0]
+        save_filename = basename + "_" + str(peripheral.name) + '.pdf'
+        logger.info("Saving graph to %s..." % save_filename)
+        A.draw(save_filename)
+
+        # if peripheral.name == "UART" or False:
+        #
+        #     # peripheral._label_nodes()
+        #     # A = to_agraph(peripheral.graph)
+        #     # A.layout('dot')
+        #     # A.draw('UART_before.svg')
+        #     # print(peripheral.graph.nodes)
+        #     #
+        #     #
+        #     # peripheral.optimize2()
+        #     A = to_agraph(peripheral.graph)
+        #     A.layout('dot')
+        #     A.draw('UART_optimized.svg')
+        #
+        #     pos = networkx.spring_layout(peripheral.graph, k=.01, iterations=1500)
+        #     networkx.draw(peripheral.graph, pos, with_labels=True, node_size=200, font_size=6)
+        #
+        #     edge_labels = networkx.get_edge_attributes(peripheral.graph, 'r')
+        #     networkx.draw_networkx_edge_labels(peripheral.graph, pos, labels=edge_labels, font_size=6)
+
+        # plt.savefig("graph.pdf")
+        # plt.show()
+
+    print model

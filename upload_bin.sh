@@ -1,6 +1,6 @@
 #!/bin/sh
 
-tty=ttyACM1
+tty=ttyACM0
 baud=1200
 # Set up device
 stty -F /dev/$tty $baud

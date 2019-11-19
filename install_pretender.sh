@@ -24,6 +24,9 @@ cd build/qemu
 ../../src/avatar-qemu/configure --disable-sdl --target-list=arm-softmmu
 make -j
 
+#for gdb executable
+sudo apt-get install gdb-multiarch
+
 # install openocd
 cd ../../../../
 cd openocd
