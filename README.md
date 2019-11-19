@@ -58,35 +58,45 @@ This will result in a `recording.tsv` in the output directory specified.  Every 
 
 4. You can then generate a model file using:
 ```bash
-pretender-model-generate
+conware-model-generate
 ```
 For example,
 ```bash
-pretender-model-generate - r firmware/custom/blink/
+conware-model-generate - r firmware/custom/blink/
 ```
 This will output a `model.pickle` file in the same directory.  This model is effectively a graph representation of the input file, but represented as a state machine and with memory reads represented as simple models (e.g., storage, pattern, or markov).  It has a lot of room for improvement (i.e., the point of this project)
 
 5. To optimize this model, use  [IN PROGESS]
 ```bash
-pretender-model-optimize
-
-6. Otherwise, to optimize and visualize the optimization, run
-```bash
-pretender-model-visualize
+conware-model-optimize
 ```
 For example,
 ```bash
-pretender-model-visualize -r firmware/custom/blink/  
+conware-model-optimize firmware/custom/blink
 ```
-The current version will dump PDF files, which can be opened to see the state machine. (e.g., _UART.gv.pdf_)
+
+6. To visualize a model we created, run
+```bash
+conware-model-visualize
+```
+For example,
+```bash
+conware-model-visualize -r firmware/custom/blink/model.pickle  
+```
+Or, to run on the optimized model,
+```bash
+conware-model-visualize -r firmware/custom/blink/model_optimized.pickle
+```
+
+The current version will dump SVG files, which can be opened to see the state machine. (e.g., _UART.gv.pdf_)
 
 7. Once the model is optmized, it can be used to rehost the firmware [IN PROGESS]
 ```bash
-pretender-emulate
+conware-emulate
 ```
 For example,
 ```bash
-pretender-emulate --board-config pretender/configs/due.yaml -s firmware/custom/blink/build/blink.ino.bin  -r firmware/custom/blink -t 30
+conware-emulate --board-config pretender/configs/due.yaml -s firmware/custom/blink/build/blink.ino.bin  -r firmware/custom/blink -t 30
 ```
 will run the firmware for 30 seconds in an emulator
 
