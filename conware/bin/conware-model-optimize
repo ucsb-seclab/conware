@@ -4,6 +4,7 @@
 import argparse
 import fnmatch
 import os
+import cProfile
 
 import sys
 
@@ -58,6 +59,7 @@ if __name__ == "__main__":
         logger.info("Optimizing %s..." % str(peripheral.name))
 
         peripheral.optimize2()
+        #cProfile.run('peripheral.optimize2()')
 
     optimized_filename = os.path.join(args.recording_dir, MODEL_FILE_OPTIMIZED)
     logger.info("Saving optimized model to %s" % optimized_filename)
