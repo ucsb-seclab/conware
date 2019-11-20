@@ -218,7 +218,12 @@ class PeripheralModel:
     @profile
     def _get_merge_constraints(self, state_id_1, state_id_2):
         """
-        Recursive call to
+        Will return a set of edges that must also be equal if the two states
+        are equal or False
+
+        An empty set means that the two states are fine to merge without any
+        further checking
+
         :param state_id_1:
         :param state_id_2:
         :return:
@@ -232,6 +237,8 @@ class PeripheralModel:
         if state1 == state2:
             logger.debug(
                 "%d (%s) == %d (%s)" % (state_id_1, state1, state_id_2, state2))
+            # Mark the nodes as equal
+            self.equiv_states.append((state_id_1, state_id_2))
             # If these states are already accounted for, we don't need to
             # keep traversing
             # for equiv_tuple in self.equiv_states:
@@ -253,30 +260,32 @@ class PeripheralModel:
             equiv_classes = [tuple(c) for c in
                              networkx.connected_components(graph)]
 
+            # Get all of the equivalent edges for our nodes (note that they
+            # are in the same equivalence class)
             equiv_edges = set()
             for equiv_class in equiv_classes:
                 if state_id_1 in equiv_class:
                     for state_id in equiv_class:
                         equiv_edges |= set(self.graph.out_edges(state_id))
 
+            # Get the edges for each of these new nodes
             edges_1 = self.graph.out_edges(state_id_1)
             edges_2 = self.graph.out_edges(state_id_2)
 
+            # Figure out any shared edges
             rtn = True
-            # Check all outgoing edges for node 1
-            for e1 in edges_1:
-                for e2 in equiv_edges:
+            for e2 in equiv_edges:
+                e2_labels = self._get_edge_labels(e2)
+                # Check all outgoing edges for node 1
+                for e1 in edges_1:
                     e1_labels = self._get_edge_labels(e1)
-                    e2_labels = self._get_edge_labels(e2)
                     # Do we have a duplicate edge (i.e., state transition)
                     if e1_labels & e2_labels:
                         merge_set.add((e1[1], e2[1]))
 
-            # Check all outgoing edges for node 2
-            for e1 in edges_2:
-                for e2 in equiv_edges:
+                # Check all outgoing edges for node 2
+                for e1 in edges_2:
                     e1_labels = self._get_edge_labels(e1)
-                    e2_labels = self._get_edge_labels(e2)
                     # Do we have a duplicate edge (i.e., state transition)
                     if e1_labels & e2_labels:
                         merge_set.add((e1[1], e2[1]))
