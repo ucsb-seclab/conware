@@ -4,43 +4,14 @@
 import argparse
 import fnmatch
 import os
-
 import sys
-
-sys.path.append("/home/graham/Desktop/conware/conware/")
-
 import logging
+
+# Conware
 from conware.model import PretenderModel
 from conware import *
-import pickle
 
 logger = logging.getLogger(__name__)
-
-
-def merge_partial_model(model, partial_model_fn):
-    """
-    This merges a partial model with a newly-created model.
-    When we use iterative modeling, we will not observe the partially modeled pieces.
-    Therefore, we need to smash them together a little differently than a multi-run single model
-    We here find the "good models" (as before, where we had full interrupt recordings) and then
-    insert this peripheral into our new model.
-    :param model:
-    :param partial_model:
-    :return:
-    """
-    with open(partial_model_fn, 'rb') as f:
-        pm = pickle.load(f)
-        # Patch in the addresses from the partial model
-        for addr, m in pm.items():
-            mdl = m['model']
-            if mdl.irq_num and mdl.interrupt_timings and mdl.interrupt_trigger:
-                logger.info("Using partial model for address %#08x %s" % (
-                    addr, repr(mdl)))
-                if not addr in model.model_per_address:
-                    model.model_per_address[addr] = {}
-                model.model_per_address[addr]['model'] = mdl
-    return model
-
 
 if __name__ == "__main__":
     # Default argument values
@@ -53,10 +24,8 @@ if __name__ == "__main__":
 
     # Get user input
     parser = argparse.ArgumentParser()
-    parser.add_argument("--recording_dir", "-r", default="recording",
+    parser.add_argument("recording_dir", default="recording",
                         help="Directory containing all of the log files")
-    parser.add_argument("--partial-model", "-P",
-                        help="Use a partial model to start with")
     parser.add_argument("--debug", "-d", default=False, action='store_true',
                         help="Enable debug output.")
     args = parser.parse_args()
@@ -64,6 +33,7 @@ if __name__ == "__main__":
     if not os.path.exists(args.recording_dir):
         parser.print_help()
         sys.exit(0)
+
     # Setup Logging
     if args.debug:
         logging.basicConfig(level=logging.DEBUG)
@@ -73,22 +43,18 @@ if __name__ == "__main__":
     # First, let's just read our log into a nice internal structure
     files = fnmatch.filter(os.listdir(args.recording_dir),
                            "*.%s" % RECORDING_EXTENSION)
-    models = []
+
+    if len(files) != 1:
+        logger.error("It looks like there is less than or more than 1 "
+                     "recording "
+                     "in the given directory!")
+        parser.print_help()
+        sys.exit(0)
+
     for f in files:
+        logger.info("Opening %s..." % f)
         p = PretenderModel()
         p.train(os.path.join(args.recording_dir, f))
-        models.append(p)
-
-    combined_model = PretenderModel()
-    if len(models) > 1:
-        for i in range(0, len(models)):
-            print "\n\n\n** Merging %d..." % (i)
-            combined_model = combined_model.merge(models[i])
-    else:
-        combined_model = models[0]
-    # Merge models
-    if args.partial_model:
-        # Merge a partial model
-        models[-1] = merge_partial_model(models[-1], args.partial_model)
-    print "Saving models..."
-    combined_model.save(os.path.join(args.recording_dir, MODEL_FILE))
+        output_model = os.path.join(args.recording_dir, MODEL_FILE)
+        print "Saving model (%s)..." % output_model
+        p.save(output_model)
