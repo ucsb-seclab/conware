@@ -9,12 +9,12 @@ from pretender.models import MemoryModel
 
 
 class MarkovPatternModel(MemoryModel):
-    def __init__(self):
+    def __init__(self, init_value=0):
         self.total_static_patterns = 0
         self.total_patterns = 0
         self.static_value_count = {}
         self.patterns = {}
-        self.value = 0
+        self.value = init_value
 
         self.count = 0
 
@@ -48,7 +48,7 @@ class MarkovPatternModel(MemoryModel):
             # Are we currently replaying static values?
             if self.replay_static_count_current > 0:
                 if self.replay_static_count_current == \
-                                self.replay_static_count - 1:
+                        self.replay_static_count - 1:
                     self.replay_static = False
                     self.replay_static_count = 0
                     self.replay_static_count_current = 0
@@ -127,7 +127,7 @@ class MarkovPatternModel(MemoryModel):
         cumulative_probability = 0.0
         for count in self.static_value_count:
             probability = 1.0 * self.static_value_count[count] / (
-                1.0 * self.total_static_patterns)
+                    1.0 * self.total_static_patterns)
             cumulative_probability += probability
             self.static_distribution[cumulative_probability] = count
 
@@ -135,7 +135,7 @@ class MarkovPatternModel(MemoryModel):
         cumulative_probability = 0.0
         for p in self.patterns:
             probability = 1.0 * self.patterns[p] / (
-                1.0 * self.total_patterns)
+                    1.0 * self.total_patterns)
             cumulative_probability += probability
             self.pattern_distribution[cumulative_probability] = p
 
@@ -219,7 +219,7 @@ class MarkovPatternModel(MemoryModel):
         cumulative_probability = 0.0
         for count in self.static_value_count:
             probability = 1.0 * self.static_value_count[count] / (
-                1.0 * self.total_static_patterns)
+                    1.0 * self.total_static_patterns)
             cumulative_probability += probability
             self.static_distribution[cumulative_probability] = count
 
@@ -227,7 +227,7 @@ class MarkovPatternModel(MemoryModel):
         cumulative_probability = 0.0
         for p in self.patterns:
             probability = 1.0 * self.patterns[p] / (
-                1.0 * self.total_patterns)
+                    1.0 * self.total_patterns)
             cumulative_probability += probability
             self.pattern_distribution[cumulative_probability] = p
 

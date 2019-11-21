@@ -20,7 +20,7 @@ class IncreasingModel(MemoryModel):
     and only 'predict' new values when the recorded data has run out
     """
 
-    def __init__(self):
+    def __init__(self, init_value=0):
         """
         """
 

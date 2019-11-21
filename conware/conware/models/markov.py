@@ -18,9 +18,9 @@ class MarkovModel(MemoryModel):
 
     """
 
-    def __init__(self, test_callback=None):
+    def __init__(self, init_value=0, test_callback=None):
         self.values = []
-        self.value = None
+        self.value = init_value
 
         # data structures to train the model
         # n_window is the number of windows to fetch data from within a given

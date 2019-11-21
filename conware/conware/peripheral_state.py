@@ -1,10 +1,13 @@
+# Native
 import logging
 import sys
-from pretender.models.increasing import IncreasingModel
-from pretender.models.markov2 import MarkovModel
-from pretender.models.markovpattern import MarkovPatternModel
-from pretender.models.pattern import PatternModel
-from pretender.models.simple_storage import SimpleStorageModel
+
+# Conware
+from conware.models.increasing import IncreasingModel
+from conware.models.markov2 import MarkovModel
+from conware.models.markovpattern import MarkovPatternModel
+from conware.models.pattern import PatternModel
+from conware.models.simple_storage import SimpleStorageModel
 
 logger = logging.getLogger(__name__)
 
@@ -65,7 +68,7 @@ class PeripheralModelState:
                 logger.info("Found Storage!! %d == %d" % (val,
                                                           self.value))
         if storage:
-            m = SimpleStorageModel()
+            m = SimpleStorageModel(self.value)
             m.train(read_log)
             logger.debug("State %s is StorageModel" % self.state_id)
             return m
@@ -74,7 +77,7 @@ class PeripheralModelState:
         if use_time_domain:
             for model in [PatternModel, IncreasingModel, MarkovPatternModel,
                           MarkovModel]:
-                m = model()
+                m = model(self.value)
                 logger.debug("Trying model %s" % repr(m))
                 if m.train(read_log):
                     logger.info("%s is %s" % (self.name, repr(model)))

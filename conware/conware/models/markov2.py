@@ -18,11 +18,11 @@ class MarkovModel(MemoryModel):
 
     """
 
-    def __init__(self):
+    def __init__(self, init_value=0):
         self.storage_recall = {}
         self.value_distribution = collections.OrderedDict()
         self.total_reads = 0
-        self.value = 0
+        self.value = init_value
 
     def __repr__(self):
         return "<MarkovModel: %s>" % str(self.value_distribution)
@@ -38,7 +38,7 @@ class MarkovModel(MemoryModel):
         cumulative_probability = 0.0
         for val in self.storage_recall:
             probability = 1.0 * self.storage_recall[val] / (
-            1.0 * self.total_reads)
+                    1.0 * self.total_reads)
             cumulative_probability += probability
             self.value_distribution[cumulative_probability] = val
 
@@ -77,7 +77,7 @@ class MarkovModel(MemoryModel):
         self.value_distribution = {}
         for val in self.storage_recall:
             probability = 1.0 * self.storage_recall[val] / (
-            1.0 * self.total_reads)
+                    1.0 * self.total_reads)
             cumulative_probability += probability
             self.value_distribution[cumulative_probability] = val
 

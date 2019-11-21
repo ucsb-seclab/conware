@@ -1,24 +1,15 @@
-import StringIO
-import atexit
 import logging
-import pstats
-import random
-import sys
 import networkx
-import line_profiler
-import cProfile
-import networkx.algorithms.isomorphism as iso
-from sets import Set
-from pretender.models.simple_storage import SimpleStorageModel
+# import line_profiler
+# import cProfile
+
+# Conware
+from conware.models.simple_storage import SimpleStorageModel
 from conware.peripheral_state import PeripheralModelState
 
 import copy
 
-
-
-
 logger = logging.getLogger(__name__)
-
 
 class PeripheralModel:
     """
@@ -159,7 +150,6 @@ class PeripheralModel:
 
             # Update all of our inbound edges
             for e in in_edges:
-                self.edge_tuples = networkx.get_edge_attributes(self.graph, "tuples")
 
                 tuples = self._get_edge_labels(e)
                 if e[0] not in equiv_set:
@@ -190,6 +180,9 @@ class PeripheralModel:
                                        address=address, value=value)
                 self.graph.remove_edge(*e)
 
+            # Update our edge tuples dict
+            self.edge_tuples = networkx.get_edge_attributes(self.graph, "tuples")
+
             # Remove all of our old states
             for state_id in equiv_set:
                 self.graph.remove_node(state_id)
@@ -212,10 +205,10 @@ class PeripheralModel:
 
 
 
-    profile = line_profiler.LineProfiler()
-    atexit.register(profile.print_stats)
+    # profile = line_profiler.LineProfiler()
+    # atexit.register(profile.print_stats)
 
-    @profile
+    # @profile
     def _get_merge_constraints(self, state_id_1, state_id_2):
         """
         Will return a set of edges that must also be equal if the two states
@@ -241,16 +234,11 @@ class PeripheralModel:
             self.equiv_states.append((state_id_1, state_id_2))
             # If these states are already accounted for, we don't need to
             # keep traversing
-            # for equiv_tuple in self.equiv_states:
-            #     if state_id_1 in equiv_tuple and \
-            #             state_id_2 in equiv_tuple:
-            #         self.equiv_states.append((state_id_1, state_id_2))
-            #         return merge_set
             self.equiv_states.append((state_id_1, state_id_2))
             if (state_id_1 in self.visited and state_id_2 in self.visited):
                 return merge_set
 
-
+            # Marked the nodes as visited
             self.visited.add(state_id_1)
             self.visited.add(state_id_2)
 
@@ -305,7 +293,6 @@ class PeripheralModel:
         merged = True
         while merged:
             merged = False
-            visted = set()
             for n1 in networkx.dfs_preorder_nodes(self.graph,
                                                   self.start_state[0]):
                 for n2 in networkx.dfs_preorder_nodes(self.graph,
@@ -319,6 +306,7 @@ class PeripheralModel:
                         continue
 
                     self.equiv_states = []
+                    self.visited = set()
 
                     merge_set = self._get_merge_constraints(n1, n2)
 

@@ -5,8 +5,8 @@ from pretender.models import MemoryModel
 
 
 class PatternModel(MemoryModel):
-    def __init__(self):
-        self.value = 0
+    def __init__(self, init_value=0):
+        self.value = init_value
         self.read_pattern = []
         self.encoded_pattern = []
         self.count = 0
