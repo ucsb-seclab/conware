@@ -30,6 +30,7 @@ class PeripheralModel:
         self.equiv_states = []
         self.visited = set()
         self.edge_tuples = networkx.get_edge_attributes(self.graph, "tuples")
+        self.node_attributes = networkx.get_node_attributes(self.graph, "state")
 
     def update_node_id(self):
         self.nodeID += 1
@@ -124,7 +125,10 @@ class PeripheralModel:
 
     def _get_state(self, state_id):
         """ Return the state given the state/node id """
-        return networkx.get_node_attributes(self.graph, 'state')[state_id]
+
+
+        #return networkx.get_node_attributes(self.graph, 'state')[state_id]
+        return self.node_attributes[state_id]
 
     def _merge_states(self, equiv_states):
         """
@@ -189,6 +193,8 @@ class PeripheralModel:
                 if state_id == self.start_state[0]:
                     self.start_state = (new_state_id, new_state)
 
+        self.node_attributes = networkx.get_node_attributes(self.graph, "state")
+
     def _label_nodes(self):
         """ Add labels to all of our nodes """
         attributes = {}
@@ -224,6 +230,8 @@ class PeripheralModel:
         merge_set = set()
         if state_id_1 == state_id_2:
             return merge_set
+
+        self.node_attributes = networkx.get_node_attributes(self.graph, "state")
 
         state1 = self._get_state(state_id_1)
         state2 = self._get_state(state_id_2)
