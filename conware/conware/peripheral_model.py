@@ -11,6 +11,7 @@ import copy
 
 logger = logging.getLogger(__name__)
 
+
 class PeripheralModel:
     """
     This class represents an external peripheral
@@ -94,7 +95,8 @@ class PeripheralModel:
         :return:
         """
         if (s1, s2) in self.graph.edges:
-            self.edge_tuples = networkx.get_edge_attributes(self.graph, "tuples")
+            self.edge_tuples = networkx.get_edge_attributes(self.graph,
+                                                            "tuples")
             tuples = self._get_edge_labels((s1, s2))
             tuples |= set([(address, value)])
             networkx.set_edge_attributes(self.graph,
@@ -116,7 +118,7 @@ class PeripheralModel:
         :param edge: Edge Label
         :return: (address, value)
         """
-        #tuples = networkx.get_edge_attributes(self.graph, 'tuples')
+        # tuples = networkx.get_edge_attributes(self.graph, 'tuples')
         if edge in self.edge_tuples:
             return self.edge_tuples[edge]
         else:
@@ -181,7 +183,8 @@ class PeripheralModel:
                 self.graph.remove_edge(*e)
 
             # Update our edge tuples dict
-            self.edge_tuples = networkx.get_edge_attributes(self.graph, "tuples")
+            self.edge_tuples = networkx.get_edge_attributes(self.graph,
+                                                            "tuples")
 
             # Remove all of our old states
             for state_id in equiv_set:
@@ -202,8 +205,6 @@ class PeripheralModel:
                     node, state)}
 
         networkx.set_node_attributes(self.graph, attributes)
-
-
 
     # profile = line_profiler.LineProfiler()
     # atexit.register(profile.print_stats)
@@ -282,7 +283,6 @@ class PeripheralModel:
 
             return False
 
-
     def optimize2(self):
         """
         This function will optimize the state machine, merging equivalent
@@ -309,7 +309,6 @@ class PeripheralModel:
                     self.visited = set()
 
                     merge_set = self._get_merge_constraints(n1, n2)
-
 
                     if merge_set is False:
                         continue
@@ -338,7 +337,8 @@ class PeripheralModel:
                         logger.info("Merging States: %d and %d" % (n1, n2))
                         logger.debug("Equivalent nodes: %s" % self.equiv_states)
                         self._merge_states(self.equiv_states)
-                        self.edge_tuples = networkx.get_edge_attributes(self.graph, "tuples")
+                        self.edge_tuples = networkx.get_edge_attributes(
+                            self.graph, "tuples")
                         merged = True
                         # if (n1 == 1488 and n2 == 62):  # 1488 and 62/68/, 1531 and 170
                         #     pr.disable()
@@ -418,7 +418,7 @@ class PeripheralModel:
 
         if (address not in self.current_state[1].model_per_address):
             # if (uart):
-            #     logger.info("Couldnt find model for read address")
+            logger.warn("Could not find model for read address")
             return -1
 
         # if (uart):
@@ -471,7 +471,7 @@ class PeripheralModel:
 
             if ((address, value) in edge_tuple):
                 self.current_state = (
-                edge[1], self.graph.nodes[edge[1]]["state"])
+                    edge[1], self.graph.nodes[edge[1]]["state"])
                 if (uart):
                     logger.info(
                         "Found correct edge transition, updating current state to: ")
@@ -480,11 +480,14 @@ class PeripheralModel:
                 # Write our value to the model (e.g., SimpleStorage)
                 if address in self.current_state[1].model_per_address:
                     self.current_state[1].model_per_address[address].write(
+                        address,
                         value)
                 else:
-                    if (uart):
-                        logger.info(
-                            "Couldnt write address to model because address not found in model per address")
+                    logger.info(
+                        "Couldnt write address to model because address not found in model per address")
+                    for addr in self.current_state[1].model_per_address:
+                        self.current_state[1].model_per_address[addr].write(
+                            address, value)
                 return True
 
             elif (edge_tuple[0][0] == address and edge_tuple[0][1] != value):
@@ -524,7 +527,7 @@ class PeripheralModel:
                         "Found good edge in BFS, transitioning to state: " + str(
                             edge[1]))
                 self.current_state = (
-                edge[1], self.graph.nodes[edge[1]]["state"])
+                    edge[1], self.graph.nodes[edge[1]]["state"])
                 if address in self.current_state[1].model_per_address:
                     self.current_state[1].model_per_address[address].write(
                         value)

@@ -80,7 +80,7 @@ class PeripheralModelState:
                 m = model(self.value)
                 logger.debug("Trying model %s" % repr(m))
                 if m.train(read_log):
-                    logger.info("%s is %s" % (self.name, repr(model)))
+                    logger.info("%s is %s" % (self.name, repr(m)))
                     return m
         else:
             for model in [MarkovModel]:

@@ -1,21 +1,33 @@
 import logging
+import random
+
+# Conware
+from conware.models import MemoryModel
 
 logger = logging.getLogger(__name__)
-from pretender.models import MemoryModel
 
 
 class PatternModel(MemoryModel):
-    def __init__(self, init_value=0):
+    def __init__(self, address, init_value=0):
         self.value = init_value
-        self.read_pattern = []
+        # self.read_pattern = []
         self.encoded_pattern = []
         self.count = 0
+        self.index = 0
+        self.read_patterns = {self.value: []}
 
     def __str__(self):
-        if len(self.read_pattern) > 5:
-            return "<PatternModel [%d items]>" % len(self.read_pattern)
+        if len(self.read_patterns[self.value]) == 0:
+            return "<PatternModel (empty)>"
+        elif len(self.read_patterns[self.value][self.index]) > 5:
+            return "<PatternModel (%d) [%d items]>" % (len(
+                self.read_patterns), len(
+                self.read_patterns[self.value][self.index]))
         else:
-            return "<PatternModel %s>" % self.read_pattern
+            return "<PatternModel (%d) %s>" % (len(
+                self.read_patterns), self.read_patterns[
+                self.value][
+                self.index])
 
     def __repr__(self):
         return self.__str__()
@@ -23,7 +35,8 @@ class PatternModel(MemoryModel):
     def __eq__(self, other_model):
         if type(other_model) != type(self):
             return False
-        if self.read_pattern == other_model.read_pattern:
+        if self.read_patterns[self.value][self.index] == \
+                other_model.read_patterns[other_model.value][other_model.index]:
             return True
         else:
             if len(self.encoded_pattern) != len(other_model.encoded_pattern):
@@ -32,27 +45,56 @@ class PatternModel(MemoryModel):
                 if x[0] != \
                         other_model.encoded_pattern[idx][0]:
                     return False
-            return True
 
-    def write(self, value):
-        self.value = value
+        return True
+
+    def write(self, address, value):
+        """
+        Update which specific pattern we are returning
+        This should help our replays be more realistic as the pattern will be
+        dependent on the write value that brought us into the state.
+
+        :param address:
+        :param value:
+        :return:
+        """
+
+        # have we seen this value?
+        if value in self.read_patterns:
+            self.value = value
+            # Do we have more than one option?  Pick one randomly
+            if len(self.read_patterns[value]) > 1:
+                logger.info("Updated to random read pattern.")
+                self.index = random.randint(0, len(self.read_patterns[value])-1)
+            else:
+                self.index = 0
+        else:
+            # Value we've never seen, let's just pick one.
+            self.value = random.choice(self.read_patterns.keys())
+            logger.warning("Saw a write that we've never seen before (%d), "
+                           "randomly selected %d." % (value, self.value))
         return True
 
     def read(self):
-        idx = self.count % len(self.read_pattern)
+        idx = self.count % len(self.read_patterns[self.value][self.index])
         self.count += 1
-        return self.read_pattern[idx]
+        return self.read_patterns[self.value][self.index][idx]
 
     def merge(self, other_model):
-        if type(other_model) != type(self):
-            logger.debug("Tried to merge two models that aren't the same (%s "
+        if other_model != self:
+            logger.error("Tried to merge two models that aren't the same (%s "
                          "!= %s)" % (type(other_model), type(self)))
             return False
 
-        if self.read_pattern != other_model.read_pattern:
-            logger.debug("Patterns are different. (%s != %s)" % (
-                self.read_pattern, other_model.read_pattern))
-            return False
+        # Add the pattern from the other
+        if other_model.value not in self.read_patterns:
+            self.read_patterns[other_model.value] = \
+                other_model.read_patterns[other_model.value]
+        elif other_model.read_patterns[other_model.value][
+            other_model.index] not in self.read_patterns[
+            other_model.value]:
+            self.read_patterns[other_model.value].append(
+                other_model.read_patterns[other_model.value][other_model.index])
 
         return True
 
@@ -68,9 +110,9 @@ class PatternModel(MemoryModel):
         # Only extract our read values
         reads = [x[0] for x in log]
 
-        self.read_pattern = self.get_pattern(reads)
+        read_pattern = self.get_pattern(reads)
 
-        if self.read_pattern is None:
+        if read_pattern is None:
             return False
         else:
             # Now let's encode our pattern
@@ -78,7 +120,7 @@ class PatternModel(MemoryModel):
             last = None
             repeated_value = None
             repeated_count = 0
-            for x in self.read_pattern:
+            for x in read_pattern:
                 if x == last:
                     repeated_count += 1
                 else:
@@ -88,6 +130,7 @@ class PatternModel(MemoryModel):
                     repeated_count = 1
             pattern.append((last, repeated_count))
 
+            self.read_patterns[self.value].append(read_pattern)
             self.encoded_pattern = pattern
             return True
 

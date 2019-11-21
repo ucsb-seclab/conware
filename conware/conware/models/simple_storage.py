@@ -18,7 +18,7 @@ class SimpleStorageModel(MemoryModel):
             return False
         return True
 
-    def write(self, value):
+    def write(self, address, value):
         self.value = value
         return True
 

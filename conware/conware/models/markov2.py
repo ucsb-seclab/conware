@@ -45,7 +45,7 @@ class MarkovModel(MemoryModel):
         logger.debug("Trained MarkovModel (%s)" % repr(self.value_distribution))
         return True
 
-    def write(self, value):
+    def write(self, address, value):
         return True
 
     def read(self):

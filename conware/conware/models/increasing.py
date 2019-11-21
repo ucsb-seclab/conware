@@ -149,7 +149,7 @@ class IncreasingModel(MemoryModel):
         self.slope, self.intercept, self.r_value, self.p_value, self.std_err = \
             stats.linregress(fixed_x, y)
 
-    def write(self, value):
+    def write(self, address, value):
         """
         This should be a read-only model
         """

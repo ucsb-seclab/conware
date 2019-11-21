@@ -35,7 +35,7 @@ class MarkovPatternModel(MemoryModel):
         return "<MarkovPatternModel %s, %s>" % (self.static_value,
                                                 self.pattern_distribution)
 
-    def write(self, value):
+    def write(self, address, value):
         self.value = value
         return True
 
