@@ -205,10 +205,10 @@ class PeripheralModel:
 
         networkx.set_node_attributes(self.graph, attributes)
 
-    profile = line_profiler.LineProfiler()
-    atexit.register(profile.print_stats)
+    #profile = line_profiler.LineProfiler()
+    #atexit.register(profile.print_stats)
 
-    @profile
+    #@profile
     def _get_merge_constraints(self, state_id_1, state_id_2):
         """
         Will return a set of edges that must also be equal if the two states
