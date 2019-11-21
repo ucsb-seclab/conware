@@ -76,7 +76,7 @@ class MarkovModel(MemoryModel):
         self.window_index = 0
         return True
 
-    def write(self, value):
+    def write(self, address, value):
         return True
 
     def read(self):

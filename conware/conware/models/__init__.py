@@ -10,7 +10,7 @@ class MemoryModel(object):
         return
 
     @abc.abstractmethod
-    def write(self, data):
+    def write(self, address, data):
         """ Memory write """
         return
 

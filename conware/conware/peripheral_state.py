@@ -28,6 +28,9 @@ class PeripheralModelState:
         self.model_per_address_ordered = {}
         self.model_per_address = {}
 
+        self.merged_states = set()
+        self.merged_states.add(state_id)
+
         # state number imported from old state model, not sure if we need it
         # was used for visualization purposes, i haven't dove very deep into all
         # of the different visualizations, just UART
@@ -40,7 +43,8 @@ class PeripheralModelState:
             models.append(
                 "0x%08X: %s" % (address, self.model_per_address[address]))
 
-        return ", ".join(models)
+        # return ":".join([str(x) for x in sorted(self.merged_states)]) + " " + \
+        return "#%d " % len(self.merged_states) + ",".join(models)
 
     def __eq__(self, other_state):
         for address in self.model_per_address:
@@ -80,7 +84,7 @@ class PeripheralModelState:
                 m = model(self.value)
                 logger.debug("Trying model %s" % repr(m))
                 if m.train(read_log):
-                    logger.info("%s is %s" % (self.name, repr(model)))
+                    logger.info("%s is %s" % (self.name, repr(m)))
                     return m
         else:
             for model in [MarkovModel]:
@@ -155,4 +159,6 @@ class PeripheralModelState:
         #     if address not in self.model_per_address_ordered:
         #         self.model_per_address_ordered[address] = \
         #             other.model_per_address_ordered[address]
+
+        self.merged_states |= other.merged_states
         return True
