@@ -407,7 +407,8 @@ class PeripheralModel:
         :param address:
         :param size:
         :return:
-        look in model, models per address, figur out which address reading from, read from that model (peripheral state stored)
+        look in model, models per address, figure out which address reading
+        from, read from that model (peripheral state stored)
         """
 
         # Assumption: We are in correct current state and expect read address to be there
@@ -484,7 +485,9 @@ class PeripheralModel:
                         value)
                 else:
                     logger.info(
-                        "Couldnt write address to model because address not found in model per address")
+                        "%s: Couldnt write address to model because address "
+                        "not "
+                        "found in model per address", self.name)
                     for addr in self.current_state[1].model_per_address:
                         self.current_state[1].model_per_address[addr].write(
                             address, value)
