@@ -7,24 +7,24 @@ import sys
 
 import yaml
 
-sys.path.append("/home/graham/Desktop/conware/avatar2-pretender")
 from avatar2 import *
 
 import logging
 
-sys.path.append("/home/graham/Desktop/conware/conware/")
 from conware.peripherals import Pretender
 
-from pretender.logger import LogWriter
-from pretender.bin_parser import M3Parser
-from pretender.coverage import get_hit_blocks
+from conware.tools.logger import LogWriter
+from conware.tools.bin_parser import M3Parser
+from conware.tools.coverage import get_hit_blocks
 
+# Conware
 from conware.pretender_model import PretenderModel
 from conware import *
 
 logger = logging.getLogger(__name__)
 seq = 0
 time_start = 0;
+
 
 def parse_args():
     # Default argument values
@@ -91,7 +91,7 @@ def parse_args():
 
     if not os.path.exists(args.qemu_executable):
         logger.error("QEMU executable (%s) does not exist." %
-                   args.qemu_executable)
+                     args.qemu_executable)
         parser.print_usage()
         sys.exit()
     else:
@@ -99,7 +99,7 @@ def parse_args():
 
     if not os.path.exists(args.recording_dir):
         logger.error("Recording directory does not exist (%s)." %
-              args.recording_dir)
+                     args.recording_dir)
         parser.print_help()
         sys.exit()
     else:
@@ -327,10 +327,10 @@ if __name__ == '__main__':
     # Update our IVT?
     if 'ivt_address' in args.__dict__ and args.ivt_address:
         logger.warning("Setting QEMU vector table base to %#08x" %
-                    args.ivt_address)
+                       args.ivt_address)
         qemu.protocols.interrupts.set_vector_table_base(args.ivt_address)
 
-    time_start  = time.time()
+    time_start = time.time()
 
     # Dropping to a shell?
     if args.shell:
