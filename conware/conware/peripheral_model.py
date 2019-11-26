@@ -33,6 +33,7 @@ class PeripheralModel:
         self.start_state = self.current_state
         self.equiv_states = []
         self.visited = set()
+        self.wildcard_edges = set()
 
     def update_node_id(self):
         self.nodeID += 1
@@ -396,7 +397,7 @@ class PeripheralModel:
 
         # Assumption: We are in correct current state and expect read address to be there
 
-
+        logger.info("Reading from: " + str(address))
         if (address not in self.current_state[1].model_per_address):
             logger.warn("Could not find model for read address")
             return -1
@@ -413,8 +414,10 @@ class PeripheralModel:
         1. look for edge
         2. check if simple storage model in models per address
         3. BFS for valid edge
+        4. If no edge found, pick edge with most instances of that address
+        3 & 4 are interchangeable, do we have a wildcard edge? If so use that edge, if not bfs, otherwise pick edge w/ most instances?
         """
-
+        logger.info("Writing to: " + str(address) + " with value: " + str(value))
         current_state_id = self.current_state[0]
         out_edges = self.graph.edges(current_state_id)
         for edge in out_edges:
@@ -449,8 +452,13 @@ class PeripheralModel:
 
                 # if it is a simple storage model then just write to the address
                 self.current_state[1].model_per_address[address].write(value)
+                logger.info("simple storage!, writing to address: " + str(address))
                 return True
-        logger.info("Was not simple storage, starting BFS")
+
+
+        self.wildcard_edges = self._get_wildcard_edges()
+
+        logger.info("Was not simple storage, starting BFS/Wildcard")
         # otherwise start BFS
         target_edges = list(
             networkx.edge_bfs(self.graph, source=self.current_state[0]))
@@ -466,7 +474,17 @@ class PeripheralModel:
                 if address in self.current_state[1].model_per_address:
                     self.current_state[1].model_per_address[address].write(
                         value)
+                    logger.info("BFS Edge: " + str(edge) + " selected")
                 return True
+            elif (edge,address) in self.wildcard_edges:
+                self.current_state = (
+                    edge[1], self.graph.nodes[edge[1]]["state"])
+                if address in self.current_state[1].model_per_address:
+                    self.current_state[1].model_per_address[address].write(
+                        value)
+                    logger.info("Wildcard Edge: " + str(edge) + " selected")
+                return True
+
 
         logger.info("No matching edge!, picking edge with most writes to target addresss")
         #If we dont find value for address, look at all edges, with writes to that address, pick the one that has it the most times
@@ -492,3 +510,22 @@ class PeripheralModel:
                      "and value: %s : %s" % (self.name, hex(address),
                                              str(value)))
         return False
+
+    def _get_wildcard_edges(self):
+        wildcard_edges = set()
+        all_edges = self.graph.edges
+        for edge in all_edges:
+            addr = -1
+            count = 0
+            label = self._get_edge_labels(edge)
+            for tuple in label:
+                if addr == -1:
+                    addr = tuple[0]
+                    count += 1
+                elif addr == tuple[0]:
+                    count += 1
+                else:
+                    break
+            if count >= 5:      #arbitrary number
+                wildcard_edges.add((edge, addr))
+        return wildcard_edges
