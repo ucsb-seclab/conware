@@ -25,6 +25,13 @@ logger = logging.getLogger(__name__)
 seq = 0
 time_start = 0;
 
+UART = {
+    'rx': None,
+    'tx': None,
+    'rx_file': None,
+    'tx_file': None
+}
+
 
 def parse_args():
     # Default argument values
@@ -144,8 +151,11 @@ def emulate_read_after(avatar, message, **kwargs):
              "0x%x" % message.pc,
              message.size, time.time() - time_start, model_name])
 
-    if message.address == 0x400e081c:
+    if message.address == UART['rx']:
         logger.info("<<< %s" % hex(message.value))
+
+        if UART['rx_file'] is not None:
+            UART['rx_file'].write(chr(message.value))
 
     seq += 1
 
@@ -192,7 +202,7 @@ def emulate_write_after(avatar, message, **kwargs):
              "0x%x" % message.pc,
              message.size, time.time() - time_start, model_name])
 
-    if message.address == 0x400e081c:
+    if message.address == UART['tx']:
         dest = [0] * 4
         l = message.value
         dest[0] = chr(l & 0xFF)
@@ -202,10 +212,13 @@ def emulate_write_after(avatar, message, **kwargs):
         value_str = "".join(dest)
 
         logger.info(">> %s (%s)" % (repr(value_str), hex(message.value)))
-    if message.address == 0x40020018:
-        print "LED ON", hex(message.value), time.time()
-    elif message.address == 0x40020028:
-        print "LED OFF", time.time()
+        if UART['tx_file'] is not None:
+            UART['tx_file'].write(chr(message.value))
+
+    # if message.address == 0x40020018:
+    #     print "LED ON", hex(message.value), time.time()
+    # elif message.address == 0x40020028:
+    #     print "LED OFF", time.time()
 
     seq += 1
     # mem_log.write_row(
@@ -259,6 +272,13 @@ if __name__ == '__main__':
     avatar_dir = os.path.join(args.output_dir, "emulate_logs")
     avatar = Avatar(output_directory=avatar_dir, arch=ARM_CORTEX_M3)
 
+    # UART Output
+
+    uart_tx_file = os.path.join(avatar_dir, "uart_tx.txt")
+    uart_rx_file = os.path.join(avatar_dir, "uart_rx.txt")
+    UART['tx_file'] = open(uart_tx_file, "w+", 0) # unbuffered
+    UART['rx_file'] = open(uart_rx_file, "w+", 0) # unbuffered
+
     # Setup emulator
     qemu_args = []
     COVERAGE_LOG = None
@@ -276,6 +296,11 @@ if __name__ == '__main__':
                              additional_args=qemu_args,
                              system_clock_scale=args.system_clock_scale)
     qemu.gdb_port = args.qemu_port
+
+    # Update our uart params
+    if "uart" in config:
+        UART['tx'] = config['uart']['tx']
+        UART['rx'] = config['uart']['rx']
 
     # Define our memory map for this board
     logger.info("Configuring memory layout...")
@@ -348,6 +373,10 @@ if __name__ == '__main__':
     qemu.stop()
     print("Shutting down Avatar...")
     avatar.shutdown()
+
+    UART['tx_file'].close()
+    UART['rx_file'].close()
+
     if args.coverage:
         blocks = get_hit_blocks(COVERAGE_LOG)
         print "Hit blocks:", repr(blocks)
