@@ -1,4 +1,7 @@
+import atexit
 import logging
+
+import line_profiler
 import networkx
 # import line_profiler
 # import cProfile
@@ -30,8 +33,7 @@ class PeripheralModel:
         self.start_state = self.current_state
         self.equiv_states = []
         self.visited = set()
-        self.edge_tuples = networkx.get_edge_attributes(self.graph, "tuples")
-        self.node_attributes = networkx.get_node_attributes(self.graph, "state")
+        self.wildcard_edges = set()
 
     def update_node_id(self):
         self.nodeID += 1
@@ -96,8 +98,8 @@ class PeripheralModel:
         :return:
         """
         if (s1, s2) in self.graph.edges:
-            self.edge_tuples = networkx.get_edge_attributes(self.graph,
-                                                            "tuples")
+            #self.edge_tuples = networkx.get_edge_attributes(self.graph,
+            #                                                "tuples")
             tuples = self._get_edge_labels((s1, s2))
             tuples |= set([(address, value)])
             networkx.set_edge_attributes(self.graph,
@@ -119,18 +121,14 @@ class PeripheralModel:
         :param edge: Edge Label
         :return: (address, value)
         """
-        # tuples = networkx.get_edge_attributes(self.graph, 'tuples')
-        if edge in self.edge_tuples:
-            return self.edge_tuples[edge]
-        else:
-            return None
+
+        return self.graph[edge[0]][edge[1]]["tuples"]
 
     def _get_state(self, state_id):
         """ Return the state given the state/node id """
 
+        return self.graph.nodes.data("state")[state_id]
 
-        #return networkx.get_node_attributes(self.graph, 'state')[state_id]
-        return self.node_attributes[state_id]
 
     def _merge_states(self, equiv_states):
         """
@@ -186,9 +184,6 @@ class PeripheralModel:
                                        address=address, value=value)
                 self.graph.remove_edge(*e)
 
-            # Update our edge tuples dict
-            self.edge_tuples = networkx.get_edge_attributes(self.graph,
-                                                            "tuples")
 
             # Remove all of our old states
             for state_id in equiv_set:
@@ -196,7 +191,6 @@ class PeripheralModel:
                 if state_id == self.start_state[0]:
                     self.start_state = (new_state_id, new_state)
 
-        self.node_attributes = networkx.get_node_attributes(self.graph, "state")
 
     def _label_nodes(self):
         """ Add labels to all of our nodes """
@@ -212,10 +206,10 @@ class PeripheralModel:
 
         networkx.set_node_attributes(self.graph, attributes)
 
-    # profile = line_profiler.LineProfiler()
-    # atexit.register(profile.print_stats)
+    #profile = line_profiler.LineProfiler()
+    #atexit.register(profile.print_stats)
 
-    # @profile
+    #@profile
     def _get_merge_constraints(self, state_id_1, state_id_2):
         """
         Will return a set of edges that must also be equal if the two states
@@ -232,7 +226,6 @@ class PeripheralModel:
         if state_id_1 == state_id_2:
             return merge_set
 
-        self.node_attributes = networkx.get_node_attributes(self.graph, "state")
 
         state1 = self._get_state(state_id_1)
         state2 = self._get_state(state_id_2)
@@ -297,7 +290,6 @@ class PeripheralModel:
         states.
         :return:
         """
-        self.edge_tuples = networkx.get_edge_attributes(self.graph, "tuples")
         merged = True
         while merged:
             merged = False
@@ -345,26 +337,10 @@ class PeripheralModel:
                         logger.info("Merging States: %d and %d" % (n1, n2))
                         logger.debug("Equivalent nodes: %s" % self.equiv_states)
                         self._merge_states(self.equiv_states)
-                        self.edge_tuples = networkx.get_edge_attributes(
-                            self.graph, "tuples")
                         merged = True
-                        # if (n1 == 1488 and n2 == 62):  # 1488 and 62/68/, 1531 and 170
-                        #     pr.disable()
-                        #     s = StringIO.StringIO()
-                        #     sortby = 'cumulative'
-                        #     ps = pstats.Stats(pr, stream=s).sort_stats(sortby)
-                        #     ps.print_stats()
-                        #     print s.getvalue()
                         break
 
                 if merged:
-                    # if (n1 == 1488 and n2 == 62):  # 1488 and 62/68/, 1531 and 170
-                    #     pr.disable()
-                    #     s = StringIO.StringIO()
-                    #     sortby = 'cumulative'
-                    #     ps = pstats.Stats(pr, stream=s).sort_stats(sortby)
-                    #     ps.print_stats()
-                    #     print s.getvalue()
                     break
 
         self._label_nodes()
@@ -420,19 +396,12 @@ class PeripheralModel:
         """
 
         # Assumption: We are in correct current state and expect read address to be there
-        # uart = False
-        # if (self.name == 'UART'):
-        #     uart = True
-        #     logger.info("UART reading from address: " + str(hex(address)))
 
+        logger.info("Reading from: " + str(address))
         if (address not in self.current_state[1].model_per_address):
-            # if (uart):
             logger.warn("Could not find model for read address")
             return -1
 
-        # if (uart):
-        #     logger.info("Found read: " + str(
-        #         hex(self.current_state[1].model_per_address[address].read())))
         return self.current_state[1].model_per_address[address].read()
 
     def write(self, address, size, value):
@@ -445,46 +414,18 @@ class PeripheralModel:
         1. look for edge
         2. check if simple storage model in models per address
         3. BFS for valid edge
+        4. If no edge found, pick edge with most instances of that address
+        3 & 4 are interchangeable, do we have a wildcard edge? If so use that edge, if not bfs, otherwise pick edge w/ most instances?
         """
-        uart = False
-        # logger.info("current peripheral: " + str(self.name))
-        # logger.info("current state: " + str(self.current_state[0]))
-        # logger.info("Attempting to write address: " + hex(address) + " Value: " + str(value))
-        if (self.name == 'UART'):
-            uart = True
-            logger.info("UART")
-            logger.info("Attempting to write address: " + str(
-                address) + " Value: " + str(value))
-
-        if (uart):
-            if (value == 79):
-                logger.info("Ascii value 79 found: O")
-            if (value == 78):
-                logger.info("Ascii value 78 found: N")
-            if (value == 13):
-                logger.info("Ascii value 13 found: CARRIAGE RETURN")
-            if (value == 10):
-                logger.info("Ascii value 10 found: LINE FEED")
-            if (value == 2):
-                logger.info("Ascii value 2 found: START OF TEXT")
-            if (value == 102):
-                logger.info("Ascii value 102 found: f")
-            if (value == 111):
-                logger.info("Ascii value 111 found: o")
-
+        logger.info("Writing to: " + str(address) + " with value: " + str(value))
         current_state_id = self.current_state[0]
         out_edges = self.graph.edges(current_state_id)
-        # print("out edges from current state: ", out_edges)
         for edge in out_edges:
             edge_tuple = list(self.graph[edge[0]][edge[1]]['tuples'])
 
             if ((address, value) in edge_tuple):
                 self.current_state = (
                     edge[1], self.graph.nodes[edge[1]]["state"])
-                if (uart):
-                    logger.info(
-                        "Found correct edge transition, updating current state to: ")
-                    logger.info(str(self.current_state))
 
                 # Write our value to the model (e.g., SimpleStorage)
                 if address in self.current_state[1].model_per_address:
@@ -502,49 +443,89 @@ class PeripheralModel:
                 return True
 
             elif (edge_tuple[0][0] == address and edge_tuple[0][1] != value):
-                if (uart):
-                    logger.info(
-                        "Found correct write address but incorrect value")
+                logger.info("found correct address but no matching value, check simple storage model")
 
         # couldnt find an edge, check if simple storage model
         if (address in self.current_state[1].model_per_address):
-            if (uart):
-                logger.info(
-                    "We couldnt find a connecting edge, checking if SimpleStorage")
             if (type(self.current_state[1].model_per_address[
                          address]) is SimpleStorageModel):
-                if (uart):
-                    logger.info("SimpleStorage!! Writing")
+
                 # if it is a simple storage model then just write to the address
                 self.current_state[1].model_per_address[address].write(value)
+                logger.info("simple storage!, writing to address: " + str(address))
                 return True
 
+
+        self.wildcard_edges = self._get_wildcard_edges()
+
+        logger.info("Was not simple storage, starting BFS/Wildcard")
         # otherwise start BFS
         target_edges = list(
-            networkx.bfs_edges(self.graph, source=self.current_state[0]))
-        if (uart):
-            logger.info("Starting BFS with target edges: " + str(target_edges))
+            networkx.edge_bfs(self.graph, source=self.current_state[0]))
+
         for edge in target_edges:
 
             edge_tuple = list(self.graph[edge[0]][edge[1]]['tuples'])
 
-            if (uart):
-                logger.info("BFS edge being considered: " + str(
-                    edge) + "; with addr, val: " + str(edge_tuple))
 
             if ((address, value) in edge_tuple):
-                if (uart):
-                    logger.info(
-                        "Found good edge in BFS, transitioning to state: " + str(
-                            edge[1]))
                 self.current_state = (
                     edge[1], self.graph.nodes[edge[1]]["state"])
                 if address in self.current_state[1].model_per_address:
                     self.current_state[1].model_per_address[address].write(
                         value)
+                    logger.info("BFS Edge: " + str(edge) + " selected")
+                return True
+            elif (edge,address) in self.wildcard_edges:
+                self.current_state = (
+                    edge[1], self.graph.nodes[edge[1]]["state"])
+                if address in self.current_state[1].model_per_address:
+                    self.current_state[1].model_per_address[address].write(
+                        value)
+                    logger.info("Wildcard Edge: " + str(edge) + " selected")
                 return True
 
+
+        logger.info("No matching edge!, picking edge with most writes to target addresss")
+        #If we dont find value for address, look at all edges, with writes to that address, pick the one that has it the most times
+        picked_edge = ((None,None),0) #(edge, addresscount)
+        all_edges = self.graph.edges
+        for edge in all_edges:
+            addr_count = 0
+            label = self._get_edge_labels(edge)
+            for tuple in label:
+                if tuple[0] == address:
+                    addr_count += 1
+            if addr_count > picked_edge[1]:
+                picked_edge = (edge, addr_count)
+        self.current_state = (picked_edge[0][1], self.graph.nodes[picked_edge[0][1]]["state"])
+        logger.info("Picked edge: " + str(picked_edge[0]))
+        if address in self.current_state[1].model_per_address:
+            self.current_state[1].model_per_address[address].write(value)
+        return True
+
+
+        #This address has never been written to, do nothing
         logger.error("%s: We couldn't find a transition matching that address "
                      "and value: %s : %s" % (self.name, hex(address),
                                              str(value)))
         return False
+
+    def _get_wildcard_edges(self):
+        wildcard_edges = set()
+        all_edges = self.graph.edges
+        for edge in all_edges:
+            addr = -1
+            count = 0
+            label = self._get_edge_labels(edge)
+            for tuple in label:
+                if addr == -1:
+                    addr = tuple[0]
+                    count += 1
+                elif addr == tuple[0]:
+                    count += 1
+                else:
+                    break
+            if count >= 5:      #arbitrary number
+                wildcard_edges.add((edge, addr))
+        return wildcard_edges

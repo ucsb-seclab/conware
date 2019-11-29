@@ -31,8 +31,6 @@ UART = {
     'rx_file': None,
     'tx_file': None
 }
-
-
 def parse_args():
     # Default argument values
     sample = "firmware/custom/blink/build/blink.ino.bin"
@@ -98,7 +96,7 @@ def parse_args():
 
     if not os.path.exists(args.qemu_executable):
         logger.error("QEMU executable (%s) does not exist." %
-                     args.qemu_executable)
+                   args.qemu_executable)
         parser.print_usage()
         sys.exit()
     else:
@@ -106,7 +104,7 @@ def parse_args():
 
     if not os.path.exists(args.recording_dir):
         logger.error("Recording directory does not exist (%s)." %
-                     args.recording_dir)
+              args.recording_dir)
         parser.print_help()
         sys.exit()
     else:
@@ -153,7 +151,6 @@ def emulate_read_after(avatar, message, **kwargs):
 
     if message.address == UART['rx']:
         logger.info("<<< %s" % hex(message.value))
-
         if UART['rx_file'] is not None:
             UART['rx_file'].write(chr(message.value))
 
@@ -271,7 +268,6 @@ if __name__ == '__main__':
     logger.info("Creating Avatar instance...")
     avatar_dir = os.path.join(args.output_dir, "emulate_logs")
     avatar = Avatar(output_directory=avatar_dir, arch=ARM_CORTEX_M3)
-
     # UART Output
 
     uart_tx_file = os.path.join(avatar_dir, "uart_tx.txt")
@@ -296,11 +292,6 @@ if __name__ == '__main__':
                              additional_args=qemu_args,
                              system_clock_scale=args.system_clock_scale)
     qemu.gdb_port = args.qemu_port
-
-    # Update our uart params
-    if "uart" in config:
-        UART['tx'] = config['uart']['tx']
-        UART['rx'] = config['uart']['rx']
 
     # Define our memory map for this board
     logger.info("Configuring memory layout...")
@@ -352,10 +343,10 @@ if __name__ == '__main__':
     # Update our IVT?
     if 'ivt_address' in args.__dict__ and args.ivt_address:
         logger.warning("Setting QEMU vector table base to %#08x" %
-                       args.ivt_address)
+                    args.ivt_address)
         qemu.protocols.interrupts.set_vector_table_base(args.ivt_address)
 
-    time_start = time.time()
+    time_start  = time.time()
 
     # Dropping to a shell?
     if args.shell:
@@ -373,10 +364,8 @@ if __name__ == '__main__':
     qemu.stop()
     print("Shutting down Avatar...")
     avatar.shutdown()
-
     UART['tx_file'].close()
     UART['rx_file'].close()
-
     if args.coverage:
         blocks = get_hit_blocks(COVERAGE_LOG)
         print "Hit blocks:", repr(blocks)
