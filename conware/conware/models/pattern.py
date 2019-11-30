@@ -65,7 +65,7 @@ class PatternModel(MemoryModel):
             self.value = value
             # Do we have more than one option?  Pick one randomly
             if len(self.read_patterns[value]) > 1:
-                logger.info("Updated to random read pattern.")
+                logger.debug("Updated to random read pattern.")
                 self.index = random.randint(0,
                                             len(self.read_patterns[value]) - 1)
             else:
@@ -73,7 +73,7 @@ class PatternModel(MemoryModel):
         else:
             # Value we've never seen, let's just pick one.
             self.value = random.choice(self.read_patterns.keys())
-            logger.warning("Saw a write that we've never seen before (%d), "
+            logger.debug("Saw a write that we've never seen before (%08X), "
                            "randomly selected %d." % (value, self.value))
         return True
 

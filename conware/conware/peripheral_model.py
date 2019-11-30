@@ -33,7 +33,7 @@ class PeripheralModel:
         self.start_state = self.current_state
         self.equiv_states = []
         self.visited = set()
-        self.wildcard_edges = set()
+        self.wildcard_edges = {}
 
     def update_node_id(self):
         self.nodeID += 1
@@ -203,10 +203,6 @@ class PeripheralModel:
 
         networkx.set_node_attributes(self.graph, attributes)
 
-    # profile = line_profiler.LineProfiler()
-    # atexit.register(profile.print_stats)
-
-    # @profile
     def _get_merge_constraints(self, state_id_1, state_id_2):
         """
         Will return a set of edges that must also be equal if the two states
@@ -340,6 +336,7 @@ class PeripheralModel:
                     break
 
         self._label_nodes()
+        self._update_wildcard_edges()
 
     def _get_state_attributes(self, state_id):
         """ Return the state given the state/node id """
@@ -401,6 +398,29 @@ class PeripheralModel:
 
         return self.current_state[1].model_per_address[address].read()
 
+    def _update_state(self, new_state, address, value):
+        """
+
+        :param new_state:
+        :return:
+        """
+        self.current_state = (
+            new_state, self.graph.nodes[new_state]["state"])
+
+        # Write our value to the model (e.g., SimpleStorage)
+        if address in self.current_state[1].model_per_address:
+            self.current_state[1].model_per_address[address].write(
+                address,
+                value)
+        else:
+            logger.debug(
+                "%s: Couldn't write address to model because address "
+                "not "
+                "found in model per address", self.name)
+            for addr in self.current_state[1].model_per_address:
+                self.current_state[1].model_per_address[addr].write(
+                    address, value)
+
     def write(self, address, size, value):
         """
         write a value to the modeled peripheral (i.e., state transition)
@@ -422,27 +442,21 @@ class PeripheralModel:
             edge_tuple = list(self.graph[edge[0]][edge[1]]['tuples'])
 
             if (address, value) in edge_tuple:
-                self.current_state = (
-                    edge[1], self.graph.nodes[edge[1]]["state"])
-
-                # Write our value to the model (e.g., SimpleStorage)
-                if address in self.current_state[1].model_per_address:
-                    self.current_state[1].model_per_address[address].write(
-                        address,
-                        value)
-                else:
-                    logger.info(
-                        "%s: Couldnt write address to model because address "
-                        "not "
-                        "found in model per address", self.name)
-                    for addr in self.current_state[1].model_per_address:
-                        self.current_state[1].model_per_address[addr].write(
-                            address, value)
+                self._update_state(edge[1], address, value)
                 return True
 
-            elif edge_tuple[0][0] == address and edge_tuple[0][1] != value:
-                logger.info(
-                    "found correct address but no matching value, check simple storage model")
+            elif edge in self.wildcard_edges and address in \
+                    self.wildcard_edges[edge]:
+                logger.info("%s/%d Taking wildcard edge (%08X, %d)!" % (
+                    self.name, self.current_state[0],
+                    address, value))
+                self._update_state(edge[1], address, value)
+                return True
+
+            # TODO: This check seems invalid, as there may still be a branch
+            # elif edge_tuple[0][0] == address and edge_tuple[0][1] != value:
+            #     logger.info(
+            #         "found correct address but no matching value, check simple storage model")
 
         # couldnt find an edge, check if simple storage model
         if address in self.current_state[1].model_per_address:
@@ -453,8 +467,6 @@ class PeripheralModel:
                 logger.info(
                     "simple storage!, writing to address: " + str(address))
                 return True
-
-        self.wildcard_edges = self._get_wildcard_edges()
 
         logger.info("Was not simple storage, starting BFS/Wildcard")
         # otherwise start BFS
@@ -496,7 +508,7 @@ class PeripheralModel:
             if addr_count > picked_edge[1]:
                 picked_edge = (edge, addr_count)
         self.current_state = (
-        picked_edge[0][1], self.graph.nodes[picked_edge[0][1]]["state"])
+            picked_edge[0][1], self.graph.nodes[picked_edge[0][1]]["state"])
         logger.info("Picked edge: " + str(picked_edge[0]))
         if address in self.current_state[1].model_per_address:
             self.current_state[1].model_per_address[address].write(value)
@@ -508,21 +520,53 @@ class PeripheralModel:
                                              str(value)))
         return False
 
-    def _get_wildcard_edges(self):
-        wildcard_edges = set()
+    def _update_wildcard_edges(self, threshold=5):
+        """
+        Annotate any edges that have more than **threshold** writes to accept
+        any value as a transition (i.e., a wildcard)
+        :param threshold: Number of unique writes before we accept any
+        transition
+
+        :return:
+        """
+        self.wildcard_edges = {}
         all_edges = self.graph.edges
         for edge in all_edges:
-            addr = -1
-            count = 0
+            # Count how many times each address is used on this edge
+            addresses = {}
             label = self._get_edge_labels(edge)
-            for tuple in label:
-                if addr == -1:
-                    addr = tuple[0]
-                    count += 1
-                elif addr == tuple[0]:
-                    count += 1
-                else:
-                    break
-            if count >= 5:  # arbitrary number
-                wildcard_edges.add((edge, addr))
-        return wildcard_edges
+            for (address, value) in label:
+                if address not in addresses:
+                    addresses[address] = set()
+                addresses[address].add((address, value))
+
+            for address in addresses:
+                if len(addresses[address]) > threshold:
+                    logger.info("%s has a wildcard edge (count: %d)" %
+                                (edge, len(addresses[address])))
+
+                    # make sure no other outgoing edges use this address
+                    has_other_edge = False
+                    for e2 in self.graph.out_edges(edge[0]):
+                        if e2 == edge or has_other_edge:
+                            continue
+                        label = self._get_edge_labels(e2)
+                        for (a2, v2) in label:
+                            if a2 == address:
+                                has_other_edge = True
+                                break
+                    if has_other_edge:
+                        continue
+
+                    # Add to labels
+                    edges = self.graph[edge[0]][edge[1]]["tuples"]
+                    edges -= addresses[address]
+                    edge_label = ", ".join(["(0x%08X, %d)" % x for x in edges])
+                    self.graph[edge[0]][edge[1]]["label"] = edge_label + \
+                                                            ", (%08X,*)" % address
+
+                    # Should we mark this edge as a wildcard?
+                    if edge not in self.wildcard_edges:
+                        self.wildcard_edges[edge] = [address]
+                    else:
+                        self.wildcard_edges[edge].append(address)
