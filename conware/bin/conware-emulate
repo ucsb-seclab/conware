@@ -190,7 +190,6 @@ def emulate_write_after(avatar, message, **kwargs):
                                                     hex(message.address),
                                                     message.value,
                                                     model_val, hex(message.pc)))
-
         OUTPUT_TSV.write_row(
             ['WRITE', seq,
              "%08x" % message.address,
@@ -268,8 +267,9 @@ if __name__ == '__main__':
     logger.info("Creating Avatar instance...")
     avatar_dir = os.path.join(args.output_dir, "emulate_logs")
     avatar = Avatar(output_directory=avatar_dir, arch=ARM_CORTEX_M3)
-    # UART Output
 
+
+    # UART Output
     uart_tx_file = os.path.join(avatar_dir, "uart_tx.txt")
     uart_rx_file = os.path.join(avatar_dir, "uart_rx.txt")
     UART['tx_file'] = open(uart_tx_file, "w+", 0) # unbuffered
@@ -292,6 +292,11 @@ if __name__ == '__main__':
                              additional_args=qemu_args,
                              system_clock_scale=args.system_clock_scale)
     qemu.gdb_port = args.qemu_port
+
+    if "uart" in config:
+        UART['tx'] = config['uart']['tx']
+        UART['rx'] = config['uart']['rx']
+
 
     # Define our memory map for this board
     logger.info("Configuring memory layout...")
