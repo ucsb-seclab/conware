@@ -428,11 +428,10 @@ class PeripheralModel:
         :param size:
         :param value:
         :return:
-        1. look for edge
+        1. look for edge (either a provided value, or wildcard edge)
         2. check if simple storage model in models per address
         3. BFS for valid edge
         4. If no edge found, pick edge with most instances of that address
-        3 & 4 are interchangeable, do we have a wildcard edge? If so use that edge, if not bfs, otherwise pick edge w/ most instances?
         """
         logger.debug(
             "Writing to: " + str(address) + " with value: " + str(value))
