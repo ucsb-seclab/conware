@@ -3,7 +3,10 @@ import itertools
 import sys
 import argparse
 import csv
+import logging
+import pandas as pd
 
+logger = logging.getLogger(__name__)
 # emulated log: Operation Seqn	Address	Value	Value (Model)	PC	Size	Timestamp	Model /////////This is a tsv file
 # recorded log: Operation	Seqn	Address	Value	Value (Model)	PC	Size	Timestamp	Model ///////// this is listed as a csv file but it is a tsv file
 
@@ -23,53 +26,130 @@ def main(emulated, recorded):
     emulated_csv = csv.reader(emulated_log, dialect=csv.excel_tab)
     recorded_csv = csv.reader(recorded_log, dialect=csv.excel_tab)
 
+    recorded_tuples = []
+    emulated_tuples = []
+
+    # Read relevant tuples from recording
     for row in recorded_csv:
-        if (row[0] == 'READ'):
+        recorded_tuples.append((row[0], row[2], row[3]))
+        if row[0] == 'READ':
             recorded_reads.append([row[2], row[3], row[6]])
-        elif (row[0] == 'WRITE'):
+        elif row[0] == 'WRITE':
             recorded_writes.append([row[2], row[3], row[6]])
+
+    # Read relevant tuples from emulated output
     for row in emulated_csv:
-        if (row[0] == 'READ'):
+        emulated_tuples.append((row[0], row[2], row[3]))
+        if row[0] == 'READ':
             emulated_reads.append([row[2], row[3], row[6]])
-        elif (row[0] == 'WRITE'):
+        elif row[0] == 'WRITE':
             emulated_writes.append([row[2], row[3], row[6]])
-    emulated_log.seek(0)
-    recorded_log.seek(0)
 
-    for write in recorded_writes:
-        if write not in emulated_writes:
-            print("Write: " + str(write) + " not in emulated log")
-            #for check_write_row in recorded_csv:
-                #if check_write_row[0] == 'WRITE' and check_write_row[2] == \
-                 #       write[0] and check_write_row[3] == write[1] and \
-                 #       check_write_row[6] == write[2]:
-                    #print("Missing Write Data: " + str(check_write_row))
+    idx_emulated = 0
+    idx_recorded = 0
 
-    emulated_log.seek(0)
-    recorded_log.seek(0)
-    for read in recorded_reads:
-        if read not in emulated_reads:
-            print("Read: " + str(read) + " not in emulated log")
-            #for check_read_row in recorded_csv:
-                #if check_read_row[0] == 'READ' and check_read_row[2] == read[
-                 #   0] and check_read_row[3] == read[1] and check_read_row[6] == \
-                #        read[2]:
-                    #print("Missing Read Data: " + str(check_read_row))
+    not_equal_count = 0
+    repeat_count = 0
 
-    emulated_log.seek(0)
-    recorded_log.seek(0)
-    count = 0
-    for recorded_op, emulated_op in itertools.izip(recorded_csv, emulated_csv):
-    #while recorded_log and emulated_log:
-        #recorded_op, emulated_op = recorded_log.pop(), emulated_log.pop()
-        if (recorded_op[0] != emulated_op[0] or recorded_op[2] != emulated_op[2] or recorded_op[3] != emulated_op[3]):
-            print("Emulated model diverged from recorded model in row: " + str(count))
-            print("Recorded Operation: " + str(recorded_op))
-            #print("Santiy Check Recorded_op " + str(recorded_op[0]) + " : " + str(recorded_op[2]) + " : " + str(recorded_op[3]))
-            print("Emulated Operation: " + str(emulated_op))
-            #print("Santiy Check Emulated_op " + str(emulated_op[0]) + " : " + str(emulated_op[2]) + " : " + str(emulated_op[3]))
+    while idx_emulated < len(recorded_tuples) and idx_emulated < len(
+            emulated_tuples):
+        op_emu, addr_emu, value_emu = emulated_tuples[idx_emulated]
 
-        count += 1
+        op_rec, addr_rec, value_rec = recorded_tuples[idx_recorded]
+        if op_rec == op_emu and addr_rec == addr_emu:
+            if value_emu != value_rec:
+                # Let's check to see if we have any duplicate values (e.g.,
+                # status registers)
+
+                # Check to see if emulated keeps repeating
+                idx_tmp = idx_emulated
+                while idx_tmp < len(emulated_tuples) and emulated_tuples[
+                    idx_tmp] == (op_emu, addr_emu, value_emu):
+                    idx_tmp += 1
+                if idx_tmp == len(emulated_tuples):
+                    logger.info(
+                        "Hit end of emulated log (%d early)" % (idx_tmp -
+                                                                idx_emulated))
+                    break
+                # Looks like we just had a long repeat
+                if recorded_tuples[idx_recorded] == emulated_tuples[idx_tmp]:
+                    logger.debug("Skipped %d lines in emulated output." %
+                                 (idx_tmp - idx_emulated))
+                    repeat_count += idx_tmp - idx_emulated
+                    idx_emulated = idx_tmp
+                    continue
+
+                # Check to see if the recording keeps repeating
+                idx_tmp = idx_recorded
+                while idx_tmp < len(recorded_tuples) and recorded_tuples[
+                    idx_tmp] == (op_rec, addr_rec, value_rec):
+                    idx_tmp += 1
+                # Looks like we just had a few repeats
+                if idx_tmp == len(recorded_tuples):
+                    logger.info(
+                        "Hit end of recorded log (%d early)" % (idx_tmp -
+                                                                idx_recorded))
+                    break
+                if recorded_tuples[idx_recorded] == emulated_tuples[idx_tmp]:
+                    logger.debug("Skipped %d lines in recorded output." %
+                                 (idx_tmp - idx_recorded))
+                    repeat_count += idx_tmp - idx_recorded
+                    idx_recorded = idx_tmp
+                    continue
+
+                # Hum... they never synced up?
+                not_equal_count += 1
+                idx_emulated += 1
+                idx_recorded += 1
+                logger.warning("Found unequal rows %s != %s" % (
+                    recorded_tuples[idx_recorded],
+                    emulated_tuples[idx_emulated]))
+            else:
+                # Equal!
+                idx_emulated += 1
+                idx_recorded += 1
+                continue
+        else:
+            # Let's advance until they sync up again
+            next_emu = idx_emulated
+            next_rec = idx_recorded
+
+            # Find the next index in each that makes them both equal
+            while next_emu < len(emulated_tuples) and \
+                    emulated_tuples[next_emu] != recorded_tuples[idx_recorded]:
+                next_emu += 1
+
+            while next_rec < len(recorded_tuples) and \
+                    recorded_tuples[next_rec] != emulated_tuples[idx_emulated]:
+                next_rec += 1
+
+            # Increment the smallest jump in the sequence
+            if (next_rec - idx_recorded) < (next_emu - idx_emulated):
+                logger.warning("%d lines missing from emulated @ %d." % (
+                    next_rec - idx_recorded, idx_emulated))
+
+                not_equal_count += next_rec - idx_recorded
+                while idx_recorded < next_rec:
+                    print("%d: %s %s %s" % ((idx_recorded + 1,
+                                             ) + recorded_tuples[idx_recorded]))
+                    idx_recorded += 1
+                continue
+            else:
+                logger.warning("%d lines missing from recording. @ %d" % (
+                    next_emu - idx_emulated, idx_recorded))
+                not_equal_count = next_emu - idx_emulated
+                while idx_emulated < next_emu:
+                    print("%d: %s %s %s" % (
+                            (idx_emulated + 1,) + emulated_tuples[
+                        idx_emulated]))
+                    idx_emulated += 1
+                continue
+
+        logger.error("Pretty sure this should never happen...")
+        not_equal_count += 1
+        idx_emulated += 1
+        idx_recorded += 1
+        continue
 
 
 if __name__ == "__main__":
@@ -79,4 +159,6 @@ if __name__ == "__main__":
     parser.add_argument('recorded_log')
 
     args = parser.parse_args()
+
+    logging.basicConfig(level=logging.INFO)
     main(args.emulated_log, args.recorded_log)
