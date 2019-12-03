@@ -32,7 +32,7 @@
 // For SAM3X:
 #define _useTimer1
 #define _useTimer2
-#define _useTimer3
+//#define _useTimer3
 #define _useTimer4
 #define _useTimer5
 

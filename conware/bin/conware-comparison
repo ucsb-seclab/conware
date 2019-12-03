@@ -2,20 +2,16 @@
 # Native
 import argparse
 import importlib
-import os
 import pprint
-import time
-import sys
 
 from avatar2 import *
 import logging
 
-from pretender.common import build_avatar, build_qemu_emulator, set_memory_map, \
-    load_config, build_hardware
-from pretender.logger import LogWriter
-from pretender.model import PretenderModel
-from pretender.bin_parser import M3Parser
-import pretender.globals as G
+from conware.common import build_avatar, build_qemu_emulator, set_memory_map, load_config, build_hardware
+from conware.tools.logger import LogWriter
+from conware.model import PretenderModel
+from conware.bin_parser import M3Parser
+import conware.globals as G
 
 logger = logging.getLogger(__name__)
 

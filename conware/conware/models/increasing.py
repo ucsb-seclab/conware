@@ -3,7 +3,8 @@ import logging
 import time
 
 logger = logging.getLogger(__name__)
-from pretender.models import MemoryModel
+#from pretender.models import MemoryModel
+from conware.models import MemoryModel
 
 
 class IncreasingModel(MemoryModel):

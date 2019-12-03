@@ -14,14 +14,24 @@ import numpy
 # from avatar2.peripherals.nucleo_usart import NucleoUSART
 
 # Pretender
-import pretender.globals as G
-from pretender.ground_truth.arduino_due import PeripheralMemoryMap
-from pretender.logger import LogReader
-from pretender.cluster_peripherals import cluster_peripherals
-from pretender.mmiogroup import MMIOGroup
-from pretender.models.increasing import IncreasingModel
-from pretender.models.pattern import PatternModel
-from pretender.models.simple_storage import SimpleStorageModel
+#import pretender.globals as G
+import conware.globals as G
+
+#from pretender.ground_truth.arduino_due import PeripheralMemoryMap
+from conware.ground_truth.arduino_due import PeripheralMemoryMap
+
+#from pretender.logger import LogReader
+from conware.tools.logger import LogReader
+
+#from pretender.cluster_peripherals import cluster_peripherals
+from conware.cluster_peripherals import cluster_peripherals
+
+#from pretender.models.increasing import IncreasingModel
+#from pretender.models.pattern import PatternModel
+
+
+#from pretender.models.simple_storage import SimpleStorageModel
+from conware.models.simple_storage import SimpleStorageModel
 from conware.peripheral_model import PeripheralModel
 
 logger = logging.getLogger(__name__)
@@ -61,9 +71,7 @@ class PretenderModel:
         self.shutdown()
 
     def shutdown(self):
-        for mdl in self.model_per_address.values():
-            if isinstance(mdl, MMIOGroup):
-                mdl.shutdown()
+        pass
 
     def save(self, filename):
         """ Save our model to the specified directory """
@@ -282,15 +290,7 @@ class PretenderModel:
             self.__init_address(address)
             self.model_per_address[address]['model'] = SimpleStorageModel()
 
-        logger.debug(
-            "Using model %s" % self.model_per_address[address]['model'])
-        if isinstance(self.model_per_address[address]['model'], MMIOGroup):
-            logger.debug("Reading from MMIOGroup")
-            return self.model_per_address[address]['model'].read_memory(address,
-                                                                        size)
-        elif isinstance(self.model_per_address[address]['model'], NucleoUSART):
-            logger.debug("Reading from virtual serial port")
-            return self.model_per_address[address]['model'].read()
+
 
         return self.model_per_address[address]['model'].read()
 

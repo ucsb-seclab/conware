@@ -14,18 +14,10 @@ tc.o:
 00000000 T TC_Start
 00000000 T TC_Stop
 
+adc12_sam3u.o:
+
 interrupt_sam_nvic.o:
 00000000 D g_interrupt_enabled
-
-rtt.o:
-         U __assert_func
-00000000 r __func__.6797
-00000000 r __func__.6805
-00000000 T RTT_EnableIT
-00000000 T RTT_GetStatus
-00000000 T RTT_GetTime
-00000000 T RTT_SetAlarm
-00000000 T RTT_SetPrescaler
 
 uotghs_device.o:
          U g_interrupt_enabled
@@ -61,7 +53,9 @@ uotghs_device.o:
 00000000 b ul_recv_fifo_ptr
 00000000 b ul_send_fifo_ptr
 
-adc12_sam3u.o:
+uotghs.o:
+00000000 B gpf_isr
+00000000 T UOTGHS_Handler
 
 twi.o:
          U __assert_func
@@ -97,6 +91,8 @@ twi.o:
 00000000 T TWI_TransferComplete
 00000000 T TWI_WriteByte
 
+udphs.o:
+
 pio.o:
 00000000 T PIO_Clear
 00000000 T PIO_Configure
@@ -109,46 +105,6 @@ pio.o:
 00000000 T PIO_SetInput
 00000000 T PIO_SetOutput
 00000000 T PIO_SetPeripheral
-
-udphs.o:
-
-ssc.o:
-         U memset
-00000000 T ssc_disable_interrupt
-00000000 T ssc_disable_rx
-00000000 T ssc_disable_tx
-00000000 T ssc_disable_tx_frame_sync_data
-00000000 T ssc_enable_interrupt
-00000000 T ssc_enable_rx
-00000000 T ssc_enable_tx
-00000000 T ssc_enable_tx_frame_sync_data
-00000000 T ssc_get_interrupt_mask
-00000000 T ssc_get_rx_access
-00000000 T ssc_get_rx_compare
-00000000 T ssc_get_status
-00000000 T ssc_get_tx_access
-00000000 T ssc_get_writeprotect_status
-00000000 T ssc_i2s_set_receiver
-00000000 T ssc_i2s_set_transmitter
-00000000 T ssc_is_rx_enabled
-00000000 T ssc_is_rx_ready
-00000000 T ssc_is_tx_empty
-00000000 T ssc_is_tx_enabled
-00000000 T ssc_is_tx_ready
-00000000 T ssc_read
-00000000 T ssc_read_sync_data
-00000000 T ssc_reset
-00000000 T ssc_set_clock_divider
-00000000 T ssc_set_loop_mode
-00000000 T ssc_set_normal_mode
-00000000 T ssc_set_receiver
-00000000 T ssc_set_rx_compare
-00000000 T ssc_set_rx_stop_selection
-00000000 T ssc_set_td_default_level
-00000000 T ssc_set_transmitter
-00000000 T ssc_set_writeprotect
-00000000 T ssc_write
-00000000 T ssc_write_sync_data
 
 efc.o:
 00000000 T efc_disable_frdy_interrupt
@@ -277,16 +233,15 @@ emac.o:
 00000000 b gs_uc_tx_buffer
          U memcpy
 
-rstc.o:
-00000000 T rstc_disable_user_reset
-00000000 T rstc_disable_user_reset_interrupt
-00000000 T rstc_enable_user_reset
-00000000 T rstc_enable_user_reset_interrupt
-00000000 T rstc_get_reset_cause
-00000000 T rstc_get_status
-00000000 T rstc_reset_extern
-00000000 T rstc_set_external_reset
-00000000 T rstc_start_software_reset
+rtt.o:
+         U __assert_func
+00000000 r __func__.6797
+00000000 r __func__.6805
+00000000 T RTT_EnableIT
+00000000 T RTT_GetStatus
+00000000 T RTT_GetTime
+00000000 T RTT_SetAlarm
+00000000 T RTT_SetPrescaler
 
 dacc.o:
 00000000 T dacc_disable_channel
@@ -344,6 +299,17 @@ uotghs_host.o:
 00000000 T UHD_Pipe_Write
 00000000 T UHD_SetStack
 00000000 b uhd_state
+
+rstc.o:
+00000000 T rstc_disable_user_reset
+00000000 T rstc_disable_user_reset_interrupt
+00000000 T rstc_enable_user_reset
+00000000 T rstc_enable_user_reset_interrupt
+00000000 T rstc_get_reset_cause
+00000000 T rstc_get_status
+00000000 T rstc_reset_extern
+00000000 T rstc_set_external_reset
+00000000 T rstc_start_software_reset
 
 trng.o:
 00000000 T trng_disable
@@ -422,6 +388,21 @@ timetick.o:
 00000000 T TimeTick_Increment
 00000000 T Wait
 
+conware.o:
+00000000 T conware_interrupt_enter
+00000000 T conware_interrupt_exit
+00000000 T conware_log
+00000000 T conware_print_results
+00000000 B CURRENT_INDEX
+         U iprintf
+00000000 B PRINTING
+00000fa0 C RECORD_ADDRESS
+000003e8 C RECORD_OPERATION
+00000fa0 C RECORD_PC
+00000fa0 C RECORD_REPEATED
+00000fa0 C RECORD_TIME
+00000fa0 C RECORD_VALUE
+
 adc.o:
 00000000 T adc_configure_power_save
 00000000 T adc_configure_sequence
@@ -495,9 +476,43 @@ usart.o:
 00000000 T USART_Write
 00000000 T USART_WriteBuffer
 
-uotghs.o:
-00000000 B gpf_isr
-00000000 T UOTGHS_Handler
+ssc.o:
+         U memset
+00000000 T ssc_disable_interrupt
+00000000 T ssc_disable_rx
+00000000 T ssc_disable_tx
+00000000 T ssc_disable_tx_frame_sync_data
+00000000 T ssc_enable_interrupt
+00000000 T ssc_enable_rx
+00000000 T ssc_enable_tx
+00000000 T ssc_enable_tx_frame_sync_data
+00000000 T ssc_get_interrupt_mask
+00000000 T ssc_get_rx_access
+00000000 T ssc_get_rx_compare
+00000000 T ssc_get_status
+00000000 T ssc_get_tx_access
+00000000 T ssc_get_writeprotect_status
+00000000 T ssc_i2s_set_receiver
+00000000 T ssc_i2s_set_transmitter
+00000000 T ssc_is_rx_enabled
+00000000 T ssc_is_rx_ready
+00000000 T ssc_is_tx_empty
+00000000 T ssc_is_tx_enabled
+00000000 T ssc_is_tx_ready
+00000000 T ssc_read
+00000000 T ssc_read_sync_data
+00000000 T ssc_reset
+00000000 T ssc_set_clock_divider
+00000000 T ssc_set_loop_mode
+00000000 T ssc_set_normal_mode
+00000000 T ssc_set_receiver
+00000000 T ssc_set_rx_compare
+00000000 T ssc_set_rx_stop_selection
+00000000 T ssc_set_td_default_level
+00000000 T ssc_set_transmitter
+00000000 T ssc_set_writeprotect
+00000000 T ssc_write
+00000000 T ssc_write_sync_data
 
 gpbr.o:
 00000000 T gpbr_read
@@ -570,17 +585,3 @@ startup_sam3xa.o:
          U USART2_Handler
          U USART3_Handler
          U WDT_Handler
-
-conware.o:
-00000000 T conware_interrupt_enter
-00000000 T conware_interrupt_exit
-00000000 T conware_log
-00000000 T conware_print_results
-00000000 B CURRENT_INDEX
-         U iprintf
-00000000 B PRINTING
-00004e20 C RECORD_ADDRESS
-00001388 C RECORD_OPERATION
-00004e20 C RECORD_PC
-00004e20 C RECORD_TIME
-00004e20 C RECORD_VALUE

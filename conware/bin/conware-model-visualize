@@ -9,18 +9,9 @@ import sys
 
 from networkx.drawing.nx_agraph import to_agraph
 
-sys.path.append("/home/graham/Desktop/conware/conware/")
-
 import logging
 
 from conware.model import PretenderModel
-import pretender.globals as G
-import pickle
-
-import networkx
-import matplotlib.pyplot as plt
-
-from graphviz import Digraph
 
 logger = logging.getLogger(__name__)
 

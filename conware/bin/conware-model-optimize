@@ -2,15 +2,11 @@
 
 # Native
 import argparse
-import fnmatch
 import os
 import cProfile
 
 import sys
 
-from networkx.drawing.nx_agraph import to_agraph
-
-sys.path.append("/home/graham/Desktop/conware/conware/")
 
 import logging
 

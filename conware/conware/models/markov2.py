@@ -1,7 +1,7 @@
 import collections
 import logging
-from pretender.models import MemoryModel
-from pretender.logger import LogReader
+#from pretender.models import MemoryModel
+from conware.models import MemoryModel
 import random
 
 logger = logging.getLogger(__name__)

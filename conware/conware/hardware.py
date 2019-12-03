@@ -2,7 +2,8 @@ import serial
 
 import logging
 
-from pretender.logger import LogWriter
+#from pretender.logger import LogWriter
+from conware.tools.logger import LogWriter
 
 logger = logging.getLogger(__name__)
 
