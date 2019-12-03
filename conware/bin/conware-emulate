@@ -31,6 +31,8 @@ UART = {
     'rx_file': None,
     'tx_file': None
 }
+
+
 def parse_args():
     # Default argument values
     sample = "firmware/custom/blink/build/blink.ino.bin"
@@ -96,7 +98,7 @@ def parse_args():
 
     if not os.path.exists(args.qemu_executable):
         logger.error("QEMU executable (%s) does not exist." %
-                   args.qemu_executable)
+                     args.qemu_executable)
         parser.print_usage()
         sys.exit()
     else:
@@ -104,7 +106,7 @@ def parse_args():
 
     if not os.path.exists(args.recording_dir):
         logger.error("Recording directory does not exist (%s)." %
-              args.recording_dir)
+                     args.recording_dir)
         parser.print_help()
         sys.exit()
     else:
@@ -268,12 +270,11 @@ if __name__ == '__main__':
     avatar_dir = os.path.join(args.output_dir, "emulate_logs")
     avatar = Avatar(output_directory=avatar_dir, arch=ARM_CORTEX_M3)
 
-
     # UART Output
     uart_tx_file = os.path.join(avatar_dir, "uart_tx.txt")
     uart_rx_file = os.path.join(avatar_dir, "uart_rx.txt")
-    UART['tx_file'] = open(uart_tx_file, "w+", 0) # unbuffered
-    UART['rx_file'] = open(uart_rx_file, "w+", 0) # unbuffered
+    UART['tx_file'] = open(uart_tx_file, "w+", 0)  # unbuffered
+    UART['rx_file'] = open(uart_rx_file, "w+", 0)  # unbuffered
 
     # Setup emulator
     qemu_args = []
@@ -296,7 +297,6 @@ if __name__ == '__main__':
     if "uart" in config:
         UART['tx'] = config['uart']['tx']
         UART['rx'] = config['uart']['rx']
-
 
     # Define our memory map for this board
     logger.info("Configuring memory layout...")
@@ -348,10 +348,10 @@ if __name__ == '__main__':
     # Update our IVT?
     if 'ivt_address' in args.__dict__ and args.ivt_address:
         logger.warning("Setting QEMU vector table base to %#08x" %
-                    args.ivt_address)
+                       args.ivt_address)
         qemu.protocols.interrupts.set_vector_table_base(args.ivt_address)
 
-    time_start  = time.time()
+    time_start = time.time()
 
     # Dropping to a shell?
     if args.shell:
