@@ -35,28 +35,26 @@ To optimize this model, which is the real power of conware, we execute `pretende
 
       **Install both of these, in a [virtualenv](https://virtualenv.pypa.io/en/latest/)**.  
 
-      Once virtualenv is isntalled and *conware* environment is created, run:
+      Once virtualenv is installed *and* **conware environment is created**, run:
 
      `./install_pretender.sh`
 
 
 ## Example usage
 
-1. Build and instrument the arduino firmware:
-```bash
-./rebuild_runtime.sh
-```
+   1. Build and instrument the arduino firmware:
+    
+     ./rebuild_runtime.sh
 
-2. Build and instrument an arduino project:
-```bash
-./instrument_project.sh <arduino directory>
-```
-For example,
-```bash
-./instrument_project.sh firmware/custom/blink/
-```
+   2. Build and instrument an arduino project:
+    
+     ./instrument_project.sh <arduino directory>
 
-3. Execute the firmware and log the data (saved a TSV file in the specified directory).  The device address is the filename in `/dev/` (e.g., ttyACM0)
+   For example:
+   
+     `./instrument_project.sh firmware/custom/blink/`
+
+   3. Execute the firmware log the data (saved a TSV file in the specified directory).  The device address is the filename in `/dev/` (e.g., ttyACM0)
 ```bash
 python conware/log_data.py -l <device address> <output directory>
 ```
