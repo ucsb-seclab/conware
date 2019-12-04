@@ -50,6 +50,7 @@ CFLAGS += -Wunreachable-code
 CFLAGS += -Wcast-align
 #CFLAGS += -Wmissing-noreturn
 #CFLAGS += -Wconversion
+CFLAGS += -save-temps
 
 # To reduce application size use only integer printf function.
 CFLAGS += -Dprintf=iprintf
