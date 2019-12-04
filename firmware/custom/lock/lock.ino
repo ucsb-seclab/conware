@@ -1,6 +1,6 @@
 /*-----( Import needed libraries )-----*/
 
-#include "IRremote.h"
+#include "IRremote2.h"
 #include <Servo.h>
 
 /*-----( Declare Constants )-----*/
