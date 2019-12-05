@@ -1,0 +1,1058 @@
+2019-10-31 12:07:29,091 | avatar.targets.qemu.INFO | QEMU process running
+2019-10-31 12:15:10,494 | avatar.targets.qemu.INFO | QEMU process running
+2019-10-31 12:30:13,999 | avatar.targets.qemu.INFO | QEMU process running
+2019-10-31 12:36:03,883 | avatar.targets.qemu.INFO | QEMU process running
+2019-10-31 12:40:41,698 | avatar.targets.qemu.INFO | QEMU process running
+2019-10-31 12:53:06,302 | avatar.targets.qemu.INFO | QEMU process running
+2019-10-31 12:58:38,547 | avatar.targets.qemu.INFO | QEMU process running
+2019-10-31 12:59:12,884 | avatar.targets.qemu.INFO | QEMU process running
+2019-10-31 13:00:17,383 | avatar.targets.qemu.INFO | QEMU process running
+2019-10-31 13:02:59,890 | avatar.targets.qemu.INFO | QEMU process running
+2019-10-31 13:04:28,438 | avatar.targets.qemu.INFO | QEMU process running
+2019-10-31 13:05:11,981 | avatar.targets.qemu.INFO | QEMU process running
+2019-10-31 13:05:32,616 | avatar.targets.qemu.INFO | QEMU process running
+2019-10-31 13:05:32,761 | avatar.targets.qemu.QMPProtocol.INFO | {"return": {}, "id": 0}
+
+2019-10-31 13:05:32,761 | avatar.targets.qemu.INFO | Connected to remote target
+2019-10-31 13:05:32,762 | avatar.targets.qemu.RemoteMemoryProtocol.INFO | Successfully connected rmp
+2019-10-31 13:05:32,776 | avatar.targets.qemu.INFO | State changed to to TargetStates.STOPPED
+2019-10-31 13:05:32,794 | avatar.targets.qemu.INFO | State changed to to TargetStates.RUNNING
+2019-10-31 13:05:32,801 | avatar.targets.qemu.INFO | State changed to to TargetStates.EXITED
+2019-10-31 13:10:49,576 | avatar.targets.qemu.INFO | QEMU process running
+2019-10-31 13:10:49,686 | avatar.targets.qemu.QMPProtocol.INFO | {"return": {}, "id": 0}
+
+2019-10-31 13:10:49,687 | avatar.targets.qemu.INFO | Connected to remote target
+2019-10-31 13:10:49,688 | avatar.targets.qemu.RemoteMemoryProtocol.INFO | Successfully connected rmp
+2019-10-31 13:10:49,693 | avatar.targets.qemu.INFO | State changed to to TargetStates.STOPPED
+2019-10-31 13:11:36,589 | avatar.targets.qemu.INFO | State changed to to TargetStates.RUNNING
+2019-10-31 13:11:36,593 | avatar.targets.qemu.INFO | State changed to to TargetStates.EXITED
+2019-10-31 13:14:19,432 | avatar.targets.qemu.INFO | QEMU process running
+2019-10-31 13:14:19,539 | avatar.targets.qemu.QMPProtocol.INFO | {"return": {}, "id": 0}
+
+2019-10-31 13:14:19,540 | avatar.targets.qemu.INFO | Connected to remote target
+2019-10-31 13:14:19,541 | avatar.targets.qemu.RemoteMemoryProtocol.INFO | Successfully connected rmp
+2019-10-31 13:14:19,548 | avatar.targets.qemu.INFO | State changed to to TargetStates.STOPPED
+2019-10-31 13:14:36,791 | avatar.targets.qemu.INFO | State changed to to TargetStates.RUNNING
+2019-10-31 13:14:36,795 | avatar.targets.qemu.INFO | State changed to to TargetStates.EXITED
+2019-10-31 13:16:41,934 | avatar.targets.qemu.INFO | QEMU process running
+2019-10-31 13:16:42,034 | avatar.targets.qemu.INFO | State changed to to TargetStates.STOPPED
+2019-10-31 13:16:42,050 | avatar.targets.qemu.QMPProtocol.INFO | {"return": {}, "id": 0}
+
+2019-10-31 13:16:42,051 | avatar.targets.qemu.INFO | Connected to remote target
+2019-10-31 13:16:42,052 | avatar.targets.qemu.RemoteMemoryProtocol.INFO | Successfully connected rmp
+2019-10-31 13:19:11,864 | avatar.targets.qemu.INFO | QEMU process running
+2019-10-31 13:19:11,974 | avatar.targets.qemu.QMPProtocol.INFO | {"return": {}, "id": 0}
+
+2019-10-31 13:19:11,975 | avatar.targets.qemu.INFO | Connected to remote target
+2019-10-31 13:19:11,976 | avatar.targets.qemu.RemoteMemoryProtocol.INFO | Successfully connected rmp
+2019-10-31 13:19:11,989 | avatar.targets.qemu.INFO | State changed to to TargetStates.STOPPED
+2019-10-31 13:22:54,701 | avatar.targets.qemu.INFO | QEMU process running
+2019-10-31 13:22:54,810 | avatar.targets.qemu.INFO | State changed to to TargetStates.STOPPED
+2019-10-31 13:22:54,815 | avatar.targets.qemu.QMPProtocol.INFO | {"return": {}, "id": 0}
+
+2019-10-31 13:22:54,816 | avatar.targets.qemu.INFO | Connected to remote target
+2019-10-31 13:22:54,817 | avatar.targets.qemu.RemoteMemoryProtocol.INFO | Successfully connected rmp
+2019-10-31 13:28:34,208 | avatar.targets.qemu.INFO | QEMU process running
+2019-10-31 13:29:03,198 | avatar.targets.qemu.QMPProtocol.INFO | {"return": {}, "id": 0}
+
+2019-10-31 13:29:03,216 | avatar.targets.qemu.INFO | State changed to to TargetStates.STOPPED
+2019-10-31 13:31:50,600 | avatar.targets.qemu.INFO | Connected to remote target
+2019-10-31 13:31:50,602 | avatar.targets.qemu.RemoteMemoryProtocol.INFO | Successfully connected rmp
+2019-10-31 13:32:00,287 | avatar.targets.qemu.INFO | State changed to to TargetStates.RUNNING
+2019-10-31 13:32:00,288 | avatar.targets.qemu.INFO | State changed to to TargetStates.EXITED
+2019-10-31 13:33:30,907 | avatar.targets.qemu.INFO | QEMU process running
+2019-10-31 13:33:31,000 | avatar.targets.qemu.INFO | State changed to to TargetStates.STOPPED
+2019-10-31 13:33:31,002 | avatar.targets.qemu.QMPProtocol.INFO | {"return": {}, "id": 0}
+
+2019-10-31 13:33:31,003 | avatar.targets.qemu.INFO | Connected to remote target
+2019-10-31 13:33:31,003 | avatar.targets.qemu.RemoteMemoryProtocol.INFO | Successfully connected rmp
+2019-10-31 13:33:31,016 | avatar.targets.qemu.INFO | State changed to to TargetStates.RUNNING
+2019-10-31 13:37:11,049 | avatar.targets.qemu.INFO | State changed to to TargetStates.EXITED
+2019-10-31 13:37:59,782 | avatar.targets.qemu.INFO | QEMU process running
+2019-10-31 13:37:59,890 | avatar.targets.qemu.QMPProtocol.INFO | {"return": {}, "id": 0}
+
+2019-10-31 13:37:59,891 | avatar.targets.qemu.INFO | Connected to remote target
+2019-10-31 13:37:59,892 | avatar.targets.qemu.RemoteMemoryProtocol.INFO | Successfully connected rmp
+2019-10-31 13:37:59,899 | avatar.targets.qemu.INFO | State changed to to TargetStates.STOPPED
+2019-10-31 13:37:59,934 | avatar.targets.qemu.INFO | State changed to to TargetStates.RUNNING
+2019-10-31 13:38:23,946 | avatar.targets.qemu.INFO | State changed to to TargetStates.EXITED
+2019-10-31 14:18:38,115 | avatar.targets.qemu.INFO | QEMU process running
+2019-10-31 14:18:38,227 | avatar.targets.qemu.QMPProtocol.INFO | {"return": {}, "id": 0}
+
+2019-10-31 14:18:38,227 | avatar.targets.qemu.INFO | Connected to remote target
+2019-10-31 14:18:38,228 | avatar.targets.qemu.RemoteMemoryProtocol.INFO | Successfully connected rmp
+2019-10-31 14:18:38,233 | avatar.targets.qemu.INFO | State changed to to TargetStates.STOPPED
+2019-10-31 14:18:38,251 | avatar.targets.qemu.INFO | State changed to to TargetStates.RUNNING
+2019-10-31 14:21:07,276 | avatar.targets.qemu.INFO | State changed to to TargetStates.EXITED
+2019-10-31 14:21:24,717 | avatar.targets.qemu.INFO | QEMU process running
+2019-10-31 14:21:24,816 | avatar.targets.qemu.QMPProtocol.INFO | {"return": {}, "id": 0}
+
+2019-10-31 14:21:24,816 | avatar.targets.qemu.INFO | Connected to remote target
+2019-10-31 14:21:24,816 | avatar.targets.qemu.RemoteMemoryProtocol.INFO | Successfully connected rmp
+2019-10-31 14:21:24,839 | avatar.targets.qemu.INFO | State changed to to TargetStates.STOPPED
+2019-10-31 14:21:24,860 | avatar.targets.qemu.INFO | State changed to to TargetStates.RUNNING
+2019-10-31 14:21:24,893 | avatar.targets.qemu.INFO | State changed to to TargetStates.EXITED
+2019-10-31 14:22:38,712 | avatar.targets.qemu.INFO | QEMU process running
+2019-10-31 14:22:38,832 | avatar.targets.qemu.QMPProtocol.INFO | {"return": {}, "id": 0}
+
+2019-10-31 14:22:38,833 | avatar.targets.qemu.INFO | Connected to remote target
+2019-10-31 14:22:38,834 | avatar.targets.qemu.RemoteMemoryProtocol.INFO | Successfully connected rmp
+2019-10-31 14:22:38,850 | avatar.targets.qemu.INFO | State changed to to TargetStates.STOPPED
+2019-10-31 14:22:38,870 | avatar.targets.qemu.INFO | State changed to to TargetStates.RUNNING
+2019-10-31 14:23:17,872 | avatar.targets.qemu.INFO | State changed to to TargetStates.EXITED
+2019-10-31 14:24:10,702 | avatar.targets.qemu.INFO | QEMU process running
+2019-10-31 14:24:10,816 | avatar.targets.qemu.INFO | State changed to to TargetStates.STOPPED
+2019-10-31 14:24:10,817 | avatar.targets.qemu.QMPProtocol.INFO | {"return": {}, "id": 0}
+
+2019-10-31 14:24:10,817 | avatar.targets.qemu.INFO | Connected to remote target
+2019-10-31 14:24:10,818 | avatar.targets.qemu.RemoteMemoryProtocol.INFO | Successfully connected rmp
+2019-10-31 14:24:10,851 | avatar.targets.qemu.INFO | State changed to to TargetStates.RUNNING
+2019-10-31 14:24:52,846 | avatar.targets.qemu.INFO | State changed to to TargetStates.EXITED
+2019-10-31 14:25:39,489 | avatar.targets.qemu.INFO | QEMU process running
+2019-10-31 14:25:39,604 | avatar.targets.qemu.INFO | State changed to to TargetStates.STOPPED
+2019-10-31 14:25:39,607 | avatar.targets.qemu.QMPProtocol.INFO | {"return": {}, "id": 0}
+
+2019-10-31 14:25:39,607 | avatar.targets.qemu.INFO | Connected to remote target
+2019-10-31 14:25:39,608 | avatar.targets.qemu.RemoteMemoryProtocol.INFO | Successfully connected rmp
+2019-10-31 14:25:39,637 | avatar.targets.qemu.INFO | State changed to to TargetStates.RUNNING
+2019-10-31 14:26:06,650 | avatar.targets.qemu.INFO | State changed to to TargetStates.EXITED
+2019-10-31 14:27:30,438 | avatar.targets.qemu.INFO | QEMU process running
+2019-10-31 14:27:30,555 | avatar.targets.qemu.QMPProtocol.INFO | {"return": {}, "id": 0}
+
+2019-10-31 14:27:30,555 | avatar.targets.qemu.INFO | Connected to remote target
+2019-10-31 14:27:30,556 | avatar.targets.qemu.INFO | State changed to to TargetStates.STOPPED
+2019-10-31 14:27:30,560 | avatar.targets.qemu.RemoteMemoryProtocol.INFO | Successfully connected rmp
+2019-10-31 14:27:30,575 | avatar.targets.qemu.INFO | State changed to to TargetStates.RUNNING
+2019-10-31 14:28:07,347 | avatar.targets.qemu.INFO | State changed to to TargetStates.EXITED
+2019-10-31 14:29:01,431 | avatar.targets.qemu.INFO | QEMU process running
+2019-10-31 14:29:01,551 | avatar.targets.qemu.INFO | State changed to to TargetStates.STOPPED
+2019-10-31 14:29:01,553 | avatar.targets.qemu.QMPProtocol.INFO | {"return": {}, "id": 0}
+
+2019-10-31 14:29:01,553 | avatar.targets.qemu.INFO | Connected to remote target
+2019-10-31 14:29:01,557 | avatar.targets.qemu.RemoteMemoryProtocol.INFO | Successfully connected rmp
+2019-10-31 14:29:01,585 | avatar.targets.qemu.INFO | State changed to to TargetStates.RUNNING
+2019-10-31 14:29:53,380 | avatar.targets.qemu.INFO | State changed to to TargetStates.EXITED
+2019-10-31 14:32:16,899 | avatar.targets.qemu.INFO | QEMU process running
+2019-10-31 14:32:17,017 | avatar.targets.qemu.QMPProtocol.INFO | {"return": {}, "id": 0}
+
+2019-10-31 14:32:17,018 | avatar.targets.qemu.INFO | State changed to to TargetStates.STOPPED
+2019-10-31 14:32:17,018 | avatar.targets.qemu.INFO | Connected to remote target
+2019-10-31 14:32:17,020 | avatar.targets.qemu.RemoteMemoryProtocol.INFO | Successfully connected rmp
+2019-10-31 14:32:17,036 | avatar.targets.qemu.INFO | State changed to to TargetStates.RUNNING
+2019-10-31 14:32:53,065 | avatar.targets.qemu.INFO | State changed to to TargetStates.EXITED
+2019-10-31 14:33:46,275 | avatar.targets.qemu.INFO | QEMU process running
+2019-10-31 14:33:46,391 | avatar.targets.qemu.QMPProtocol.INFO | {"return": {}, "id": 0}
+
+2019-10-31 14:33:46,392 | avatar.targets.qemu.INFO | State changed to to TargetStates.STOPPED
+2019-10-31 14:33:46,393 | avatar.targets.qemu.INFO | Connected to remote target
+2019-10-31 14:33:46,394 | avatar.targets.qemu.RemoteMemoryProtocol.INFO | Successfully connected rmp
+2019-10-31 14:33:46,409 | avatar.targets.qemu.INFO | State changed to to TargetStates.RUNNING
+2019-10-31 14:34:54,434 | avatar.targets.qemu.INFO | State changed to to TargetStates.EXITED
+2019-10-31 14:36:08,166 | avatar.targets.qemu.INFO | QEMU process running
+2019-10-31 14:36:08,288 | avatar.targets.qemu.INFO | State changed to to TargetStates.STOPPED
+2019-10-31 14:36:08,290 | avatar.targets.qemu.QMPProtocol.INFO | {"return": {}, "id": 0}
+
+2019-10-31 14:36:08,290 | avatar.targets.qemu.INFO | Connected to remote target
+2019-10-31 14:36:08,292 | avatar.targets.qemu.RemoteMemoryProtocol.INFO | Successfully connected rmp
+2019-10-31 14:36:08,307 | avatar.targets.qemu.INFO | State changed to to TargetStates.RUNNING
+2019-10-31 14:37:07,315 | avatar.targets.qemu.INFO | State changed to to TargetStates.EXITED
+2019-10-31 14:38:25,961 | avatar.targets.qemu.INFO | QEMU process running
+2019-10-31 14:38:26,078 | avatar.targets.qemu.INFO | State changed to to TargetStates.STOPPED
+2019-10-31 14:38:26,085 | avatar.targets.qemu.QMPProtocol.INFO | {"return": {}, "id": 0}
+
+2019-10-31 14:38:26,085 | avatar.targets.qemu.INFO | Connected to remote target
+2019-10-31 14:38:26,086 | avatar.targets.qemu.RemoteMemoryProtocol.INFO | Successfully connected rmp
+2019-10-31 14:38:26,110 | avatar.targets.qemu.INFO | State changed to to TargetStates.RUNNING
+2019-10-31 14:38:56,128 | avatar.targets.qemu.INFO | State changed to to TargetStates.EXITED
+2019-10-31 14:39:14,524 | avatar.targets.qemu.INFO | QEMU process running
+2019-10-31 14:39:14,626 | avatar.targets.qemu.QMPProtocol.INFO | {"return": {}, "id": 0}
+
+2019-10-31 14:39:14,626 | avatar.targets.qemu.INFO | Connected to remote target
+2019-10-31 14:39:14,626 | avatar.targets.qemu.RemoteMemoryProtocol.INFO | Successfully connected rmp
+2019-10-31 14:39:14,642 | avatar.targets.qemu.INFO | State changed to to TargetStates.STOPPED
+2019-10-31 14:39:14,658 | avatar.targets.qemu.INFO | State changed to to TargetStates.RUNNING
+2019-10-31 14:39:14,690 | avatar.targets.qemu.INFO | State changed to to TargetStates.EXITED
+2019-10-31 14:42:21,286 | avatar.targets.qemu.INFO | QEMU process running
+2019-10-31 14:42:21,402 | avatar.targets.qemu.INFO | State changed to to TargetStates.STOPPED
+2019-10-31 14:42:21,406 | avatar.targets.qemu.QMPProtocol.INFO | {"return": {}, "id": 0}
+
+2019-10-31 14:42:21,407 | avatar.targets.qemu.INFO | Connected to remote target
+2019-10-31 14:42:21,408 | avatar.targets.qemu.RemoteMemoryProtocol.INFO | Successfully connected rmp
+2019-10-31 14:42:21,437 | avatar.targets.qemu.INFO | State changed to to TargetStates.RUNNING
+2019-10-31 14:49:46,441 | avatar.targets.qemu.INFO | State changed to to TargetStates.EXITED
+2019-10-31 14:50:55,391 | avatar.targets.qemu.INFO | QEMU process running
+2019-10-31 14:50:55,511 | avatar.targets.qemu.INFO | State changed to to TargetStates.STOPPED
+2019-10-31 14:50:55,512 | avatar.targets.qemu.QMPProtocol.INFO | {"return": {}, "id": 0}
+
+2019-10-31 14:50:55,513 | avatar.targets.qemu.INFO | Connected to remote target
+2019-10-31 14:50:55,514 | avatar.targets.qemu.RemoteMemoryProtocol.INFO | Successfully connected rmp
+2019-10-31 14:50:55,529 | avatar.targets.qemu.INFO | State changed to to TargetStates.RUNNING
+2019-10-31 14:52:05,564 | avatar.targets.qemu.INFO | State changed to to TargetStates.EXITED
+2019-10-31 14:52:45,274 | avatar.targets.qemu.INFO | QEMU process running
+2019-10-31 14:52:45,389 | avatar.targets.qemu.INFO | State changed to to TargetStates.STOPPED
+2019-10-31 14:52:45,394 | avatar.targets.qemu.QMPProtocol.INFO | {"return": {}, "id": 0}
+
+2019-10-31 14:52:45,394 | avatar.targets.qemu.INFO | Connected to remote target
+2019-10-31 14:52:45,395 | avatar.targets.qemu.RemoteMemoryProtocol.INFO | Successfully connected rmp
+2019-10-31 14:52:45,423 | avatar.targets.qemu.INFO | State changed to to TargetStates.RUNNING
+2019-10-31 14:52:56,944 | avatar.targets.qemu.INFO | State changed to to TargetStates.EXITED
+2019-10-31 14:55:38,111 | avatar.targets.qemu.INFO | QEMU process running
+2019-10-31 14:55:38,222 | avatar.targets.qemu.INFO | State changed to to TargetStates.STOPPED
+2019-10-31 14:55:38,235 | avatar.targets.qemu.QMPProtocol.INFO | {"return": {}, "id": 0}
+
+2019-10-31 14:55:38,235 | avatar.targets.qemu.INFO | Connected to remote target
+2019-10-31 14:55:38,236 | avatar.targets.qemu.RemoteMemoryProtocol.INFO | Successfully connected rmp
+2019-10-31 14:55:38,258 | avatar.targets.qemu.INFO | State changed to to TargetStates.RUNNING
+2019-10-31 14:55:57,261 | avatar.targets.qemu.INFO | State changed to to TargetStates.EXITED
+2019-10-31 14:57:59,468 | avatar.targets.qemu.INFO | QEMU process running
+2019-10-31 14:57:59,584 | avatar.targets.qemu.INFO | State changed to to TargetStates.STOPPED
+2019-10-31 14:57:59,595 | avatar.targets.qemu.QMPProtocol.INFO | {"return": {}, "id": 0}
+
+2019-10-31 14:57:59,595 | avatar.targets.qemu.INFO | Connected to remote target
+2019-10-31 14:57:59,597 | avatar.targets.qemu.RemoteMemoryProtocol.INFO | Successfully connected rmp
+2019-10-31 14:57:59,619 | avatar.targets.qemu.INFO | State changed to to TargetStates.RUNNING
+2019-10-31 15:00:36,097 | avatar.targets.qemu.INFO | QEMU process running
+2019-10-31 15:00:36,213 | avatar.targets.qemu.INFO | State changed to to TargetStates.STOPPED
+2019-10-31 15:00:36,217 | avatar.targets.qemu.QMPProtocol.INFO | {"return": {}, "id": 0}
+
+2019-10-31 15:00:36,217 | avatar.targets.qemu.INFO | Connected to remote target
+2019-10-31 15:00:36,221 | avatar.targets.qemu.RemoteMemoryProtocol.INFO | Successfully connected rmp
+2019-10-31 15:00:36,246 | avatar.targets.qemu.INFO | State changed to to TargetStates.RUNNING
+2019-10-31 15:01:52,861 | avatar.targets.qemu.INFO | QEMU process running
+2019-10-31 15:01:52,979 | avatar.targets.qemu.INFO | State changed to to TargetStates.STOPPED
+2019-10-31 15:01:52,985 | avatar.targets.qemu.QMPProtocol.INFO | {"return": {}, "id": 0}
+
+2019-10-31 15:01:52,986 | avatar.targets.qemu.INFO | Connected to remote target
+2019-10-31 15:01:52,987 | avatar.targets.qemu.RemoteMemoryProtocol.INFO | Successfully connected rmp
+2019-10-31 15:01:53,011 | avatar.targets.qemu.INFO | State changed to to TargetStates.RUNNING
+2019-10-31 15:03:46,996 | avatar.targets.qemu.INFO | QEMU process running
+2019-10-31 15:03:47,114 | avatar.targets.qemu.INFO | State changed to to TargetStates.STOPPED
+2019-10-31 15:03:47,116 | avatar.targets.qemu.QMPProtocol.INFO | {"return": {}, "id": 0}
+
+2019-10-31 15:03:47,116 | avatar.targets.qemu.INFO | Connected to remote target
+2019-10-31 15:03:47,117 | avatar.targets.qemu.RemoteMemoryProtocol.INFO | Successfully connected rmp
+2019-10-31 15:03:47,146 | avatar.targets.qemu.INFO | State changed to to TargetStates.RUNNING
+2019-10-31 15:07:11,407 | avatar.targets.qemu.INFO | QEMU process running
+2019-10-31 15:07:11,525 | avatar.targets.qemu.INFO | State changed to to TargetStates.STOPPED
+2019-10-31 15:07:11,528 | avatar.targets.qemu.QMPProtocol.INFO | {"return": {}, "id": 0}
+
+2019-10-31 15:07:11,529 | avatar.targets.qemu.INFO | Connected to remote target
+2019-10-31 15:07:11,530 | avatar.targets.qemu.RemoteMemoryProtocol.INFO | Successfully connected rmp
+2019-10-31 15:07:11,557 | avatar.targets.qemu.INFO | State changed to to TargetStates.RUNNING
+2019-10-31 15:07:52,595 | avatar.targets.qemu.INFO | State changed to to TargetStates.STOPPED
+2019-10-31 15:08:10,842 | avatar.targets.qemu.INFO | QEMU process running
+2019-10-31 15:08:10,943 | avatar.targets.qemu.QMPProtocol.INFO | {"return": {}, "id": 0}
+
+2019-10-31 15:08:10,943 | avatar.targets.qemu.INFO | Connected to remote target
+2019-10-31 15:08:10,944 | avatar.targets.qemu.RemoteMemoryProtocol.INFO | Successfully connected rmp
+2019-10-31 15:08:10,959 | avatar.targets.qemu.INFO | State changed to to TargetStates.STOPPED
+2019-10-31 15:08:10,975 | avatar.targets.qemu.INFO | State changed to to TargetStates.RUNNING
+2019-10-31 15:08:11,239 | avatar.targets.qemu.INFO | State changed to to TargetStates.EXITED
+2019-10-31 15:14:00,164 | avatar.targets.qemu.INFO | QEMU process running
+2019-10-31 15:14:00,267 | avatar.targets.qemu.QMPProtocol.INFO | {"return": {}, "id": 0}
+
+2019-10-31 15:14:00,267 | avatar.targets.qemu.INFO | Connected to remote target
+2019-10-31 15:14:00,267 | avatar.targets.qemu.RemoteMemoryProtocol.INFO | Successfully connected rmp
+2019-10-31 15:14:00,282 | avatar.targets.qemu.INFO | State changed to to TargetStates.STOPPED
+2019-10-31 15:14:00,298 | avatar.targets.qemu.INFO | State changed to to TargetStates.RUNNING
+2019-10-31 15:14:30,400 | avatar.targets.qemu.INFO | State changed to to TargetStates.STOPPED
+2019-10-31 15:29:40,425 | avatar.targets.qemu.INFO | QEMU process running
+2019-10-31 15:29:40,524 | avatar.targets.qemu.QMPProtocol.INFO | {"return": {}, "id": 0}
+
+2019-10-31 15:29:40,525 | avatar.targets.qemu.INFO | Connected to remote target
+2019-10-31 15:29:40,525 | avatar.targets.qemu.RemoteMemoryProtocol.INFO | Successfully connected rmp
+2019-10-31 15:29:40,548 | avatar.targets.qemu.INFO | State changed to to TargetStates.STOPPED
+2019-10-31 15:29:40,573 | avatar.targets.qemu.INFO | State changed to to TargetStates.RUNNING
+2019-10-31 15:30:00,262 | avatar.targets.qemu.INFO | State changed to to TargetStates.EXITED
+2019-10-31 15:30:16,808 | avatar.targets.qemu.INFO | QEMU process running
+2019-10-31 15:30:16,907 | avatar.targets.qemu.QMPProtocol.INFO | {"return": {}, "id": 0}
+
+2019-10-31 15:30:16,907 | avatar.targets.qemu.INFO | Connected to remote target
+2019-10-31 15:30:16,907 | avatar.targets.qemu.RemoteMemoryProtocol.INFO | Successfully connected rmp
+2019-10-31 15:30:16,928 | avatar.targets.qemu.INFO | State changed to to TargetStates.STOPPED
+2019-10-31 15:30:16,945 | avatar.targets.qemu.INFO | State changed to to TargetStates.RUNNING
+2019-10-31 15:30:47,001 | avatar.targets.qemu.INFO | State changed to to TargetStates.STOPPED
+2019-10-31 15:31:13,225 | avatar.targets.qemu.INFO | QEMU process running
+2019-10-31 15:31:13,325 | avatar.targets.qemu.QMPProtocol.INFO | {"return": {}, "id": 0}
+
+2019-10-31 15:31:13,325 | avatar.targets.qemu.INFO | Connected to remote target
+2019-10-31 15:31:13,325 | avatar.targets.qemu.RemoteMemoryProtocol.INFO | Successfully connected rmp
+2019-10-31 15:31:13,348 | avatar.targets.qemu.INFO | State changed to to TargetStates.STOPPED
+2019-10-31 15:31:13,365 | avatar.targets.qemu.INFO | State changed to to TargetStates.RUNNING
+2019-10-31 15:31:43,430 | avatar.targets.qemu.INFO | State changed to to TargetStates.STOPPED
+2019-10-31 15:33:39,363 | avatar.targets.qemu.INFO | QEMU process running
+2019-10-31 15:33:39,461 | avatar.targets.qemu.QMPProtocol.INFO | {"return": {}, "id": 0}
+
+2019-10-31 15:33:39,461 | avatar.targets.qemu.INFO | Connected to remote target
+2019-10-31 15:33:39,461 | avatar.targets.qemu.RemoteMemoryProtocol.INFO | Successfully connected rmp
+2019-10-31 15:33:39,486 | avatar.targets.qemu.INFO | State changed to to TargetStates.STOPPED
+2019-10-31 15:33:39,505 | avatar.targets.qemu.INFO | State changed to to TargetStates.RUNNING
+2019-10-31 15:34:09,559 | avatar.targets.qemu.INFO | State changed to to TargetStates.STOPPED
+2019-10-31 15:34:30,267 | avatar.targets.qemu.INFO | QEMU process running
+2019-10-31 15:34:30,367 | avatar.targets.qemu.QMPProtocol.INFO | {"return": {}, "id": 0}
+
+2019-10-31 15:34:30,367 | avatar.targets.qemu.INFO | Connected to remote target
+2019-10-31 15:34:30,368 | avatar.targets.qemu.RemoteMemoryProtocol.INFO | Successfully connected rmp
+2019-10-31 15:34:30,389 | avatar.targets.qemu.INFO | State changed to to TargetStates.STOPPED
+2019-10-31 15:34:30,404 | avatar.targets.qemu.INFO | State changed to to TargetStates.RUNNING
+2019-10-31 15:35:00,443 | avatar.targets.qemu.INFO | State changed to to TargetStates.STOPPED
+2019-10-31 15:36:53,410 | avatar.targets.qemu.INFO | QEMU process running
+2019-10-31 15:36:53,526 | avatar.targets.qemu.INFO | State changed to to TargetStates.STOPPED
+2019-10-31 15:36:53,532 | avatar.targets.qemu.QMPProtocol.INFO | {"return": {}, "id": 0}
+
+2019-10-31 15:36:53,533 | avatar.targets.qemu.INFO | Connected to remote target
+2019-10-31 15:36:53,534 | avatar.targets.qemu.RemoteMemoryProtocol.INFO | Successfully connected rmp
+2019-10-31 15:36:53,560 | avatar.targets.qemu.INFO | State changed to to TargetStates.RUNNING
+2019-10-31 15:41:54,225 | avatar.targets.qemu.INFO | QEMU process running
+2019-10-31 15:41:54,371 | avatar.targets.qemu.QMPProtocol.INFO | {"return": {}, "id": 0}
+
+2019-10-31 15:41:54,372 | avatar.targets.qemu.INFO | Connected to remote target
+2019-10-31 15:41:54,372 | avatar.targets.qemu.RemoteMemoryProtocol.INFO | Successfully connected rmp
+2019-10-31 15:41:54,387 | avatar.targets.qemu.INFO | State changed to to TargetStates.STOPPED
+2019-10-31 15:41:54,403 | avatar.targets.qemu.INFO | State changed to to TargetStates.RUNNING
+2019-10-31 15:42:24,441 | avatar.targets.qemu.INFO | State changed to to TargetStates.STOPPED
+2019-10-31 15:46:11,942 | avatar.targets.qemu.INFO | QEMU process running
+2019-10-31 15:46:12,059 | avatar.targets.qemu.INFO | State changed to to TargetStates.STOPPED
+2019-10-31 15:46:12,059 | avatar.targets.qemu.QMPProtocol.INFO | {"return": {}, "id": 0}
+
+2019-10-31 15:46:12,060 | avatar.targets.qemu.INFO | Connected to remote target
+2019-10-31 15:46:12,061 | avatar.targets.qemu.RemoteMemoryProtocol.INFO | Successfully connected rmp
+2019-10-31 15:46:12,077 | avatar.targets.qemu.INFO | State changed to to TargetStates.RUNNING
+2019-10-31 15:51:58,411 | avatar.targets.qemu.INFO | State changed to to TargetStates.EXITED
+2019-10-31 15:52:14,846 | avatar.targets.qemu.INFO | QEMU process running
+2019-10-31 15:52:14,948 | avatar.targets.qemu.QMPProtocol.INFO | {"return": {}, "id": 0}
+
+2019-10-31 15:52:14,948 | avatar.targets.qemu.INFO | Connected to remote target
+2019-10-31 15:52:14,949 | avatar.targets.qemu.RemoteMemoryProtocol.INFO | Successfully connected rmp
+2019-10-31 15:52:14,966 | avatar.targets.qemu.INFO | State changed to to TargetStates.STOPPED
+2019-10-31 15:52:14,992 | avatar.targets.qemu.INFO | State changed to to TargetStates.RUNNING
+2019-10-31 15:52:24,118 | avatar.targets.qemu.INFO | State changed to to TargetStates.EXITED
+2019-10-31 15:53:52,228 | avatar.targets.qemu.INFO | QEMU process running
+2019-10-31 15:53:52,341 | avatar.targets.qemu.QMPProtocol.INFO | {"return": {}, "id": 0}
+
+2019-10-31 15:53:52,341 | avatar.targets.qemu.INFO | Connected to remote target
+2019-10-31 15:53:52,342 | avatar.targets.qemu.INFO | State changed to to TargetStates.STOPPED
+2019-10-31 15:53:52,345 | avatar.targets.qemu.RemoteMemoryProtocol.INFO | Successfully connected rmp
+2019-10-31 15:53:52,361 | avatar.targets.qemu.INFO | State changed to to TargetStates.RUNNING
+2019-10-31 15:57:36,232 | avatar.targets.qemu.INFO | QEMU process running
+2019-10-31 15:57:36,346 | avatar.targets.qemu.INFO | State changed to to TargetStates.STOPPED
+2019-10-31 15:57:36,347 | avatar.targets.qemu.QMPProtocol.INFO | {"return": {}, "id": 0}
+
+2019-10-31 15:57:36,348 | avatar.targets.qemu.INFO | Connected to remote target
+2019-10-31 15:57:36,349 | avatar.targets.qemu.RemoteMemoryProtocol.INFO | Successfully connected rmp
+2019-10-31 15:57:36,364 | avatar.targets.qemu.INFO | State changed to to TargetStates.RUNNING
+2019-10-31 15:58:54,838 | avatar.targets.qemu.INFO | QEMU process running
+2019-10-31 15:58:54,949 | avatar.targets.qemu.QMPProtocol.INFO | {"return": {}, "id": 0}
+
+2019-10-31 15:58:54,950 | avatar.targets.qemu.INFO | Connected to remote target
+2019-10-31 15:58:54,951 | avatar.targets.qemu.INFO | State changed to to TargetStates.STOPPED
+2019-10-31 15:58:54,951 | avatar.targets.qemu.RemoteMemoryProtocol.INFO | Successfully connected rmp
+2019-10-31 15:58:54,969 | avatar.targets.qemu.INFO | State changed to to TargetStates.RUNNING
+2019-10-31 15:59:05,487 | avatar.targets.qemu.INFO | State changed to to TargetStates.EXITED
+2019-10-31 16:05:01,060 | avatar.targets.qemu.INFO | QEMU process running
+2019-10-31 16:05:01,168 | avatar.targets.qemu.QMPProtocol.INFO | {"return": {}, "id": 0}
+
+2019-10-31 16:05:01,169 | avatar.targets.qemu.INFO | Connected to remote target
+2019-10-31 16:05:01,170 | avatar.targets.qemu.RemoteMemoryProtocol.INFO | Successfully connected rmp
+2019-10-31 16:05:01,180 | avatar.targets.qemu.INFO | State changed to to TargetStates.STOPPED
+2019-10-31 16:05:01,199 | avatar.targets.qemu.INFO | State changed to to TargetStates.RUNNING
+2019-10-31 16:06:50,725 | avatar.targets.qemu.INFO | QEMU process running
+2019-10-31 16:06:50,838 | avatar.targets.qemu.QMPProtocol.INFO | {"return": {}, "id": 0}
+
+2019-10-31 16:06:50,838 | avatar.targets.qemu.INFO | Connected to remote target
+2019-10-31 16:06:50,839 | avatar.targets.qemu.RemoteMemoryProtocol.INFO | Successfully connected rmp
+2019-10-31 16:06:50,845 | avatar.targets.qemu.INFO | State changed to to TargetStates.STOPPED
+2019-10-31 16:06:50,885 | avatar.targets.qemu.INFO | State changed to to TargetStates.RUNNING
+2019-10-31 16:08:22,276 | avatar.targets.qemu.INFO | State changed to to TargetStates.STOPPED
+2019-10-31 16:08:40,315 | avatar.targets.qemu.INFO | QEMU process running
+2019-10-31 16:08:40,415 | avatar.targets.qemu.QMPProtocol.INFO | {"return": {}, "id": 0}
+
+2019-10-31 16:08:40,415 | avatar.targets.qemu.INFO | Connected to remote target
+2019-10-31 16:08:40,415 | avatar.targets.qemu.RemoteMemoryProtocol.INFO | Successfully connected rmp
+2019-10-31 16:08:40,437 | avatar.targets.qemu.INFO | State changed to to TargetStates.STOPPED
+2019-10-31 16:08:40,453 | avatar.targets.qemu.INFO | State changed to to TargetStates.RUNNING
+2019-10-31 16:09:10,489 | avatar.targets.qemu.INFO | State changed to to TargetStates.STOPPED
+2019-10-31 16:12:12,082 | avatar.targets.qemu.INFO | QEMU process running
+2019-10-31 16:12:12,197 | avatar.targets.qemu.INFO | State changed to to TargetStates.STOPPED
+2019-10-31 16:12:12,198 | avatar.targets.qemu.QMPProtocol.INFO | {"return": {}, "id": 0}
+
+2019-10-31 16:12:12,199 | avatar.targets.qemu.INFO | Connected to remote target
+2019-10-31 16:12:12,200 | avatar.targets.qemu.RemoteMemoryProtocol.INFO | Successfully connected rmp
+2019-10-31 16:12:12,232 | avatar.targets.qemu.INFO | State changed to to TargetStates.RUNNING
+2019-10-31 16:15:29,045 | avatar.targets.qemu.INFO | State changed to to TargetStates.STOPPED
+2019-10-31 16:17:04,894 | avatar.targets.qemu.INFO | QEMU process running
+2019-10-31 16:17:05,005 | avatar.targets.qemu.INFO | State changed to to TargetStates.STOPPED
+2019-10-31 16:17:05,012 | avatar.targets.qemu.QMPProtocol.INFO | {"return": {}, "id": 0}
+
+2019-10-31 16:17:05,012 | avatar.targets.qemu.INFO | Connected to remote target
+2019-10-31 16:17:05,013 | avatar.targets.qemu.RemoteMemoryProtocol.INFO | Successfully connected rmp
+2019-10-31 16:17:05,042 | avatar.targets.qemu.INFO | State changed to to TargetStates.RUNNING
+2019-10-31 16:18:01,376 | avatar.targets.qemu.INFO | QEMU process running
+2019-10-31 16:18:01,490 | avatar.targets.qemu.INFO | State changed to to TargetStates.STOPPED
+2019-10-31 16:18:01,494 | avatar.targets.qemu.QMPProtocol.INFO | {"return": {}, "id": 0}
+
+2019-10-31 16:18:01,494 | avatar.targets.qemu.INFO | Connected to remote target
+2019-10-31 16:18:01,495 | avatar.targets.qemu.RemoteMemoryProtocol.INFO | Successfully connected rmp
+2019-10-31 16:18:01,523 | avatar.targets.qemu.INFO | State changed to to TargetStates.RUNNING
+2019-10-31 16:18:19,521 | avatar.targets.qemu.INFO | State changed to to TargetStates.EXITED
+2019-11-05 09:40:37,524 | avatar.targets.qemu.INFO | QEMU process running
+2019-11-05 09:40:39,578 | avatar.targets.qemu.QMPProtocol.INFO | {"return": {}, "id": 0}
+
+2019-11-05 09:40:39,578 | avatar.targets.qemu.INFO | Connected to remote target
+2019-11-05 09:40:39,579 | avatar.targets.qemu.RemoteMemoryProtocol.INFO | Successfully connected rmp
+2019-11-05 09:40:39,591 | avatar.targets.qemu.INFO | State changed to to TargetStates.STOPPED
+2019-11-05 09:40:39,610 | avatar.targets.qemu.INFO | State changed to to TargetStates.RUNNING
+2019-11-05 09:43:48,745 | avatar.targets.qemu.INFO | State changed to to TargetStates.STOPPED
+2019-11-05 09:45:10,747 | avatar.targets.qemu.INFO | QEMU process running
+2019-11-05 09:45:10,839 | avatar.targets.qemu.QMPProtocol.INFO | {"return": {}, "id": 0}
+
+2019-11-05 09:45:10,839 | avatar.targets.qemu.INFO | Connected to remote target
+2019-11-05 09:45:10,840 | avatar.targets.qemu.RemoteMemoryProtocol.INFO | Successfully connected rmp
+2019-11-05 09:45:10,844 | avatar.targets.qemu.INFO | State changed to to TargetStates.STOPPED
+2019-11-05 09:45:10,862 | avatar.targets.qemu.INFO | State changed to to TargetStates.RUNNING
+2019-11-05 09:45:13,297 | avatar.targets.qemu.INFO | State changed to to TargetStates.EXITED
+2019-11-05 09:47:02,066 | avatar.targets.qemu.INFO | QEMU process running
+2019-11-05 09:47:02,157 | avatar.targets.qemu.QMPProtocol.INFO | {"return": {}, "id": 0}
+
+2019-11-05 09:47:02,157 | avatar.targets.qemu.INFO | Connected to remote target
+2019-11-05 09:47:02,157 | avatar.targets.qemu.RemoteMemoryProtocol.INFO | Successfully connected rmp
+2019-11-05 09:47:02,163 | avatar.targets.qemu.INFO | State changed to to TargetStates.STOPPED
+2019-11-05 09:47:02,179 | avatar.targets.qemu.INFO | State changed to to TargetStates.RUNNING
+2019-11-05 09:47:17,861 | avatar.targets.qemu.INFO | State changed to to TargetStates.EXITED
+2019-11-05 09:48:52,601 | avatar.targets.qemu.INFO | QEMU process running
+2019-11-05 09:48:52,693 | avatar.targets.qemu.QMPProtocol.INFO | {"return": {}, "id": 0}
+
+2019-11-05 09:48:52,693 | avatar.targets.qemu.INFO | Connected to remote target
+2019-11-05 09:48:52,693 | avatar.targets.qemu.RemoteMemoryProtocol.INFO | Successfully connected rmp
+2019-11-05 09:48:52,697 | avatar.targets.qemu.INFO | State changed to to TargetStates.STOPPED
+2019-11-05 09:48:52,713 | avatar.targets.qemu.INFO | State changed to to TargetStates.RUNNING
+2019-11-05 09:48:55,416 | avatar.targets.qemu.INFO | State changed to to TargetStates.EXITED
+2019-11-05 09:51:43,711 | avatar.targets.qemu.INFO | QEMU process running
+2019-11-05 09:51:43,800 | avatar.targets.qemu.QMPProtocol.INFO | {"return": {}, "id": 0}
+
+2019-11-05 09:51:43,800 | avatar.targets.qemu.INFO | Connected to remote target
+2019-11-05 09:51:43,800 | avatar.targets.qemu.RemoteMemoryProtocol.INFO | Successfully connected rmp
+2019-11-05 09:51:43,809 | avatar.targets.qemu.INFO | State changed to to TargetStates.STOPPED
+2019-11-05 09:51:43,835 | avatar.targets.qemu.INFO | State changed to to TargetStates.RUNNING
+2019-11-05 09:51:45,437 | avatar.targets.qemu.INFO | State changed to to TargetStates.EXITED
+2019-11-05 10:02:17,113 | avatar.targets.qemu.INFO | QEMU process running
+2019-11-05 10:02:17,202 | avatar.targets.qemu.QMPProtocol.INFO | {"return": {}, "id": 0}
+
+2019-11-05 10:02:17,202 | avatar.targets.qemu.INFO | Connected to remote target
+2019-11-05 10:02:17,203 | avatar.targets.qemu.RemoteMemoryProtocol.INFO | Successfully connected rmp
+2019-11-05 10:02:17,211 | avatar.targets.qemu.INFO | State changed to to TargetStates.STOPPED
+2019-11-05 10:02:17,227 | avatar.targets.qemu.INFO | State changed to to TargetStates.RUNNING
+2019-11-05 10:02:22,334 | avatar.targets.qemu.INFO | State changed to to TargetStates.EXITED
+2019-11-05 10:04:05,374 | avatar.targets.qemu.INFO | QEMU process running
+2019-11-05 10:04:05,464 | avatar.targets.qemu.QMPProtocol.INFO | {"return": {}, "id": 0}
+
+2019-11-05 10:04:05,464 | avatar.targets.qemu.INFO | Connected to remote target
+2019-11-05 10:04:05,464 | avatar.targets.qemu.RemoteMemoryProtocol.INFO | Successfully connected rmp
+2019-11-05 10:04:05,473 | avatar.targets.qemu.INFO | State changed to to TargetStates.STOPPED
+2019-11-05 10:04:05,490 | avatar.targets.qemu.INFO | State changed to to TargetStates.RUNNING
+2019-11-05 10:04:35,543 | avatar.targets.qemu.INFO | State changed to to TargetStates.STOPPED
+2019-11-05 10:10:46,057 | avatar.targets.qemu.INFO | QEMU process running
+2019-11-05 10:10:46,145 | avatar.targets.qemu.QMPProtocol.INFO | {"return": {}, "id": 0}
+
+2019-11-05 10:10:46,146 | avatar.targets.qemu.INFO | Connected to remote target
+2019-11-05 10:10:46,146 | avatar.targets.qemu.RemoteMemoryProtocol.INFO | Successfully connected rmp
+2019-11-05 10:10:46,159 | avatar.targets.qemu.INFO | State changed to to TargetStates.STOPPED
+2019-11-05 10:10:46,184 | avatar.targets.qemu.INFO | State changed to to TargetStates.RUNNING
+2019-11-05 10:10:46,486 | avatar.targets.qemu.INFO | State changed to to TargetStates.EXITED
+2019-11-05 10:11:16,529 | avatar.targets.qemu.INFO | QEMU process running
+2019-11-05 10:11:16,619 | avatar.targets.qemu.QMPProtocol.INFO | {"return": {}, "id": 0}
+
+2019-11-05 10:11:16,619 | avatar.targets.qemu.INFO | Connected to remote target
+2019-11-05 10:11:16,619 | avatar.targets.qemu.RemoteMemoryProtocol.INFO | Successfully connected rmp
+2019-11-05 10:11:16,628 | avatar.targets.qemu.INFO | State changed to to TargetStates.STOPPED
+2019-11-05 10:11:16,644 | avatar.targets.qemu.INFO | State changed to to TargetStates.RUNNING
+2019-11-05 10:11:16,907 | avatar.targets.qemu.INFO | State changed to to TargetStates.EXITED
+2019-11-05 10:21:33,861 | avatar.targets.qemu.INFO | QEMU process running
+2019-11-05 10:21:33,955 | avatar.targets.qemu.QMPProtocol.INFO | {"return": {}, "id": 0}
+
+2019-11-05 10:21:33,955 | avatar.targets.qemu.INFO | State changed to to TargetStates.STOPPED
+2019-11-05 10:21:33,956 | avatar.targets.qemu.INFO | Connected to remote target
+2019-11-05 10:21:33,956 | avatar.targets.qemu.RemoteMemoryProtocol.INFO | Successfully connected rmp
+2019-11-05 10:21:33,971 | avatar.targets.qemu.INFO | State changed to to TargetStates.RUNNING
+2019-11-05 10:21:34,235 | avatar.targets.qemu.INFO | State changed to to TargetStates.EXITED
+2019-11-05 10:22:57,895 | avatar.targets.qemu.INFO | QEMU process running
+2019-11-05 10:22:58,012 | avatar.targets.qemu.QMPProtocol.INFO | {"return": {}, "id": 0}
+
+2019-11-05 10:22:58,013 | avatar.targets.qemu.INFO | Connected to remote target
+2019-11-05 10:22:58,014 | avatar.targets.qemu.RemoteMemoryProtocol.INFO | Successfully connected rmp
+2019-11-05 10:22:58,028 | avatar.targets.qemu.INFO | State changed to to TargetStates.STOPPED
+2019-11-05 10:22:58,051 | avatar.targets.qemu.INFO | State changed to to TargetStates.RUNNING
+2019-11-05 10:24:30,073 | avatar.targets.qemu.INFO | State changed to to TargetStates.STOPPED
+2019-11-05 10:25:58,009 | avatar.targets.qemu.INFO | QEMU process running
+2019-11-05 10:25:58,122 | avatar.targets.qemu.QMPProtocol.INFO | {"return": {}, "id": 0}
+
+2019-11-05 10:25:58,123 | avatar.targets.qemu.INFO | Connected to remote target
+2019-11-05 10:25:58,124 | avatar.targets.qemu.RemoteMemoryProtocol.INFO | Successfully connected rmp
+2019-11-05 10:25:58,134 | avatar.targets.qemu.INFO | State changed to to TargetStates.STOPPED
+2019-11-05 10:25:58,182 | avatar.targets.qemu.INFO | State changed to to TargetStates.RUNNING
+2019-11-05 10:27:38,355 | avatar.targets.qemu.INFO | State changed to to TargetStates.EXITED
+2019-11-05 10:28:24,958 | avatar.targets.qemu.INFO | QEMU process running
+2019-11-05 10:28:25,069 | avatar.targets.qemu.QMPProtocol.INFO | {"return": {}, "id": 0}
+
+2019-11-05 10:28:25,070 | avatar.targets.qemu.INFO | Connected to remote target
+2019-11-05 10:28:25,071 | avatar.targets.qemu.RemoteMemoryProtocol.INFO | Successfully connected rmp
+2019-11-05 10:28:25,080 | avatar.targets.qemu.INFO | State changed to to TargetStates.STOPPED
+2019-11-05 10:28:25,132 | avatar.targets.qemu.INFO | State changed to to TargetStates.RUNNING
+2019-11-05 10:29:48,876 | avatar.targets.qemu.INFO | State changed to to TargetStates.EXITED
+2019-11-05 10:30:27,659 | avatar.targets.qemu.INFO | QEMU process running
+2019-11-05 10:30:27,774 | avatar.targets.qemu.QMPProtocol.INFO | {"return": {}, "id": 0}
+
+2019-11-05 10:30:27,774 | avatar.targets.qemu.INFO | Connected to remote target
+2019-11-05 10:30:27,775 | avatar.targets.qemu.RemoteMemoryProtocol.INFO | Successfully connected rmp
+2019-11-05 10:30:27,781 | avatar.targets.qemu.INFO | State changed to to TargetStates.STOPPED
+2019-11-05 10:30:27,807 | avatar.targets.qemu.INFO | State changed to to TargetStates.RUNNING
+2019-11-05 10:31:33,631 | avatar.targets.qemu.INFO | State changed to to TargetStates.EXITED
+2019-11-05 10:32:54,139 | avatar.targets.qemu.INFO | QEMU process running
+2019-11-05 10:32:54,252 | avatar.targets.qemu.QMPProtocol.INFO | {"return": {}, "id": 0}
+
+2019-11-05 10:32:54,253 | avatar.targets.qemu.INFO | Connected to remote target
+2019-11-05 10:32:54,254 | avatar.targets.qemu.RemoteMemoryProtocol.INFO | Successfully connected rmp
+2019-11-05 10:32:54,261 | avatar.targets.qemu.INFO | State changed to to TargetStates.STOPPED
+2019-11-05 10:32:54,307 | avatar.targets.qemu.INFO | State changed to to TargetStates.RUNNING
+2019-11-05 10:33:33,276 | avatar.targets.qemu.INFO | State changed to to TargetStates.EXITED
+2019-11-05 10:35:54,504 | avatar.targets.qemu.INFO | QEMU process running
+2019-11-05 10:35:54,618 | avatar.targets.qemu.QMPProtocol.INFO | {"return": {}, "id": 0}
+
+2019-11-05 10:35:54,618 | avatar.targets.qemu.INFO | Connected to remote target
+2019-11-05 10:35:54,619 | avatar.targets.qemu.RemoteMemoryProtocol.INFO | Successfully connected rmp
+2019-11-05 10:35:54,624 | avatar.targets.qemu.INFO | State changed to to TargetStates.STOPPED
+2019-11-05 10:35:54,664 | avatar.targets.qemu.INFO | State changed to to TargetStates.RUNNING
+2019-11-05 10:38:44,419 | avatar.targets.qemu.INFO | State changed to to TargetStates.EXITED
+2019-11-05 10:39:29,517 | avatar.targets.qemu.INFO | QEMU process running
+2019-11-05 10:39:29,628 | avatar.targets.qemu.QMPProtocol.INFO | {"return": {}, "id": 0}
+
+2019-11-05 10:39:29,628 | avatar.targets.qemu.INFO | Connected to remote target
+2019-11-05 10:39:29,629 | avatar.targets.qemu.RemoteMemoryProtocol.INFO | Successfully connected rmp
+2019-11-05 10:39:29,635 | avatar.targets.qemu.INFO | State changed to to TargetStates.STOPPED
+2019-11-05 10:39:29,659 | avatar.targets.qemu.INFO | State changed to to TargetStates.RUNNING
+2019-11-05 10:46:38,060 | avatar.targets.qemu.INFO | State changed to to TargetStates.EXITED
+2019-11-05 10:47:45,265 | avatar.targets.qemu.INFO | QEMU process running
+2019-11-05 10:47:45,374 | avatar.targets.qemu.QMPProtocol.INFO | {"return": {}, "id": 0}
+
+2019-11-05 10:47:45,374 | avatar.targets.qemu.INFO | Connected to remote target
+2019-11-05 10:47:45,375 | avatar.targets.qemu.RemoteMemoryProtocol.INFO | Successfully connected rmp
+2019-11-05 10:47:45,388 | avatar.targets.qemu.INFO | State changed to to TargetStates.STOPPED
+2019-11-05 10:47:45,442 | avatar.targets.qemu.INFO | State changed to to TargetStates.RUNNING
+2019-11-05 10:52:47,116 | avatar.targets.qemu.INFO | State changed to to TargetStates.EXITED
+2019-11-05 10:55:01,478 | avatar.targets.qemu.INFO | QEMU process running
+2019-11-05 10:55:01,589 | avatar.targets.qemu.QMPProtocol.INFO | {"return": {}, "id": 0}
+
+2019-11-05 10:55:01,589 | avatar.targets.qemu.INFO | Connected to remote target
+2019-11-05 10:55:01,592 | avatar.targets.qemu.RemoteMemoryProtocol.INFO | Successfully connected rmp
+2019-11-05 10:55:01,594 | avatar.targets.qemu.INFO | State changed to to TargetStates.STOPPED
+2019-11-05 10:55:01,635 | avatar.targets.qemu.INFO | State changed to to TargetStates.RUNNING
+2019-11-05 10:55:38,027 | avatar.targets.qemu.INFO | State changed to to TargetStates.EXITED
+2019-11-05 10:56:11,498 | avatar.targets.qemu.INFO | QEMU process running
+2019-11-05 10:56:11,606 | avatar.targets.qemu.QMPProtocol.INFO | {"return": {}, "id": 0}
+
+2019-11-05 10:56:11,607 | avatar.targets.qemu.INFO | Connected to remote target
+2019-11-05 10:56:11,609 | avatar.targets.qemu.RemoteMemoryProtocol.INFO | Successfully connected rmp
+2019-11-05 10:56:11,624 | avatar.targets.qemu.INFO | State changed to to TargetStates.STOPPED
+2019-11-05 10:56:11,642 | avatar.targets.qemu.INFO | State changed to to TargetStates.RUNNING
+2019-11-05 10:58:10,645 | avatar.targets.qemu.INFO | State changed to to TargetStates.EXITED
+2019-11-05 11:16:36,908 | avatar.targets.qemu.INFO | QEMU process running
+2019-11-05 11:16:37,016 | avatar.targets.qemu.QMPProtocol.INFO | {"return": {}, "id": 0}
+
+2019-11-05 11:16:37,016 | avatar.targets.qemu.INFO | Connected to remote target
+2019-11-05 11:16:37,019 | avatar.targets.qemu.RemoteMemoryProtocol.INFO | Successfully connected rmp
+2019-11-05 11:16:37,060 | avatar.targets.qemu.INFO | State changed to to TargetStates.STOPPED
+2019-11-05 11:16:37,126 | avatar.targets.qemu.INFO | State changed to to TargetStates.RUNNING
+2019-11-05 11:26:34,271 | avatar.targets.qemu.INFO | State changed to to TargetStates.EXITED
+2019-11-05 11:31:39,702 | avatar.targets.qemu.INFO | QEMU process running
+2019-11-05 11:31:39,813 | avatar.targets.qemu.QMPProtocol.INFO | {"return": {}, "id": 0}
+
+2019-11-05 11:31:39,814 | avatar.targets.qemu.INFO | Connected to remote target
+2019-11-05 11:31:39,815 | avatar.targets.qemu.RemoteMemoryProtocol.INFO | Successfully connected rmp
+2019-11-05 11:31:39,826 | avatar.targets.qemu.INFO | State changed to to TargetStates.STOPPED
+2019-11-05 11:31:39,871 | avatar.targets.qemu.INFO | State changed to to TargetStates.RUNNING
+2019-11-05 11:31:51,698 | avatar.targets.qemu.INFO | State changed to to TargetStates.EXITED
+2019-11-05 11:32:34,372 | avatar.targets.qemu.INFO | QEMU process running
+2019-11-05 11:32:34,485 | avatar.targets.qemu.QMPProtocol.INFO | {"return": {}, "id": 0}
+
+2019-11-05 11:32:34,485 | avatar.targets.qemu.INFO | Connected to remote target
+2019-11-05 11:32:34,486 | avatar.targets.qemu.RemoteMemoryProtocol.INFO | Successfully connected rmp
+2019-11-05 11:32:34,490 | avatar.targets.qemu.INFO | State changed to to TargetStates.STOPPED
+2019-11-05 11:32:34,506 | avatar.targets.qemu.INFO | State changed to to TargetStates.RUNNING
+2019-11-05 11:33:46,084 | avatar.targets.qemu.INFO | QEMU process running
+2019-11-05 11:33:46,195 | avatar.targets.qemu.QMPProtocol.INFO | {"return": {}, "id": 0}
+
+2019-11-05 11:33:46,196 | avatar.targets.qemu.INFO | Connected to remote target
+2019-11-05 11:33:46,197 | avatar.targets.qemu.RemoteMemoryProtocol.INFO | Successfully connected rmp
+2019-11-05 11:33:46,207 | avatar.targets.qemu.INFO | State changed to to TargetStates.STOPPED
+2019-11-05 11:33:46,233 | avatar.targets.qemu.INFO | State changed to to TargetStates.RUNNING
+2019-11-05 11:40:26,378 | avatar.targets.qemu.INFO | QEMU process running
+2019-11-05 11:40:26,487 | avatar.targets.qemu.QMPProtocol.INFO | {"return": {}, "id": 0}
+
+2019-11-05 11:40:26,487 | avatar.targets.qemu.INFO | Connected to remote target
+2019-11-05 11:40:26,488 | avatar.targets.qemu.RemoteMemoryProtocol.INFO | Successfully connected rmp
+2019-11-05 11:40:26,524 | avatar.targets.qemu.INFO | State changed to to TargetStates.STOPPED
+2019-11-05 11:40:26,586 | avatar.targets.qemu.INFO | State changed to to TargetStates.RUNNING
+2019-11-05 11:44:49,129 | avatar.targets.qemu.INFO | State changed to to TargetStates.EXITED
+2019-11-05 11:45:15,554 | avatar.targets.qemu.INFO | QEMU process running
+2019-11-05 11:45:15,654 | avatar.targets.qemu.QMPProtocol.INFO | {"return": {}, "id": 0}
+
+2019-11-05 11:45:15,654 | avatar.targets.qemu.INFO | Connected to remote target
+2019-11-05 11:45:15,654 | avatar.targets.qemu.RemoteMemoryProtocol.INFO | Successfully connected rmp
+2019-11-05 11:45:15,675 | avatar.targets.qemu.INFO | State changed to to TargetStates.STOPPED
+2019-11-05 11:45:15,691 | avatar.targets.qemu.INFO | State changed to to TargetStates.RUNNING
+2019-11-05 11:45:56,440 | avatar.targets.qemu.INFO | State changed to to TargetStates.EXITED
+2019-11-05 11:53:43,794 | avatar.targets.qemu.INFO | QEMU process running
+2019-11-05 11:53:43,902 | avatar.targets.qemu.QMPProtocol.INFO | {"return": {}, "id": 0}
+
+2019-11-05 11:53:43,903 | avatar.targets.qemu.INFO | Connected to remote target
+2019-11-05 11:53:43,904 | avatar.targets.qemu.RemoteMemoryProtocol.INFO | Successfully connected rmp
+2019-11-05 11:53:43,916 | avatar.targets.qemu.INFO | State changed to to TargetStates.STOPPED
+2019-11-05 11:53:43,967 | avatar.targets.qemu.INFO | State changed to to TargetStates.RUNNING
+2019-11-05 11:56:04,075 | avatar.targets.qemu.INFO | State changed to to TargetStates.EXITED
+2019-11-05 11:56:22,352 | avatar.targets.qemu.INFO | QEMU process running
+2019-11-05 11:56:22,445 | avatar.targets.qemu.INFO | State changed to to TargetStates.STOPPED
+2019-11-05 11:56:22,446 | avatar.targets.qemu.QMPProtocol.INFO | {"return": {}, "id": 0}
+
+2019-11-05 11:56:22,446 | avatar.targets.qemu.INFO | Connected to remote target
+2019-11-05 11:56:22,447 | avatar.targets.qemu.RemoteMemoryProtocol.INFO | Successfully connected rmp
+2019-11-05 11:56:22,461 | avatar.targets.qemu.INFO | State changed to to TargetStates.RUNNING
+2019-11-05 11:56:52,512 | avatar.targets.qemu.INFO | State changed to to TargetStates.STOPPED
+2019-11-05 11:58:38,442 | avatar.targets.qemu.INFO | QEMU process running
+2019-11-05 11:58:38,548 | avatar.targets.qemu.QMPProtocol.INFO | {"return": {}, "id": 0}
+
+2019-11-05 11:58:38,548 | avatar.targets.qemu.INFO | Connected to remote target
+2019-11-05 11:58:38,549 | avatar.targets.qemu.RemoteMemoryProtocol.INFO | Successfully connected rmp
+2019-11-05 11:58:38,566 | avatar.targets.qemu.INFO | State changed to to TargetStates.STOPPED
+2019-11-05 11:58:38,609 | avatar.targets.qemu.INFO | State changed to to TargetStates.RUNNING
+2019-11-05 12:02:24,887 | avatar.targets.qemu.INFO | State changed to to TargetStates.EXITED
+2019-11-05 12:02:50,512 | avatar.targets.qemu.INFO | QEMU process running
+2019-11-05 12:02:50,605 | avatar.targets.qemu.INFO | State changed to to TargetStates.STOPPED
+2019-11-05 12:02:50,607 | avatar.targets.qemu.QMPProtocol.INFO | {"return": {}, "id": 0}
+
+2019-11-05 12:02:50,607 | avatar.targets.qemu.INFO | Connected to remote target
+2019-11-05 12:02:50,607 | avatar.targets.qemu.RemoteMemoryProtocol.INFO | Successfully connected rmp
+2019-11-05 12:02:50,621 | avatar.targets.qemu.INFO | State changed to to TargetStates.RUNNING
+2019-11-05 12:03:20,657 | avatar.targets.qemu.INFO | State changed to to TargetStates.STOPPED
+2019-11-05 12:13:25,326 | avatar.targets.qemu.INFO | QEMU process running
+2019-11-05 12:13:25,484 | avatar.targets.qemu.QMPProtocol.INFO | {"return": {}, "id": 0}
+
+2019-11-05 12:13:25,485 | avatar.targets.qemu.INFO | Connected to remote target
+2019-11-05 12:13:25,488 | avatar.targets.qemu.RemoteMemoryProtocol.INFO | Successfully connected rmp
+2019-11-05 12:13:25,489 | avatar.targets.qemu.INFO | State changed to to TargetStates.STOPPED
+2019-11-05 12:13:25,507 | avatar.targets.qemu.INFO | State changed to to TargetStates.RUNNING
+2019-11-05 12:15:19,603 | avatar.targets.qemu.INFO | State changed to to TargetStates.STOPPED
+2019-11-05 12:15:59,317 | avatar.targets.qemu.INFO | QEMU process running
+2019-11-05 12:15:59,418 | avatar.targets.qemu.QMPProtocol.INFO | {"return": {}, "id": 0}
+
+2019-11-05 12:15:59,419 | avatar.targets.qemu.INFO | Connected to remote target
+2019-11-05 12:15:59,420 | avatar.targets.qemu.RemoteMemoryProtocol.INFO | Successfully connected rmp
+2019-11-05 12:15:59,441 | avatar.targets.qemu.INFO | State changed to to TargetStates.STOPPED
+2019-11-05 12:15:59,485 | avatar.targets.qemu.INFO | State changed to to TargetStates.RUNNING
+2019-11-05 12:19:49,971 | avatar.targets.qemu.INFO | State changed to to TargetStates.EXITED
+2019-11-05 12:20:24,392 | avatar.targets.qemu.INFO | QEMU process running
+2019-11-05 12:20:24,497 | avatar.targets.qemu.QMPProtocol.INFO | {"return": {}, "id": 0}
+
+2019-11-05 12:20:24,498 | avatar.targets.qemu.INFO | Connected to remote target
+2019-11-05 12:20:24,501 | avatar.targets.qemu.RemoteMemoryProtocol.INFO | Successfully connected rmp
+2019-11-05 12:20:24,523 | avatar.targets.qemu.INFO | State changed to to TargetStates.STOPPED
+2019-11-05 12:20:24,557 | avatar.targets.qemu.INFO | State changed to to TargetStates.RUNNING
+2019-11-05 12:20:46,803 | avatar.targets.qemu.INFO | State changed to to TargetStates.EXITED
+2019-11-05 12:21:18,683 | avatar.targets.qemu.INFO | QEMU process running
+2019-11-05 12:21:18,777 | avatar.targets.qemu.INFO | State changed to to TargetStates.STOPPED
+2019-11-05 12:21:18,789 | avatar.targets.qemu.QMPProtocol.INFO | {"return": {}, "id": 0}
+
+2019-11-05 12:21:18,790 | avatar.targets.qemu.INFO | Connected to remote target
+2019-11-05 12:21:18,792 | avatar.targets.qemu.RemoteMemoryProtocol.INFO | Successfully connected rmp
+2019-11-05 12:21:18,814 | avatar.targets.qemu.INFO | State changed to to TargetStates.RUNNING
+2019-11-05 12:26:23,862 | avatar.targets.qemu.INFO | State changed to to TargetStates.EXITED
+2019-11-05 12:27:04,784 | avatar.targets.qemu.INFO | QEMU process running
+2019-11-05 12:27:04,878 | avatar.targets.qemu.QMPProtocol.INFO | {"return": {}, "id": 0}
+
+2019-11-05 12:27:04,878 | avatar.targets.qemu.INFO | State changed to to TargetStates.STOPPED
+2019-11-05 12:27:04,878 | avatar.targets.qemu.INFO | Connected to remote target
+2019-11-05 12:27:04,879 | avatar.targets.qemu.RemoteMemoryProtocol.INFO | Successfully connected rmp
+2019-11-05 12:27:04,894 | avatar.targets.qemu.INFO | State changed to to TargetStates.RUNNING
+2019-11-05 12:27:05,526 | avatar.targets.qemu.INFO | State changed to to TargetStates.EXITED
+2019-11-05 12:27:35,513 | avatar.targets.qemu.INFO | QEMU process running
+2019-11-05 12:27:35,607 | avatar.targets.qemu.INFO | State changed to to TargetStates.STOPPED
+2019-11-05 12:27:35,608 | avatar.targets.qemu.QMPProtocol.INFO | {"return": {}, "id": 0}
+
+2019-11-05 12:27:35,608 | avatar.targets.qemu.INFO | Connected to remote target
+2019-11-05 12:27:35,608 | avatar.targets.qemu.RemoteMemoryProtocol.INFO | Successfully connected rmp
+2019-11-05 12:27:35,623 | avatar.targets.qemu.INFO | State changed to to TargetStates.RUNNING
+2019-11-05 12:27:39,491 | avatar.targets.qemu.INFO | State changed to to TargetStates.EXITED
+2019-11-05 12:30:21,274 | avatar.targets.qemu.INFO | QEMU process running
+2019-11-05 12:30:21,368 | avatar.targets.qemu.INFO | State changed to to TargetStates.STOPPED
+2019-11-05 12:30:21,369 | avatar.targets.qemu.QMPProtocol.INFO | {"return": {}, "id": 0}
+
+2019-11-05 12:30:21,369 | avatar.targets.qemu.INFO | Connected to remote target
+2019-11-05 12:30:21,369 | avatar.targets.qemu.RemoteMemoryProtocol.INFO | Successfully connected rmp
+2019-11-05 12:30:21,384 | avatar.targets.qemu.INFO | State changed to to TargetStates.RUNNING
+2019-11-05 12:30:25,652 | avatar.targets.qemu.INFO | State changed to to TargetStates.EXITED
+2019-11-05 12:38:34,454 | avatar.targets.qemu.INFO | QEMU process running
+2019-11-05 12:38:34,545 | avatar.targets.qemu.QMPProtocol.INFO | {"return": {}, "id": 0}
+
+2019-11-05 12:38:34,546 | avatar.targets.qemu.INFO | Connected to remote target
+2019-11-05 12:38:34,546 | avatar.targets.qemu.RemoteMemoryProtocol.INFO | Successfully connected rmp
+2019-11-05 12:38:34,549 | avatar.targets.qemu.INFO | State changed to to TargetStates.STOPPED
+2019-11-05 12:38:34,568 | avatar.targets.qemu.INFO | State changed to to TargetStates.RUNNING
+2019-11-05 12:38:57,596 | avatar.targets.qemu.INFO | State changed to to TargetStates.EXITED
+2019-11-05 12:39:25,259 | avatar.targets.qemu.INFO | QEMU process running
+2019-11-05 12:39:25,351 | avatar.targets.qemu.QMPProtocol.INFO | {"return": {}, "id": 0}
+
+2019-11-05 12:39:25,352 | avatar.targets.qemu.INFO | Connected to remote target
+2019-11-05 12:39:25,352 | avatar.targets.qemu.RemoteMemoryProtocol.INFO | Successfully connected rmp
+2019-11-05 12:39:25,354 | avatar.targets.qemu.INFO | State changed to to TargetStates.STOPPED
+2019-11-05 12:39:25,372 | avatar.targets.qemu.INFO | State changed to to TargetStates.RUNNING
+2019-11-05 12:39:55,423 | avatar.targets.qemu.INFO | State changed to to TargetStates.STOPPED
+2019-11-05 12:44:01,701 | avatar.targets.qemu.INFO | QEMU process running
+2019-11-05 12:44:01,792 | avatar.targets.qemu.QMPProtocol.INFO | {"return": {}, "id": 0}
+
+2019-11-05 12:44:01,793 | avatar.targets.qemu.INFO | Connected to remote target
+2019-11-05 12:44:01,793 | avatar.targets.qemu.RemoteMemoryProtocol.INFO | Successfully connected rmp
+2019-11-05 12:44:01,797 | avatar.targets.qemu.INFO | State changed to to TargetStates.STOPPED
+2019-11-05 12:44:01,813 | avatar.targets.qemu.INFO | State changed to to TargetStates.RUNNING
+2019-11-05 12:44:31,865 | avatar.targets.qemu.INFO | State changed to to TargetStates.STOPPED
+2019-11-05 12:49:18,189 | avatar.targets.qemu.INFO | QEMU process running
+2019-11-05 12:49:18,278 | avatar.targets.qemu.QMPProtocol.INFO | {"return": {}, "id": 0}
+
+2019-11-05 12:49:18,278 | avatar.targets.qemu.INFO | Connected to remote target
+2019-11-05 12:49:18,278 | avatar.targets.qemu.RemoteMemoryProtocol.INFO | Successfully connected rmp
+2019-11-05 12:49:18,288 | avatar.targets.qemu.INFO | State changed to to TargetStates.STOPPED
+2019-11-05 12:49:18,303 | avatar.targets.qemu.INFO | State changed to to TargetStates.RUNNING
+2019-11-05 12:49:48,345 | avatar.targets.qemu.INFO | State changed to to TargetStates.STOPPED
+2019-11-05 12:50:34,690 | avatar.targets.qemu.INFO | QEMU process running
+2019-11-05 12:50:34,780 | avatar.targets.qemu.QMPProtocol.INFO | {"return": {}, "id": 0}
+
+2019-11-05 12:50:34,780 | avatar.targets.qemu.INFO | Connected to remote target
+2019-11-05 12:50:34,780 | avatar.targets.qemu.RemoteMemoryProtocol.INFO | Successfully connected rmp
+2019-11-05 12:50:34,789 | avatar.targets.qemu.INFO | State changed to to TargetStates.STOPPED
+2019-11-05 12:50:34,805 | avatar.targets.qemu.INFO | State changed to to TargetStates.RUNNING
+2019-11-05 12:51:04,841 | avatar.targets.qemu.INFO | State changed to to TargetStates.STOPPED
+2019-11-05 12:51:53,354 | avatar.targets.qemu.INFO | QEMU process running
+2019-11-05 12:51:53,446 | avatar.targets.qemu.QMPProtocol.INFO | {"return": {}, "id": 0}
+
+2019-11-05 12:51:53,446 | avatar.targets.qemu.INFO | Connected to remote target
+2019-11-05 12:51:53,446 | avatar.targets.qemu.RemoteMemoryProtocol.INFO | Successfully connected rmp
+2019-11-05 12:51:53,452 | avatar.targets.qemu.INFO | State changed to to TargetStates.STOPPED
+2019-11-05 12:51:53,468 | avatar.targets.qemu.INFO | State changed to to TargetStates.RUNNING
+2019-11-05 12:52:23,505 | avatar.targets.qemu.INFO | State changed to to TargetStates.STOPPED
+2019-11-05 12:52:45,586 | avatar.targets.qemu.INFO | QEMU process running
+2019-11-05 12:52:45,677 | avatar.targets.qemu.QMPProtocol.INFO | {"return": {}, "id": 0}
+
+2019-11-05 12:52:45,677 | avatar.targets.qemu.INFO | Connected to remote target
+2019-11-05 12:52:45,678 | avatar.targets.qemu.RemoteMemoryProtocol.INFO | Successfully connected rmp
+2019-11-05 12:52:45,684 | avatar.targets.qemu.INFO | State changed to to TargetStates.STOPPED
+2019-11-05 12:52:45,699 | avatar.targets.qemu.INFO | State changed to to TargetStates.RUNNING
+2019-11-05 12:53:15,737 | avatar.targets.qemu.INFO | State changed to to TargetStates.STOPPED
+2019-11-05 12:55:02,734 | avatar.targets.qemu.INFO | QEMU process running
+2019-11-05 12:55:02,824 | avatar.targets.qemu.QMPProtocol.INFO | {"return": {}, "id": 0}
+
+2019-11-05 12:55:02,824 | avatar.targets.qemu.INFO | Connected to remote target
+2019-11-05 12:55:02,824 | avatar.targets.qemu.RemoteMemoryProtocol.INFO | Successfully connected rmp
+2019-11-05 12:55:02,831 | avatar.targets.qemu.INFO | State changed to to TargetStates.STOPPED
+2019-11-05 12:55:02,855 | avatar.targets.qemu.INFO | State changed to to TargetStates.RUNNING
+2019-11-05 12:55:32,898 | avatar.targets.qemu.INFO | State changed to to TargetStates.STOPPED
+2019-11-05 13:18:11,096 | avatar.targets.qemu.INFO | QEMU process running
+2019-11-05 13:18:11,187 | avatar.targets.qemu.QMPProtocol.INFO | {"return": {}, "id": 0}
+
+2019-11-05 13:18:11,187 | avatar.targets.qemu.INFO | Connected to remote target
+2019-11-05 13:18:11,188 | avatar.targets.qemu.RemoteMemoryProtocol.INFO | Successfully connected rmp
+2019-11-05 13:18:11,194 | avatar.targets.qemu.INFO | State changed to to TargetStates.STOPPED
+2019-11-05 13:18:11,211 | avatar.targets.qemu.INFO | State changed to to TargetStates.RUNNING
+2019-11-05 13:18:41,264 | avatar.targets.qemu.INFO | State changed to to TargetStates.STOPPED
+2019-11-05 13:41:54,619 | avatar.targets.qemu.INFO | QEMU process running
+2019-11-05 13:41:54,708 | avatar.targets.qemu.QMPProtocol.INFO | {"return": {}, "id": 0}
+
+2019-11-05 13:41:54,708 | avatar.targets.qemu.INFO | Connected to remote target
+2019-11-05 13:41:54,708 | avatar.targets.qemu.RemoteMemoryProtocol.INFO | Successfully connected rmp
+2019-11-05 13:41:54,716 | avatar.targets.qemu.INFO | State changed to to TargetStates.STOPPED
+2019-11-05 13:41:54,732 | avatar.targets.qemu.INFO | State changed to to TargetStates.RUNNING
+2019-11-05 13:42:24,784 | avatar.targets.qemu.INFO | State changed to to TargetStates.STOPPED
+2019-11-05 13:43:50,970 | avatar.targets.qemu.INFO | QEMU process running
+2019-11-05 13:43:51,061 | avatar.targets.qemu.QMPProtocol.INFO | {"return": {}, "id": 0}
+
+2019-11-05 13:43:51,061 | avatar.targets.qemu.INFO | Connected to remote target
+2019-11-05 13:43:51,061 | avatar.targets.qemu.RemoteMemoryProtocol.INFO | Successfully connected rmp
+2019-11-05 13:43:51,068 | avatar.targets.qemu.INFO | State changed to to TargetStates.STOPPED
+2019-11-05 13:43:51,086 | avatar.targets.qemu.INFO | State changed to to TargetStates.RUNNING
+2019-11-05 13:44:51,161 | avatar.targets.qemu.INFO | State changed to to TargetStates.STOPPED
+2019-11-05 13:46:08,092 | avatar.targets.qemu.INFO | QEMU process running
+2019-11-05 13:46:08,182 | avatar.targets.qemu.QMPProtocol.INFO | {"return": {}, "id": 0}
+
+2019-11-05 13:46:08,183 | avatar.targets.qemu.INFO | Connected to remote target
+2019-11-05 13:46:08,183 | avatar.targets.qemu.RemoteMemoryProtocol.INFO | Successfully connected rmp
+2019-11-05 13:46:08,190 | avatar.targets.qemu.INFO | State changed to to TargetStates.STOPPED
+2019-11-05 13:46:08,206 | avatar.targets.qemu.INFO | State changed to to TargetStates.RUNNING
+2019-11-05 13:47:08,275 | avatar.targets.qemu.INFO | State changed to to TargetStates.STOPPED
+2019-11-05 13:48:17,984 | avatar.targets.qemu.INFO | QEMU process running
+2019-11-05 13:48:18,074 | avatar.targets.qemu.QMPProtocol.INFO | {"return": {}, "id": 0}
+
+2019-11-05 13:48:18,074 | avatar.targets.qemu.INFO | Connected to remote target
+2019-11-05 13:48:18,075 | avatar.targets.qemu.RemoteMemoryProtocol.INFO | Successfully connected rmp
+2019-11-05 13:48:18,083 | avatar.targets.qemu.INFO | State changed to to TargetStates.STOPPED
+2019-11-05 13:48:18,101 | avatar.targets.qemu.INFO | State changed to to TargetStates.RUNNING
+2019-11-05 13:49:18,171 | avatar.targets.qemu.INFO | State changed to to TargetStates.STOPPED
+2019-11-05 13:55:32,422 | avatar.targets.qemu.INFO | QEMU process running
+2019-11-05 13:55:32,512 | avatar.targets.qemu.QMPProtocol.INFO | {"return": {}, "id": 0}
+
+2019-11-05 13:55:32,512 | avatar.targets.qemu.INFO | Connected to remote target
+2019-11-05 13:55:32,512 | avatar.targets.qemu.RemoteMemoryProtocol.INFO | Successfully connected rmp
+2019-11-05 13:55:32,519 | avatar.targets.qemu.INFO | State changed to to TargetStates.STOPPED
+2019-11-05 13:55:32,547 | avatar.targets.qemu.INFO | State changed to to TargetStates.RUNNING
+2019-11-05 13:56:32,619 | avatar.targets.qemu.INFO | State changed to to TargetStates.STOPPED
+2019-11-05 13:56:59,762 | avatar.targets.qemu.INFO | QEMU process running
+2019-11-05 13:56:59,853 | avatar.targets.qemu.QMPProtocol.INFO | {"return": {}, "id": 0}
+
+2019-11-05 13:56:59,853 | avatar.targets.qemu.INFO | Connected to remote target
+2019-11-05 13:56:59,854 | avatar.targets.qemu.RemoteMemoryProtocol.INFO | Successfully connected rmp
+2019-11-05 13:56:59,858 | avatar.targets.qemu.INFO | State changed to to TargetStates.STOPPED
+2019-11-05 13:56:59,874 | avatar.targets.qemu.INFO | State changed to to TargetStates.RUNNING
+2019-11-05 13:57:59,937 | avatar.targets.qemu.INFO | State changed to to TargetStates.STOPPED
+2019-11-05 13:58:29,192 | avatar.targets.qemu.INFO | QEMU process running
+2019-11-05 13:58:29,283 | avatar.targets.qemu.QMPProtocol.INFO | {"return": {}, "id": 0}
+
+2019-11-05 13:58:29,284 | avatar.targets.qemu.INFO | Connected to remote target
+2019-11-05 13:58:29,284 | avatar.targets.qemu.RemoteMemoryProtocol.INFO | Successfully connected rmp
+2019-11-05 13:58:29,289 | avatar.targets.qemu.INFO | State changed to to TargetStates.STOPPED
+2019-11-05 13:58:29,311 | avatar.targets.qemu.INFO | State changed to to TargetStates.RUNNING
+2019-11-05 13:59:29,382 | avatar.targets.qemu.INFO | State changed to to TargetStates.STOPPED
+2019-11-07 10:01:04,892 | avatar.targets.qemu.INFO | QEMU process running
+2019-11-07 10:01:08,584 | avatar.targets.qemu.QMPProtocol.INFO | {"return": {}, "id": 0}
+
+2019-11-07 10:01:08,584 | avatar.targets.qemu.INFO | Connected to remote target
+2019-11-07 10:01:08,587 | avatar.targets.qemu.RemoteMemoryProtocol.INFO | Successfully connected rmp
+2019-11-07 10:01:08,616 | avatar.targets.qemu.INFO | State changed to to TargetStates.STOPPED
+2019-11-07 10:01:08,674 | avatar.targets.qemu.INFO | State changed to to TargetStates.RUNNING
+2019-11-07 10:01:46,339 | avatar.targets.qemu.INFO | State changed to to TargetStates.EXITED
+2019-11-07 10:02:06,819 | avatar.targets.qemu.INFO | QEMU process running
+2019-11-07 10:02:06,908 | avatar.targets.qemu.QMPProtocol.INFO | {"return": {}, "id": 0}
+
+2019-11-07 10:02:06,908 | avatar.targets.qemu.INFO | Connected to remote target
+2019-11-07 10:02:06,908 | avatar.targets.qemu.RemoteMemoryProtocol.INFO | Successfully connected rmp
+2019-11-07 10:02:06,919 | avatar.targets.qemu.INFO | State changed to to TargetStates.STOPPED
+2019-11-07 10:02:06,935 | avatar.targets.qemu.INFO | State changed to to TargetStates.RUNNING
+2019-11-07 10:02:29,663 | avatar.targets.qemu.INFO | State changed to to TargetStates.EXITED
+2019-11-07 10:07:59,823 | avatar.targets.qemu.INFO | QEMU process running
+2019-11-07 10:07:59,923 | avatar.targets.qemu.INFO | State changed to to TargetStates.STOPPED
+2019-11-07 10:07:59,924 | avatar.targets.qemu.QMPProtocol.INFO | {"return": {}, "id": 0}
+
+2019-11-07 10:07:59,924 | avatar.targets.qemu.INFO | Connected to remote target
+2019-11-07 10:07:59,928 | avatar.targets.qemu.RemoteMemoryProtocol.INFO | Successfully connected rmp
+2019-11-07 10:07:59,940 | avatar.targets.qemu.INFO | State changed to to TargetStates.RUNNING
+2019-11-07 10:35:20,306 | avatar.targets.qemu.INFO | QEMU process running
+2019-11-07 10:35:20,391 | avatar.targets.qemu.INFO | State changed to to TargetStates.STOPPED
+2019-11-07 10:35:20,395 | avatar.targets.qemu.QMPProtocol.INFO | {"return": {}, "id": 0}
+
+2019-11-07 10:35:20,395 | avatar.targets.qemu.INFO | Connected to remote target
+2019-11-07 10:35:20,395 | avatar.targets.qemu.RemoteMemoryProtocol.INFO | Successfully connected rmp
+2019-11-07 10:35:20,422 | avatar.targets.qemu.INFO | State changed to to TargetStates.RUNNING
+2019-11-07 10:36:13,283 | avatar.targets.qemu.INFO | State changed to to TargetStates.EXITED
+2019-11-07 10:36:55,410 | avatar.targets.qemu.INFO | QEMU process running
+2019-11-07 10:36:55,499 | avatar.targets.qemu.QMPProtocol.INFO | {"return": {}, "id": 0}
+
+2019-11-07 10:36:55,500 | avatar.targets.qemu.INFO | Connected to remote target
+2019-11-07 10:36:55,500 | avatar.targets.qemu.RemoteMemoryProtocol.INFO | Successfully connected rmp
+2019-11-07 10:36:55,510 | avatar.targets.qemu.INFO | State changed to to TargetStates.STOPPED
+2019-11-07 10:36:55,526 | avatar.targets.qemu.INFO | State changed to to TargetStates.RUNNING
+2019-11-07 10:37:33,871 | avatar.targets.qemu.INFO | State changed to to TargetStates.EXITED
+2019-11-07 10:40:23,751 | avatar.targets.qemu.INFO | QEMU process running
+2019-11-07 10:40:23,842 | avatar.targets.qemu.QMPProtocol.INFO | {"return": {}, "id": 0}
+
+2019-11-07 10:40:23,842 | avatar.targets.qemu.INFO | Connected to remote target
+2019-11-07 10:40:23,842 | avatar.targets.qemu.RemoteMemoryProtocol.INFO | Successfully connected rmp
+2019-11-07 10:40:23,848 | avatar.targets.qemu.INFO | State changed to to TargetStates.STOPPED
+2019-11-07 10:40:23,863 | avatar.targets.qemu.INFO | State changed to to TargetStates.RUNNING
+2019-11-07 10:41:23,935 | avatar.targets.qemu.INFO | State changed to to TargetStates.STOPPED
+2019-11-07 10:42:43,566 | avatar.targets.qemu.INFO | QEMU process running
+2019-11-07 10:42:43,656 | avatar.targets.qemu.QMPProtocol.INFO | {"return": {}, "id": 0}
+
+2019-11-07 10:42:43,657 | avatar.targets.qemu.INFO | Connected to remote target
+2019-11-07 10:42:43,657 | avatar.targets.qemu.RemoteMemoryProtocol.INFO | Successfully connected rmp
+2019-11-07 10:42:43,664 | avatar.targets.qemu.INFO | State changed to to TargetStates.STOPPED
+2019-11-07 10:42:43,679 | avatar.targets.qemu.INFO | State changed to to TargetStates.RUNNING
+2019-11-07 10:43:31,899 | avatar.targets.qemu.INFO | State changed to to TargetStates.EXITED
+2019-11-07 10:43:47,455 | avatar.targets.qemu.INFO | QEMU process running
+2019-11-07 10:43:47,547 | avatar.targets.qemu.QMPProtocol.INFO | {"return": {}, "id": 0}
+
+2019-11-07 10:43:47,547 | avatar.targets.qemu.INFO | Connected to remote target
+2019-11-07 10:43:47,548 | avatar.targets.qemu.RemoteMemoryProtocol.INFO | Successfully connected rmp
+2019-11-07 10:43:47,551 | avatar.targets.qemu.INFO | State changed to to TargetStates.STOPPED
+2019-11-07 10:43:47,567 | avatar.targets.qemu.INFO | State changed to to TargetStates.RUNNING
+2019-11-07 10:43:50,835 | avatar.targets.qemu.INFO | State changed to to TargetStates.EXITED
+2019-11-07 10:44:24,260 | avatar.targets.qemu.INFO | QEMU process running
+2019-11-07 10:44:24,350 | avatar.targets.qemu.QMPProtocol.INFO | {"return": {}, "id": 0}
+
+2019-11-07 10:44:24,351 | avatar.targets.qemu.INFO | Connected to remote target
+2019-11-07 10:44:24,351 | avatar.targets.qemu.RemoteMemoryProtocol.INFO | Successfully connected rmp
+2019-11-07 10:44:24,358 | avatar.targets.qemu.INFO | State changed to to TargetStates.STOPPED
+2019-11-07 10:44:24,374 | avatar.targets.qemu.INFO | State changed to to TargetStates.RUNNING
+2019-11-07 10:45:24,650 | avatar.targets.qemu.INFO | State changed to to TargetStates.STOPPED
+2019-11-07 10:52:19,125 | avatar.targets.qemu.INFO | QEMU process running
+2019-11-07 10:52:19,201 | avatar.targets.qemu.QMPProtocol.INFO | {"return": {}, "id": 0}
+
+2019-11-07 10:52:19,201 | avatar.targets.qemu.INFO | Connected to remote target
+2019-11-07 10:52:19,201 | avatar.targets.qemu.RemoteMemoryProtocol.INFO | Successfully connected rmp
+2019-11-07 10:52:19,219 | avatar.targets.qemu.INFO | State changed to to TargetStates.STOPPED
+2019-11-07 10:52:19,235 | avatar.targets.qemu.INFO | State changed to to TargetStates.RUNNING
+2019-11-07 10:53:19,310 | avatar.targets.qemu.INFO | State changed to to TargetStates.STOPPED
+2019-11-07 10:55:22,956 | avatar.targets.qemu.INFO | QEMU process running
+2019-11-07 10:55:23,034 | avatar.targets.qemu.QMPProtocol.INFO | {"return": {}, "id": 0}
+
+2019-11-07 10:55:23,034 | avatar.targets.qemu.INFO | Connected to remote target
+2019-11-07 10:55:23,035 | avatar.targets.qemu.RemoteMemoryProtocol.INFO | Successfully connected rmp
+2019-11-07 10:55:23,050 | avatar.targets.qemu.INFO | State changed to to TargetStates.STOPPED
+2019-11-07 10:55:23,071 | avatar.targets.qemu.INFO | State changed to to TargetStates.RUNNING
+2019-11-07 10:55:42,327 | avatar.targets.qemu.INFO | State changed to to TargetStates.EXITED
+2019-11-07 12:48:06,017 | avatar.targets.qemu.INFO | QEMU process running
+2019-11-07 12:48:06,107 | avatar.targets.qemu.INFO | State changed to to TargetStates.STOPPED
+2019-11-07 12:48:06,112 | avatar.targets.qemu.QMPProtocol.INFO | {"return": {}, "id": 0}
+
+2019-11-07 12:48:06,112 | avatar.targets.qemu.INFO | Connected to remote target
+2019-11-07 12:48:06,116 | avatar.targets.qemu.RemoteMemoryProtocol.INFO | Successfully connected rmp
+2019-11-07 12:48:06,128 | avatar.targets.qemu.INFO | State changed to to TargetStates.RUNNING
+2019-11-07 12:48:10,137 | avatar.targets.qemu.INFO | State changed to to TargetStates.EXITED
+2019-11-07 12:48:18,037 | avatar.targets.qemu.INFO | QEMU process running
+2019-11-07 12:48:18,118 | avatar.targets.qemu.QMPProtocol.INFO | {"return": {}, "id": 0}
+
+2019-11-07 12:48:18,118 | avatar.targets.qemu.INFO | Connected to remote target
+2019-11-07 12:48:18,118 | avatar.targets.qemu.RemoteMemoryProtocol.INFO | Successfully connected rmp
+2019-11-07 12:48:18,127 | avatar.targets.qemu.INFO | State changed to to TargetStates.STOPPED
+2019-11-07 12:48:18,143 | avatar.targets.qemu.INFO | State changed to to TargetStates.RUNNING
+2019-11-07 12:48:48,212 | avatar.targets.qemu.INFO | State changed to to TargetStates.STOPPED
+2019-11-12 15:15:10,034 | avatar.targets.qemu.INFO | QEMU process running
+2019-11-12 15:15:11,810 | avatar.targets.qemu.QMPProtocol.INFO | {"return": {}, "id": 0}
+
+2019-11-12 15:15:11,810 | avatar.targets.qemu.INFO | Connected to remote target
+2019-11-12 15:15:11,810 | avatar.targets.qemu.RemoteMemoryProtocol.INFO | Successfully connected rmp
+2019-11-12 15:15:11,831 | avatar.targets.qemu.INFO | State changed to to TargetStates.STOPPED
+2019-11-12 15:15:11,849 | avatar.targets.qemu.INFO | State changed to to TargetStates.RUNNING
+2019-11-12 15:15:15,085 | avatar.targets.qemu.INFO | State changed to to TargetStates.EXITED
+2019-11-14 09:33:23,513 | avatar.targets.qemu.INFO | QEMU process running
+2019-11-14 09:33:29,178 | avatar.targets.qemu.INFO | State changed to to TargetStates.STOPPED
+2019-11-14 09:33:29,184 | avatar.targets.qemu.QMPProtocol.INFO | {"return": {}, "id": 0}
+
+2019-11-14 09:33:29,185 | avatar.targets.qemu.INFO | Connected to remote target
+2019-11-14 09:33:29,185 | avatar.targets.qemu.RemoteMemoryProtocol.INFO | Successfully connected rmp
+2019-11-14 09:33:29,242 | avatar.targets.qemu.INFO | State changed to to TargetStates.RUNNING
+2019-11-14 09:33:32,409 | avatar.targets.qemu.INFO | State changed to to TargetStates.EXITED
+2019-11-14 09:34:40,877 | avatar.targets.qemu.INFO | QEMU process running
+2019-11-14 09:34:40,965 | avatar.targets.qemu.QMPProtocol.INFO | {"return": {}, "id": 0}
+
+2019-11-14 09:34:40,966 | avatar.targets.qemu.INFO | Connected to remote target
+2019-11-14 09:34:40,967 | avatar.targets.qemu.RemoteMemoryProtocol.INFO | Successfully connected rmp
+2019-11-14 09:34:41,071 | avatar.targets.qemu.INFO | State changed to to TargetStates.STOPPED
+2019-11-14 09:34:41,373 | avatar.targets.qemu.INFO | State changed to to TargetStates.RUNNING
+2019-11-14 09:35:05,046 | avatar.targets.qemu.INFO | State changed to to TargetStates.EXITED
+2019-11-14 09:35:16,442 | avatar.targets.qemu.INFO | QEMU process running
+2019-11-14 09:35:16,530 | avatar.targets.qemu.INFO | State changed to to TargetStates.STOPPED
+2019-11-14 09:35:16,532 | avatar.targets.qemu.QMPProtocol.INFO | {"return": {}, "id": 0}
+
+2019-11-14 09:35:16,533 | avatar.targets.qemu.INFO | Connected to remote target
+2019-11-14 09:35:16,534 | avatar.targets.qemu.RemoteMemoryProtocol.INFO | Successfully connected rmp
+2019-11-14 09:35:16,547 | avatar.targets.qemu.INFO | State changed to to TargetStates.RUNNING
+2019-11-14 09:36:15,947 | avatar.targets.qemu.INFO | State changed to to TargetStates.EXITED
+2019-11-14 12:49:44,664 | avatar.targets.qemu.INFO | QEMU process running
+2019-11-14 12:49:44,742 | avatar.targets.qemu.QMPProtocol.INFO | {"return": {}, "id": 0}
+
+2019-11-14 12:49:44,743 | avatar.targets.qemu.INFO | Connected to remote target
+2019-11-14 12:49:44,743 | avatar.targets.qemu.RemoteMemoryProtocol.INFO | Successfully connected rmp
+2019-11-14 12:49:44,757 | avatar.targets.qemu.INFO | State changed to to TargetStates.STOPPED
+2019-11-14 12:49:44,773 | avatar.targets.qemu.INFO | State changed to to TargetStates.RUNNING
+2019-11-14 12:49:47,642 | avatar.targets.qemu.INFO | State changed to to TargetStates.EXITED
+2019-11-14 13:54:55,269 | avatar.targets.qemu.INFO | QEMU process running
+2019-11-14 13:54:55,402 | avatar.targets.qemu.QMPProtocol.INFO | {"return": {}, "id": 0}
+
+2019-11-14 13:54:55,403 | avatar.targets.qemu.INFO | Connected to remote target
+2019-11-14 13:54:55,403 | avatar.targets.qemu.RemoteMemoryProtocol.INFO | Successfully connected rmp
+2019-11-14 13:54:55,424 | avatar.targets.qemu.INFO | State changed to to TargetStates.STOPPED
+2019-11-14 13:54:55,440 | avatar.targets.qemu.INFO | State changed to to TargetStates.RUNNING
+2019-11-14 13:55:25,676 | avatar.targets.qemu.INFO | State changed to to TargetStates.STOPPED
+2019-11-14 14:59:55,841 | avatar.targets.qemu.INFO | QEMU process running
+2019-11-14 14:59:55,920 | avatar.targets.qemu.QMPProtocol.INFO | {"return": {}, "id": 0}
+
+2019-11-14 14:59:55,920 | avatar.targets.qemu.INFO | Connected to remote target
+2019-11-14 14:59:55,920 | avatar.targets.qemu.RemoteMemoryProtocol.INFO | Successfully connected rmp
+2019-11-14 14:59:55,932 | avatar.targets.qemu.INFO | State changed to to TargetStates.STOPPED
+2019-11-14 14:59:55,951 | avatar.targets.qemu.INFO | State changed to to TargetStates.RUNNING
+2019-11-14 14:59:59,155 | avatar.targets.qemu.INFO | State changed to to TargetStates.EXITED
+2019-11-14 15:02:26,852 | avatar.targets.qemu.INFO | QEMU process running
+2019-11-14 15:02:26,932 | avatar.targets.qemu.QMPProtocol.INFO | {"return": {}, "id": 0}
+
+2019-11-14 15:02:26,932 | avatar.targets.qemu.INFO | Connected to remote target
+2019-11-14 15:02:26,933 | avatar.targets.qemu.RemoteMemoryProtocol.INFO | Successfully connected rmp
+2019-11-14 15:02:26,944 | avatar.targets.qemu.INFO | State changed to to TargetStates.STOPPED
+2019-11-14 15:02:26,960 | avatar.targets.qemu.INFO | State changed to to TargetStates.RUNNING
+2019-11-14 15:02:29,928 | avatar.targets.qemu.INFO | State changed to to TargetStates.EXITED
+2019-11-14 15:02:49,145 | avatar.targets.qemu.INFO | QEMU process running
+2019-11-14 15:02:49,226 | avatar.targets.qemu.QMPProtocol.INFO | {"return": {}, "id": 0}
+
+2019-11-14 15:02:49,226 | avatar.targets.qemu.INFO | Connected to remote target
+2019-11-14 15:02:49,226 | avatar.targets.qemu.RemoteMemoryProtocol.INFO | Successfully connected rmp
+2019-11-14 15:02:49,237 | avatar.targets.qemu.INFO | State changed to to TargetStates.STOPPED
+2019-11-14 15:02:49,263 | avatar.targets.qemu.INFO | State changed to to TargetStates.RUNNING
+2019-11-14 15:03:19,362 | avatar.targets.qemu.INFO | State changed to to TargetStates.STOPPED
+2019-11-19 10:59:56,076 | avatar.targets.qemu.INFO | QEMU process running
+2019-11-19 10:59:59,130 | avatar.targets.qemu.INFO | State changed to to TargetStates.STOPPED
+2019-11-19 10:59:59,140 | avatar.targets.qemu.QMPProtocol.INFO | {"return": {}, "id": 0}
+
+2019-11-19 10:59:59,140 | avatar.targets.qemu.INFO | Connected to remote target
+2019-11-19 10:59:59,141 | avatar.targets.qemu.RemoteMemoryProtocol.INFO | Successfully connected rmp
+2019-11-19 10:59:59,162 | avatar.targets.qemu.INFO | State changed to to TargetStates.RUNNING
+2019-11-19 11:00:29,900 | avatar.targets.qemu.INFO | State changed to to TargetStates.STOPPED
+2019-11-19 15:11:25,493 | avatar.targets.qemu.INFO | QEMU process running
+2019-11-19 15:11:25,573 | avatar.targets.qemu.QMPProtocol.INFO | {"return": {}, "id": 0}
+
+2019-11-19 15:11:25,574 | avatar.targets.qemu.INFO | Connected to remote target
+2019-11-19 15:11:25,574 | avatar.targets.qemu.RemoteMemoryProtocol.INFO | Successfully connected rmp
+2019-11-19 15:11:25,585 | avatar.targets.qemu.INFO | State changed to to TargetStates.STOPPED
+2019-11-19 15:11:25,601 | avatar.targets.qemu.INFO | State changed to to TargetStates.RUNNING
+2019-11-19 15:11:55,638 | avatar.targets.qemu.INFO | State changed to to TargetStates.STOPPED
+2019-11-19 15:44:46,636 | avatar.targets.qemu.INFO | QEMU process running
+2019-11-19 15:44:46,715 | avatar.targets.qemu.QMPProtocol.INFO | {"return": {}, "id": 0}
+
+2019-11-19 15:44:46,715 | avatar.targets.qemu.INFO | Connected to remote target
+2019-11-19 15:44:46,715 | avatar.targets.qemu.RemoteMemoryProtocol.INFO | Successfully connected rmp
+2019-11-19 15:44:46,727 | avatar.targets.qemu.INFO | State changed to to TargetStates.STOPPED
+2019-11-19 15:44:46,743 | avatar.targets.qemu.INFO | State changed to to TargetStates.RUNNING
+2019-11-19 15:45:16,780 | avatar.targets.qemu.INFO | State changed to to TargetStates.STOPPED
+2019-11-21 10:54:49,532 | avatar.targets.qemu.INFO | QEMU process running
+2019-11-21 10:54:52,492 | avatar.targets.qemu.INFO | State changed to to TargetStates.STOPPED
+2019-11-21 10:54:52,495 | avatar.targets.qemu.QMPProtocol.INFO | {"return": {}, "id": 0}
+
+2019-11-21 10:54:52,495 | avatar.targets.qemu.INFO | Connected to remote target
+2019-11-21 10:54:52,496 | avatar.targets.qemu.RemoteMemoryProtocol.INFO | Successfully connected rmp
+2019-11-21 10:54:52,510 | avatar.targets.qemu.INFO | State changed to to TargetStates.RUNNING
+2019-11-21 10:55:22,546 | avatar.targets.qemu.INFO | State changed to to TargetStates.STOPPED
+2019-11-21 12:58:04,221 | avatar.targets.qemu.INFO | QEMU process running
+2019-11-21 12:58:04,301 | avatar.targets.qemu.QMPProtocol.INFO | {"return": {}, "id": 0}
+
+2019-11-21 12:58:04,301 | avatar.targets.qemu.INFO | Connected to remote target
+2019-11-21 12:58:04,302 | avatar.targets.qemu.RemoteMemoryProtocol.INFO | Successfully connected rmp
+2019-11-21 12:58:04,313 | avatar.targets.qemu.INFO | State changed to to TargetStates.STOPPED
+2019-11-21 12:58:04,342 | avatar.targets.qemu.INFO | State changed to to TargetStates.RUNNING
+2019-11-21 12:58:04,349 | avatar.targets.qemu.INFO | State changed to to TargetStates.EXITED
+2019-11-21 12:59:22,329 | avatar.targets.qemu.INFO | QEMU process running
+2019-11-21 12:59:22,409 | avatar.targets.qemu.QMPProtocol.INFO | {"return": {}, "id": 0}
+
+2019-11-21 12:59:22,410 | avatar.targets.qemu.INFO | Connected to remote target
+2019-11-21 12:59:22,410 | avatar.targets.qemu.RemoteMemoryProtocol.INFO | Successfully connected rmp
+2019-11-21 12:59:22,419 | avatar.targets.qemu.INFO | State changed to to TargetStates.STOPPED
+2019-11-21 12:59:22,435 | avatar.targets.qemu.INFO | State changed to to TargetStates.RUNNING
+2019-11-21 12:59:53,040 | avatar.targets.qemu.INFO | State changed to to TargetStates.STOPPED
+2019-11-21 14:25:01,722 | avatar.targets.qemu.INFO | QEMU process running
+2019-11-21 14:25:01,801 | avatar.targets.qemu.QMPProtocol.INFO | {"return": {}, "id": 0}
+
+2019-11-21 14:25:01,801 | avatar.targets.qemu.INFO | Connected to remote target
+2019-11-21 14:25:01,802 | avatar.targets.qemu.RemoteMemoryProtocol.INFO | Successfully connected rmp
+2019-11-21 14:25:01,813 | avatar.targets.qemu.INFO | State changed to to TargetStates.STOPPED
+2019-11-21 14:25:01,828 | avatar.targets.qemu.INFO | State changed to to TargetStates.RUNNING
+2019-11-21 14:25:32,268 | avatar.targets.qemu.INFO | State changed to to TargetStates.STOPPED
+2019-11-21 14:38:21,237 | avatar.targets.qemu.INFO | QEMU process running
+2019-11-21 14:38:21,317 | avatar.targets.qemu.QMPProtocol.INFO | {"return": {}, "id": 0}
+
+2019-11-21 14:38:21,317 | avatar.targets.qemu.INFO | Connected to remote target
+2019-11-21 14:38:21,318 | avatar.targets.qemu.RemoteMemoryProtocol.INFO | Successfully connected rmp
+2019-11-21 14:38:21,327 | avatar.targets.qemu.INFO | State changed to to TargetStates.STOPPED
+2019-11-21 14:38:21,343 | avatar.targets.qemu.INFO | State changed to to TargetStates.RUNNING
+2019-11-21 14:38:51,392 | avatar.targets.qemu.INFO | State changed to to TargetStates.STOPPED
