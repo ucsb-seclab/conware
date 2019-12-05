@@ -56,13 +56,15 @@ To optimize this model, which is the real power of conware, we execute `pretende
 
    3. Execute the firmware log the data (saved a TSV file in the specified directory).  The device address is the filename in `/dev/` (e.g., ttyACM0)
 ```bash
-python conware/log_data.py -l <device address> <output directory>
+./conware/bin/conware-recorder -l <device address> <output directory>
 ```
 For example,
 ```bash
-python conware/log_data.py -l ttyACM0 firmware/custom/blink/
+./conware/bin/conware-recorder -l ttyACM0 firmware/custom/blink/
 ```
 This will result in a `recording.tsv` in the output directory specified.  Every other script assumes these default names.
+
+Buffer size is defined in '/conware/runtime/arduino-1.8.8/portable/packages/arduino/hardware/sam/1.6.11/system/libsam/source'
 
 4. You can then generate a model file using:
 ```bash
