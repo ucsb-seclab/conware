@@ -87,6 +87,7 @@ INCLUDES += -I$(PROJECT_BASE_PATH)/include
 INCLUDES += -I$(CMSIS_ARM_PATH)
 INCLUDES += -I$(CMSIS_ATMEL_PATH)
 INCLUDES += -I$(CMSIS_CHIP_PATH)/include
+INCLUDES += -I/usr/include/newlib
 
 #-------------------------------------------------------------------------------
 ifdef DEBUG
