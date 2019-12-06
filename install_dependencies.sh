@@ -36,8 +36,12 @@ fi
 mkdir -p llvm-7.0.1.obj
 cd llvm-7.0.1.obj
 cmake -G Ninja -DCMAKE_BUILD_TYPE=Debug ../llvm-7.0.1.src
-#make -j4
-cmake --build .
+
+# This did not work on a multi-core machine (it spawned too many processes)
+#cmake --build .
+
+# capping l to 15 limited the use of multiple cores (to not tap exhaust the RAM)
+ninja -l 15
 
 cd .. # runtime
 cd .. # back where we started
