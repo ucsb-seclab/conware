@@ -44,55 +44,54 @@ To optimize this model, which is the real power of conware, we execute `pretende
 
    1. Build and instrument the arduino firmware:
     
-     ./rebuild_runtime.sh
+      `./rebuild_runtime.sh`
 
    2. Build and instrument an arduino project:
     
-     ./instrument_project.sh <arduino directory>
+      `./instrument_project.sh <arduino directory>`
 
    For example:
-   
-     `./instrument_project.sh firmware/custom/blink/`
+
+       `./instrument_project.sh firmware/custom/blink/`
 
    3. Execute the firmware log the data (saved a TSV file in the specified directory).  The device address is the filename in `/dev/` (e.g., ttyACM0)
-```bash
-./conware/bin/conware-recorder -l <device address> <output directory>
-```
+
+       `./conware/bin/conware-recorder -l <device address> <output directory>`
+
 For example,
-```bash
-./conware/bin/conware-recorder -l ttyACM0 firmware/custom/blink/
-```
+
+       `./conware/bin/conware-recorder -l ttyACM0 firmware/custom/blink/`
+
 This will result in a `recording.tsv` in the output directory specified.  Every other script assumes these default names.
 
 Buffer size is defined in '/conware/runtime/arduino-1.8.8/portable/packages/arduino/hardware/sam/1.6.11/system/libsam/source'
 
 4. You can then generate a model file using:
-```bash
-conware-model-generate
-```
-For example,
-```bash
-conware-model-generate - r firmware/custom/blink/
-```
+
+     **conware-model-generate**
+
+For example:
+
+  `conware-model-generate- r firmware/custom/blink/`
+
 This will output a `model.pickle` file in the same directory.  This model is effectively a graph representation of the input file, but represented as a state machine and with memory reads represented as simple models (e.g., storage, pattern, or markov).  It has a lot of room for improvement (i.e., the point of this project)
 
-5. To optimize this model, use  [IN PROGESS]
-```bash
-conware-model-optimize
-```
-For example,
-```bash
-conware-model-optimize firmware/custom/blink
-```
+5. To optimize this model, use:  [IN PROGESS]
 
-6. To visualize a model we created, run
-```bash
-conware-model-visualize
-```
-For example,
-```bash
-conware-model-visualize -r firmware/custom/blink/model.pickle  
-```
+    **conware-model-optimize**
+
+For example:
+    `conware-model-optimize firmware/custom/blink`
+
+6. To visualize a model we created, run:
+
+     **conware-model-visualize**
+
+For example:            
+     
+`conware-model-visualize -r firmware/custom/blink/model.pickle` 
+
+
 Or, to run on the optimized model,
 ```bash
 conware-model-visualize -r firmware/custom/blink/model_optimized.pickle
