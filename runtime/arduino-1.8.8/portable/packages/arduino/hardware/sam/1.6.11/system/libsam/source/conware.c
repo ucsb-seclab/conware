@@ -9,6 +9,7 @@
 #define WRITE 1
 
 unsigned int CURRENT_INDEX = 0;
+unsigned int LAST_WRITE = 0;
 int *RECORD_TIME[STORAGE_SIZE];
 void *RECORD_ADDRESS[STORAGE_SIZE];
 void *RECORD_PC[STORAGE_SIZE];
@@ -18,10 +19,14 @@ int *RECORD_REPEATED[STORAGE_SIZE];
 
 bool PRINTING = false;
 
-
+/**
+ * Print the results out over UART (or whatever the default printf is)
+ */
 void conware_print_results() {
     PRINTING = true;
     int x = 0;
+
+    // TODO: Disable interrupts
 
     iprintf("CONWAREDUMP_START\n\r");
     for (; x < STORAGE_SIZE; x++) {
@@ -39,36 +44,56 @@ void conware_print_results() {
     iprintf("CONWAREDUMP_END\n\r");
     CURRENT_INDEX = 0;
     PRINTING = false;
+
+    // TODO: Re-enabled interrupts
 }
 
+/**
+ *  Log read, write, and interrupt access to memory
+ * 
+ *  Operation:
+ *      Read: 0
+ *      Write: 1
+ *      Interrupt: 2
+ * 
+ */
 void conware_log(void *address, unsigned int value, unsigned int operation) {
     // Only instrument MMIO
     if (address < (void *) 0x40000000 || address > (void *) (0x40000000 + 0x20000000))
         return;
 
-    // Don't stop on ourselves when we are printing
+    // Don't log ourselves when we are printing
     if (PRINTING)
         return;
 
     if (CURRENT_INDEX < STORAGE_SIZE) {
-        // If it's the same access as last time, let's save space and just mark it as repeated
-        if (CURRENT_INDEX > 0 &&
-            RECORD_ADDRESS[CURRENT_INDEX - 1] == address &&
-            RECORD_VALUE[CURRENT_INDEX - 1] == value &&
-            RECORD_OPERATION[CURRENT_INDEX - 1] == operation &&
-            RECORD_PC[CURRENT_INDEX - 1] == __builtin_return_address(0)) {
+        // Did we already see this write and just need to update the repeat counter?
 
-            RECORD_REPEATED[CURRENT_INDEX - 1]++;
-        } else {
-            // TODO: Get the actual systick time.
-            RECORD_TIME[CURRENT_INDEX] = 0;
-            RECORD_ADDRESS[CURRENT_INDEX] = address;
-            RECORD_VALUE[CURRENT_INDEX] = value;
-            RECORD_OPERATION[CURRENT_INDEX] = operation;
-            RECORD_PC[CURRENT_INDEX] = __builtin_return_address(0);
-            RECORD_REPEATED[CURRENT_INDEX] = 0;
-            CURRENT_INDEX++;
+        for (int x = LAST_WRITE; x < CURRENT_INDEX; x++) {
+            if (CURRENT_INDEX > 0 &&
+            RECORD_ADDRESS[x] == address &&
+            RECORD_VALUE[x] == value &&
+            RECORD_OPERATION[x] == operation &&
+            RECORD_PC[x] == __builtin_return_address(0)) {
+
+                RECORD_REPEATED[x]++;
+                return;
+            }
         }
+        // TODO: Get the actual systick time.
+        RECORD_TIME[CURRENT_INDEX] = 0;
+        RECORD_ADDRESS[CURRENT_INDEX] = address;
+        RECORD_VALUE[CURRENT_INDEX] = value;
+        RECORD_OPERATION[CURRENT_INDEX] = operation;
+        RECORD_PC[CURRENT_INDEX] = __builtin_return_address(0);
+        RECORD_REPEATED[CURRENT_INDEX] = 0;
+        
+        // Keep track of our last write for optimization
+        if (operation == WRITE) {;
+            LAST_WRITE = CURRENT_INDEX;
+        }
+
+        CURRENT_INDEX++;
     } else {
         conware_print_results();
     }
