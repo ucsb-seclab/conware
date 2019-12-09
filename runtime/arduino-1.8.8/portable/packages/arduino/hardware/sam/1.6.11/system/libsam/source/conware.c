@@ -8,14 +8,15 @@
 #define READ 0
 #define WRITE 1
 
+unsigned int MAX_REPEATS = 0xefff;
 unsigned int CURRENT_INDEX = 0;
 unsigned int LAST_WRITE = 0;
-int *RECORD_TIME[STORAGE_SIZE];
+unsigned int *RECORD_TIME[STORAGE_SIZE];
 void *RECORD_ADDRESS[STORAGE_SIZE];
 void *RECORD_PC[STORAGE_SIZE];
 unsigned int RECORD_VALUE[STORAGE_SIZE];
 bool RECORD_OPERATION[STORAGE_SIZE];
-int *RECORD_REPEATED[STORAGE_SIZE];
+unsigned int *RECORD_REPEATED[STORAGE_SIZE];
 
 bool PRINTING = false;
 
@@ -76,7 +77,10 @@ void conware_log(void *address, unsigned int value, unsigned int operation) {
             RECORD_OPERATION[x] == operation &&
             RECORD_PC[x] == __builtin_return_address(0)) {
 
-                RECORD_REPEATED[x]++;
+                // Make sure this doesn't overflow...
+                if (RECORD_REPEATED[x] < MAX_REPEATS) {
+                    RECORD_REPEATED[x]++;
+                }
                 return;
             }
         }
