@@ -4,13 +4,13 @@ Conware's goal is to automatically model hardware peripherals in software for em
 The overall arhitecture is as follows:
 
 
-[Arduino]+[Peripheral] + [LLVM Pass](llvm-transformation-pass/) --> [Log File (TSV)] --> `pretender-model-generate` --> `pretender-model-optimize` --> `pretender-emulate`
+[Arduino]+[Peripheral] + [LLVM Pass](llvm-transformation-pass/) --> `conware-recorder` [Log File (TSV)] --> `conware-model-generate` --> `conware-model-optimize` --> `conware-emulate`
 
 The arduino code is instrumented with LLVM to record any MMIO read or write.
 This code is than run on a real arduino with the real peripheral attached.
 After a designated amount of time the log of all of the MMIO accesses are dumped over UART and stored in a log file.
-This log file is then consummed by `pretender-model-generate`, which will generate a _.pickle_ model file which can be consummed by `pretender-emulate` and run on emulated hardware.
-To optimize this model, which is the real power of conware, we execute `pretender-model-optimize`.
+This log file is then consummed by `conware-model-generate`, which will generate a _.pickle_ model file which can be consummed by `conware-emulate` and run on emulated hardware.
+To optimize this model, which is the real power of conware, we execute `conware-model-optimize`.
 
 
 ## Installation
@@ -28,39 +28,51 @@ To optimize this model, which is the real power of conware, we execute `pretende
   
       Be patient: *This will take a looong time...* 
     
-      `./install_dependencies.sh`
+```bash
+./install_dependencies.sh
+```
 
-  3. We use a combination of Avatar^2 (w/ OpenOCD) and Pretender to 
-      model our peripherals.  
+  3. We use of Avatar^2 (w/ OpenOCD) for our emulation framework.
 
-      **Install both of these, in a [virtualenv](https://virtualenv.pypa.io/en/latest/)**.  
+      **Install this in a [virtualenv](https://virtualenv.pypa.io/en/latest/)**.  
 
       Once virtualenv is installed *and* **conware environment is created**, run:
 
-     `./install_pretender.sh`
-
+```bash
+./install_avatar.sh
+```
 
 ## Example usage
 
    1. Build and instrument the arduino firmware:
     
-      `./rebuild_runtime.sh`
+```bash
+./rebuild_runtime.sh
+```
 
    2. Build and instrument an arduino project:
     
-      `./instrument_project.sh <arduino directory>`
+```bash
+./instrument_project.sh <arduino directory>
+```
 
    For example:
 
-       `./instrument_project.sh firmware/custom/blink/`
+```bash
+./instrument_project.sh firmware/custom/blink/
+```
 
    3. Execute the firmware log the data (saved a TSV file in the specified directory).  The device address is the filename in `/dev/` (e.g., ttyACM0)
 
-       `./conware/bin/conware-recorder -l <device address> <output directory>`
+```bash
+./conware/bin/conware-recorder -l <device address> <output directory>
+```
 
 For example,
 
-       `./conware/bin/conware-recorder -l ttyACM0 firmware/custom/blink/`
+```bash
+./conware/bin/conware-recorder -l ttyACM0 firmware/custom/blink/
+```
 
 This will result in a `recording.tsv` in the output directory specified.  Every other script assumes these default names.
 
@@ -81,7 +93,9 @@ This will output a `model.pickle` file in the same directory.  This model is eff
     **conware-model-optimize**
 
 For example:
-    `conware-model-optimize firmware/custom/blink`
+```bash
+conware-model-optimize firmware/custom/blink
+```
 
 6. To visualize a model we created, run:
 
@@ -89,7 +103,9 @@ For example:
 
 For example:            
      
-`conware-model-visualize -r firmware/custom/blink/model.pickle` 
+```bash
+conware-model-visualize -r firmware/custom/blink/model.pickle
+```
 
 
 Or, to run on the optimized model,
