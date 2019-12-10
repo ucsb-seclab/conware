@@ -385,8 +385,6 @@ class PeripheralModel:
 
         logger.debug("Reading from: " + str(address))
         if address not in self.current_state[1].model_per_address:
-            print(address)
-            print(type(address))
             logger.error(
                 "Could not find model for read address (%s)" % hex(address))
             return -1
@@ -427,6 +425,7 @@ class PeripheralModel:
         2. check if simple storage model in models per address
         3. BFS for valid edge
         4. If no edge found, pick edge with most instances of that address
+        //ADD SimpleStorageModel to state if we have never seen write to address
         """
 
         logger.info(
