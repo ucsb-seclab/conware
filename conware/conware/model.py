@@ -14,23 +14,23 @@ import numpy
 # from avatar2.peripherals.nucleo_usart import NucleoUSART
 
 # Pretender
-#import pretender.globals as G
+# import pretender.globals as G
 import conware.globals as G
 
-#from pretender.ground_truth.arduino_due import PeripheralMemoryMap
+# from pretender.ground_truth.arduino_due import PeripheralMemoryMap
 from conware.ground_truth.arduino_due import PeripheralMemoryMap
 
-#from pretender.logger import LogReader
+# from pretender.logger import LogReader
 from conware.tools.logger import LogReader
 
-#from pretender.cluster_peripherals import cluster_peripherals
+# from pretender.cluster_peripherals import cluster_peripherals
 from conware.cluster_peripherals import cluster_peripherals
 
-#from pretender.models.increasing import IncreasingModel
-#from pretender.models.pattern import PatternModel
+# from pretender.models.increasing import IncreasingModel
+# from pretender.models.pattern import PatternModel
 
 
-#from pretender.models.simple_storage import SimpleStorageModel
+# from pretender.models.simple_storage import SimpleStorageModel
 from conware.models.simple_storage import SimpleStorageModel
 from conware.peripheral_model import PeripheralModel
 
@@ -69,6 +69,16 @@ class PretenderModel:
 
     def __del__(self):
         self.shutdown()
+
+    def __contains__(self, peripheral):
+        """ Check to see if the given peripheral is in this model """
+        return peripheral in self.peripherals
+
+    def add_peripheral(self, peripheral):
+        """ Add a peripiheral to our list"""
+        self.peripherals.append(peripheral)
+        for addr in peripheral.addresses:
+            self.model_per_address[addr] = peripheral
 
     def shutdown(self):
         pass
@@ -111,60 +121,18 @@ class PretenderModel:
             return False
 
         # Step 1: Divide the possible addresses into peripherals
-        # self.peripheral_clusters = cluster_peripherals(
-        #     list(self.accessed_addresses))
         used_peripherals = set()
         for addr in self.accessed_addresses:
             peripheral = peripheral_memory_map.get_peripheral(addr)
             if peripheral[0] not in used_peripherals:
                 used_peripherals.add(peripheral[0])
 
-        # for p in used_peripherals:
-        #     print p
-        #
-        # logger.info("* Clusters")
-        # for x in self.peripheral_clusters:
-        #     print "%d:" % x
-        #     for y in self.peripheral_clusters[x]:
-        #         print hex(y)
-        # answer = raw_input("Do these look like reasonable clusters?[y/n]")
-        # if answer not in "Yy":
-        #     return
-
-
-        # import IPython; IPython.embed()
-        ##
-        # Step 2: Associate interrupts, their triggers, and their timings with a
-        #  peripheral
-        ##
-        # l = LogReader(filename)
-        # interrupt_mappings, interrupt_triggers, interrupt_timings, oneshots = \
-        #     self.infer_interrupt_association(l, self.peripheral_clusters)
-        # l.close()
-
-
         # Add our peripheral for each of its memory addresses
         for periph_name in peripheral_memory_map.peripheral_memory:
             if periph_name not in used_peripherals:
                 continue
-            # irq_num = None
-            # interrupt_trigger = None
-            # interrupt_timing = None
             logger.info("Packing peripheral %s" % periph_name)
-            # if periph_id in interrupt_mappings:
-            #     irq_num = interrupt_mappings[periph_id]
-            #
-            # if irq_num in interrupt_triggers:
-            #     interrupt_trigger = interrupt_triggers[irq_num]
-            #
-            # if irq_num in interrupt_timings:
-            #     interrupt_timing = interrupt_timings[irq_num]
-            # if irq_num in oneshots:
-            #     one_shot = True
-            # else:
-            #     one_shot = False
 
-            # import IPython; IPython.embed()
             addrs = peripheral_memory_map.peripheral_memory[periph_name]
             addrs = set(range(addrs[0], addrs[1]))
             peripheral = PeripheralModel(addrs,
@@ -178,7 +146,6 @@ class PretenderModel:
 
         # Pop header
         l.next()
-
 
         # First, lets just build all of our states
         for line in l:
@@ -248,7 +215,6 @@ class PretenderModel:
             self.model_per_address[address] = SimpleStorageModel()
             return True
         else:
-            # print self.model_per_address[address]
             if isinstance(self.model_per_address[address], PeripheralModel):
                 return self.model_per_address[address].write(address, size,
                                                              value)
@@ -273,8 +239,6 @@ class PretenderModel:
             print "No model found for %s, using SimpleStorageModel..." % hex(
                 address)
 
-        # print self.model_per_address[address]
-        # print self.model_per_address[address]
         if isinstance(self.model_per_address[address], PeripheralModel):
             return self.model_per_address[address].read(address, size)
         else:
@@ -290,45 +254,7 @@ class PretenderModel:
             self.__init_address(address)
             self.model_per_address[address]['model'] = SimpleStorageModel()
 
-
-
         return self.model_per_address[address]['model'].read()
-
-    def merge(self, other_model):
-
-        # Generate new peripherals, based on *all* of the observed addresses
-        pm = PretenderModel()
-        all_addresses = self.accessed_addresses | other_model.accessed_addresses
-        pm.peripheral_clusters = cluster_peripherals(list(all_addresses))
-
-        # we merge both of the peripherals into the new one
-        new_peripherals = []
-        for periph_id, periph_addrs in pm.peripheral_clusters.items():
-            # print periph_id, periph_addrs
-
-            peripheral = PeripheralModel(periph_addrs)
-
-            # Merge in this one
-            for p1 in self.peripherals:
-                peripheral.merge(p1)
-
-            # Merge in other one
-            for p2 in other_model.peripherals:
-                peripheral.merge(p2)
-
-            pm.peripherals.append(peripheral)
-            for addr in periph_addrs:
-                pm.model_per_address[addr] = peripheral
-
-        return pm
 
     def get_peripherals(self):
         return self.peripherals
-
-    def collapse_all(self):
-        logger.info("Collapsing all states")
-        for peripheral in self.peripherals:
-            # print peripheral
-            for state in peripheral.list_states():
-                # print state
-                peripheral.state_collapse(state)

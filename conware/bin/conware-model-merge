@@ -49,11 +49,18 @@ if __name__ == "__main__":
     logger.info("Importing model file (%s)..." % args.merge_model)
     merge_model = PretenderModel(filename=args.merge_model)
 
-    for peripheral in model.peripherals:
-        for peripheral2 in merge_model.peripherals:
+    for peripheral2 in merge_model.peripherals:
+
+        # Does it equal a peripheral that exists in model?
+        for peripheral in model.peripherals:
             if peripheral == peripheral2:
                 logger.info("Merging %s..." % str(peripheral.name))
                 peripheral.merge(peripheral2)
+
+        # Is this a new peripheral that we need to add?
+        if peripheral2 not in model:
+            logger.info("Adding peripheral %s..." % str(peripheral2.name))
+            model.add_peripheral(peripheral2)
 
     if args.output is None:
         merged_filename = args.model
