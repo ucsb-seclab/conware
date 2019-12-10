@@ -223,7 +223,8 @@ class PeripheralModel:
         state2 = self._get_state(state_id_2)
         if state1 == state2:
             logger.debug(
-                "%d (%s) == %d (%s)" % (state_id_1, state1, state_id_2, state2))
+                "%s (%s) == %s (%s)" % (str(state_id_1), state1,
+                                        str(state_id_2), state2))
             # Mark the nodes as equal
             self.equiv_states.append((state_id_1, state_id_2))
             # If these states are already accounted for, we don't need to
@@ -273,7 +274,8 @@ class PeripheralModel:
                         merge_set.add((e1[1], e2[1]))
             return merge_set
         else:
-
+            logger.info(
+                "%s and %s not mergable." % (str(state_id_1), str(state_id_2)))
             return False
 
     def optimize2(self):
@@ -290,7 +292,7 @@ class PeripheralModel:
                 for n2 in networkx.dfs_preorder_nodes(self.graph,
                                                       n1):
 
-                    logger.info("Comparing %d and %d" % (n1, n2))
+                    logger.info("Comparing %s and %s" % (str(n1), str(n2)))
                     if n1 == n2:
                         continue
 
@@ -316,7 +318,8 @@ class PeripheralModel:
 
                     # Did everything check out?
                     if mergable:
-                        logger.info("Merging States: %d and %d" % (n1, n2))
+                        logger.info("Merging States: %s and %s" % (str(n1),
+                                                                   str(n2)))
                         logger.debug("Equivalent nodes: %s" % self.equiv_states)
                         self._merge_states(self.equiv_states)
                         merged = True
@@ -587,11 +590,12 @@ class PeripheralModel:
                                  other_peripheral.start_state[0],
                                  other_peripheral):
             # Rename our nodes to be equivalent
-            other_peripheral.graph = networkx.relabel_nodes(other_peripheral.graph,
-                                                            self._merge_map)
+            other_peripheral.graph = networkx.relabel_nodes(
+                other_peripheral.graph,
+                self._merge_map)
 
             # Merge our graphs
-            self.graph = networkx.compose(self.graph,other_peripheral.graph)
+            self.graph = networkx.compose(self.graph, other_peripheral.graph)
 
             # Merge the nodes and edges
             for merge_node in self._merge_map:

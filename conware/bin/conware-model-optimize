@@ -7,7 +7,6 @@ import cProfile
 
 import sys
 
-
 import logging
 
 from conware.model import PretenderModel
@@ -18,16 +17,15 @@ import networkx
 
 logger = logging.getLogger(__name__)
 
-
 # Increase our recursion limit
 sys.setrecursionlimit(3000)
-
 
 if __name__ == "__main__":
     # Get user input
     parser = argparse.ArgumentParser()
-    parser.add_argument("recording_dir",
-                        help="Directory containing all of the log files.")
+    parser.add_argument("model_file",
+                        help="Path to the model file that we want to "
+                             "optimize. (e.g., model.pickle)")
     parser.add_argument("--debug", "-d", default=False, action='store_true',
                         help="Enable debug output.")
     args = parser.parse_args()
@@ -38,26 +36,23 @@ if __name__ == "__main__":
     else:
         logging.basicConfig(level=logging.INFO)
 
-    if not os.path.exists(args.recording_dir):
+    if not os.path.exists(args.model_file):
+        logger.error("Model file (%s) does not exist.", args.model_file)
         parser.print_help()
         sys.exit(0)
 
-    model_file = os.path.join(args.recording_dir, MODEL_FILE)
-    if not os.path.exists(model_file):
-        logger.error("Model file (%s) does not exist.", model_file)
-        parser.print_help()
-        sys.exit(0)
-
-    logger.info("Importing model file (%s)..." % model_file)
-    model = PretenderModel(filename=model_file)
+    logger.info("Importing model file (%s)..." % args.model_file)
+    model = PretenderModel(filename=args.model_file)
 
     for peripheral in model.peripherals:
         logger.info("Optimizing %s..." % str(peripheral.name))
 
         peripheral.optimize2()
-        #cProfile.run('peripheral.optimize2()')
+        # cProfile.run('peripheral.optimize2()')
 
-    optimized_filename = os.path.join(args.recording_dir, MODEL_FILE_OPTIMIZED)
+    optimized_filename = os.path.splitext(args.model_file)
+    optimized_filename = optimized_filename[0] + "_optimized" + \
+                         optimized_filename[1]
     logger.info("Saving optimized model to %s" % optimized_filename)
 
     model.save(optimized_filename)
