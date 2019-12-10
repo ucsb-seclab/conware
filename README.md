@@ -94,7 +94,7 @@ This will output a `model.pickle` file in the same directory.  This model is eff
 
 For example:
 ```bash
-conware-model-optimize firmware/custom/blink
+conware-model-optimize firmware/custom/blink/model.pickle
 ```
 
 6. To visualize a model we created, run:
