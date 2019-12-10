@@ -34,8 +34,11 @@ class PatternModel(MemoryModel):
         return self.__str__()
 
     def __eq__(self, other_model):
+        # Same type?
         if type(other_model) != type(self):
             return False
+
+        # Are the read patterns equal?
         if self.read_patterns[self.value][self.index] == \
                 other_model.read_patterns[other_model.value][other_model.index]:
             return True
