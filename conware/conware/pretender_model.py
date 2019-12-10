@@ -1,40 +1,23 @@
+"""
+THIS IS THE SAME AS THE OLD MODEL IN PRETENDER/PRETENDER/MODEL.PY,
+just altered to use new models (sort of)
+"""
 # Native
 import logging
 import os
-import pprint
 import pickle
-import sys
-from collections import defaultdict
-
-##THIS IS THE SAME AS THE OLD MODEL IN PRETENDER/PRETENDER/MODEL.PY,just altered to use new models (sort of)
 
 from conware.peripheral_model import PeripheralModel
 
-# Numpy
-import numpy
-
 # Avatar 2
-
 from avatar2.peripherals.nucleo_usart import NucleoUSART
 
-# Pretender
-#import pretender.globals as G
+# Conware
 import conware.globals as G
-
-#from pretender.ground_truth.arduino_due import PeripheralMemoryMap
 from conware.ground_truth.arduino_due import PeripheralMemoryMap
-
-#from pretender.logger import LogReader
 from conware.tools.logger import LogReader
-
-#from pretender.cluster_peripherals import cluster_peripherals
 from conware.cluster_peripherals import cluster_peripherals
-
-
-#from pretender.models.simple_storage import SimpleStorageModel
 from conware.models.simple_storage import SimpleStorageModel
-
-
 
 logger = logging.getLogger(__name__)
 
@@ -119,7 +102,6 @@ class PretenderModel:
             if peripheral[0] not in used_peripherals:
                 used_peripherals.add(peripheral[0])
 
-
         # Add our peripheral for each of its memory addresses
         for periph_name in peripheral_memory_map.peripheral_memory:
             if periph_name not in used_peripherals:
@@ -139,7 +121,6 @@ class PretenderModel:
 
         # Pop header
         l.next()
-
 
         # First, lets just build all of our states
         for line in l:
@@ -175,9 +156,9 @@ class PretenderModel:
             logger.info("Nodes in peripheral: " + str(peripheral.graph.nodes))
             logger.info(str(type(peripheral.graph)))
 
-        #networkx.draw(peripheral.graph)
-        #plt.savefig("first_test.png")
-        #plt.show()
+        # networkx.draw(peripheral.graph)
+        # plt.savefig("first_test.png")
+        # plt.show()
 
         for idx, peripheral in enumerate(self.peripherals):
             peripheral.train()

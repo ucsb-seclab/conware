@@ -1,16 +1,12 @@
-import atexit
+# Native
 import logging
 
-import line_profiler
+# 3rd Party
 import networkx
-# import line_profiler
-# import cProfile
 
 # Conware
 from conware.models.simple_storage import SimpleStorageModel
 from conware.peripheral_state import PeripheralModelState
-
-import copy
 
 logger = logging.getLogger(__name__)
 
@@ -30,10 +26,14 @@ class PeripheralModel:
         self.addresses = addresses
         self.name = name
         self.current_state = self.create_state(-1, "start", -1)
-        self.start_state = self.current_state
+        self.start_state = (-1, self.current_state)
         self.equiv_states = []
         self.visited = set()
         self.wildcard_edges = {}
+
+    def __eq__(self, other):
+        """ determine if two peripherals are the same """
+        return self.name == other.name and self.addresses == other.addresses
 
     def update_node_id(self):
         self.nodeID += 1
@@ -195,11 +195,11 @@ class PeripheralModel:
         for node in self.graph.nodes:
             state = self._get_state(node)
             if node == self.start_state[0]:
-                attributes[node] = {'state': state, 'label': "((%d)) %s" % (
-                    node, state)}
+                attributes[node] = {'state': state, 'label': "((%s)) %s" % (
+                    str(node), state)}
             else:
-                attributes[node] = {'state': state, 'label': "(%d) %s" % (
-                    node, state)}
+                attributes[node] = {'state': state, 'label': "(%s) %s" % (
+                    str(node), state)}
 
         networkx.set_node_attributes(self.graph, attributes)
 
@@ -229,7 +229,7 @@ class PeripheralModel:
             # If these states are already accounted for, we don't need to
             # keep traversing
             self.equiv_states.append((state_id_1, state_id_2))
-            if (state_id_1 in self.visited and state_id_2 in self.visited):
+            if state_id_1 in self.visited and state_id_2 in self.visited:
                 return merge_set
 
             # Marked the nodes as visited
@@ -291,9 +291,6 @@ class PeripheralModel:
                                                       n1):
 
                     logger.info("Comparing %d and %d" % (n1, n2))
-                    # if (n1 == 1488 and n2 == 62):
-                    #     pr = cProfile.Profile()
-                    #     pr.enable()
                     if n1 == n2:
                         continue
 
@@ -313,13 +310,6 @@ class PeripheralModel:
                         set2 = self._get_merge_constraints(x, y)
                         if set2 is False:
                             mergable = False
-                            # if (n1 == 1488 and n2 == 62):  # 1488 and 62/68/, 1531 and 170
-                            #     pr.disable()
-                            #     s = StringIO.StringIO()
-                            #     sortby = 'cumulative'
-                            #     ps = pstats.Stats(pr, stream=s).sort_stats(sortby)
-                            #     ps.print_stats()
-                            #     print s.getvalue()
                             break
                         else:
                             merge_set = merge_set.union(set2)
@@ -569,3 +559,97 @@ class PeripheralModel:
                         self.wildcard_edges[edge] = [address]
                     else:
                         self.wildcard_edges[edge].append(address)
+
+    def append_states(self, append_str):
+        """ append str to every node id """
+        # Update our states
+        for n in self.graph.nodes:
+            state = self._get_state(n)
+            state.state_id = str(n) + append_str
+        # Update start state
+        self.start_state = (str(self.start_state[0]) + append_str,
+                            self.start_state[1])
+        # Update nodes in the graph
+        self.graph = networkx.relabel_nodes(self.graph,
+                                            lambda x: str(x) + append_str)
+
+    def merge(self, other_peripheral):
+        """
+        Merge the other peripheral into this peripheral
+
+        :param other_peripheral:
+        :return:
+        """
+
+        other_peripheral.append_states("_2")
+        self._merge_map = {}
+        if self._recursive_merge(self.start_state[0],
+                                 other_peripheral.start_state[0],
+                                 other_peripheral):
+            # Rename our nodes to be equivalent
+            other_peripheral.graph = networkx.relabel_nodes(other_peripheral.graph,
+                                                            self._merge_map)
+
+            # Merge our graphs
+            self.graph = networkx.compose(self.graph,other_peripheral.graph)
+
+            # Merge the nodes and edges
+            for merge_node in self._merge_map:
+                state_id = self._merge_map[merge_node]
+
+                # Merge the states
+                state = self._get_state(state_id)
+                state2 = other_peripheral._get_state(state_id)
+                state.merge(state2)
+
+                # add all edges
+                edges2 = other_peripheral.graph.out_edges(state_id)
+                for e2 in edges2:
+                    e2_labels = other_peripheral._get_edge_labels(e2)
+                    for (address, value) in e2_labels:
+                        self._add_edge(e2[0], e2[1], address, value)
+        else:
+            logger.error("Failed to merge %s and %s" % (self, other_peripheral))
+
+        # Update labels
+        self._label_nodes()
+
+        # Update any wildcard edges
+        self._update_wildcard_edges()
+        pass
+
+    def _recursive_merge(self, state_id, state_id2, other_peripheral):
+        """
+        recursively merge every matching state from other into this peripheral
+
+        :param state_id:
+        :param state_id2:
+        :param other_peripheral:
+        :return: False if it fails
+        """
+
+        state = self._get_state(state_id)
+        state2 = other_peripheral._get_state(state_id2)
+
+        if state != state2:
+            print state, state2
+            return False
+
+        # state.merge(state2)
+        self._merge_map[state_id2] = state_id
+
+        edges = self.graph.out_edges(state_id)
+        edges2 = other_peripheral.graph.out_edges(state_id2)
+
+        rtn = True
+        for e in edges:
+            for e2 in edges2:
+                e_labels = self._get_edge_labels(e)
+                e2_labels = other_peripheral._get_edge_labels(e2)
+
+                # Do they share common edges?
+                if e_labels & e_labels:
+                    rtn &= self._recursive_merge(e[1], e2[1], other_peripheral)
+                new_edges = e2_labels - e_labels
+
+        return rtn
