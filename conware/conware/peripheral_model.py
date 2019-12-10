@@ -632,8 +632,15 @@ class PeripheralModel:
         state2 = other_peripheral._get_state(state_id2)
 
         if state != state2:
-            print state, state2
+            logger.error("%s != %s" % (state, state2))
             return False
+
+        # Have we been here before?
+        if state_id2 in self._merge_map:
+            if self._merge_map[state_id2] == state_id:
+                return True
+            else:
+                return False
 
         # state.merge(state2)
         self._merge_map[state_id2] = state_id
@@ -648,7 +655,7 @@ class PeripheralModel:
                 e2_labels = other_peripheral._get_edge_labels(e2)
 
                 # Do they share common edges?
-                if e_labels & e_labels:
+                if e_labels & e2_labels:
                     rtn &= self._recursive_merge(e[1], e2[1], other_peripheral)
                 new_edges = e2_labels - e_labels
 
