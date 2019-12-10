@@ -26,7 +26,7 @@ class PeripheralModel:
         self.addresses = addresses
         self.name = name
         self.current_state = self.create_state(-1, "start", -1)
-        self.start_state = (-1, self.current_state)
+        self.start_state = (self.current_state[0], self.current_state)
         self.equiv_states = []
         self.visited = set()
         self.wildcard_edges = {}
@@ -126,7 +126,7 @@ class PeripheralModel:
 
     def _get_state(self, state_id):
         """ Return the state given the state/node id """
-
+        #print("in _get_state, for state_id: " + str(state_id))
         return self.graph.nodes.data("state")[state_id]
 
     def _merge_states(self, equiv_states):
@@ -385,8 +385,10 @@ class PeripheralModel:
 
         logger.debug("Reading from: " + str(address))
         if address not in self.current_state[1].model_per_address:
+            print(address)
+            print(type(address))
             logger.error(
-                "Could not find model for read address (%x)" % hex(address))
+                "Could not find model for read address (%s)" % hex(address))
             return -1
 
         return self.current_state[1].model_per_address[address].read()
@@ -426,7 +428,8 @@ class PeripheralModel:
         3. BFS for valid edge
         4. If no edge found, pick edge with most instances of that address
         """
-        logger.debug(
+
+        logger.info(
             "Writing to: " + str(address) + " with value: " + str(value))
         current_state_id = self.current_state[0]
         out_edges = self.graph.edges(current_state_id)
@@ -632,8 +635,10 @@ class PeripheralModel:
         :return: False if it fails
         """
 
+
         state = self._get_state(state_id)
         state2 = other_peripheral._get_state(state_id2)
+
 
         if state != state2:
             logger.error("%s != %s" % (state, state2))
