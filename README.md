@@ -104,13 +104,13 @@ conware-model-optimize firmware/custom/blink/model.pickle
 For example:            
      
 ```bash
-conware-model-visualize -r firmware/custom/blink/model.pickle
+conware-model-visualize firmware/custom/blink/model.pickle
 ```
 
 
 Or, to run on the optimized model,
 ```bash
-conware-model-visualize -r firmware/custom/blink/model_optimized.pickle
+conware-model-visualize firmware/custom/blink/model_optimized.pickle
 ```
 
 The current version will dump SVG files, which can be opened to see the state machine. (e.g., _UART.gv.pdf_)
