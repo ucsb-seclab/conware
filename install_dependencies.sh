@@ -15,7 +15,10 @@ fi
 sudo apt-get -y install graphviz direnv
 sudo apt-get install -y libc6-dev-i386 
 
-#For graphviz to print pdf
+# Requirement for graphviz
+sudo apt-get install graphviz-dev
+
+# For graphviz to print pdf
 sudo apt-get install libcairo2-dev
 sudo apt-get install libpango1.0-dev
 
