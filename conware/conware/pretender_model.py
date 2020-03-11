@@ -203,7 +203,7 @@ class PretenderModel:
                 return self.model_per_address[address].write(address, size,
                                                              value)
             else:
-                return self.model_per_address[address].write(value)
+                return self.model_per_address[address].write(address, value)
 
     def read_memory(self, address, size):
         """
@@ -213,7 +213,7 @@ class PretenderModel:
         :param size:
         :return:
         """
-        logger.debug("Read %s %s" % (address, size))
+        logger.debug("Read %s %s" % (hex(address), size))
 
         if address not in self.model_per_address:
             logger.debug(
