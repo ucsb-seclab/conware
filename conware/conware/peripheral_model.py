@@ -26,7 +26,7 @@ class PeripheralModel:
         self.addresses = addresses
         self.name = name
         self.current_state = self.create_state(-1, "start", -1)
-        self.start_state = (self.current_state[0], self.current_state)
+        self.start_state = (self.current_state[0], self.current_state[1])
         self.equiv_states = []
         self.visited = set()
         self.wildcard_edges = {}
@@ -126,7 +126,7 @@ class PeripheralModel:
 
     def _get_state(self, state_id):
         """ Return the state given the state/node id """
-        #print("in _get_state, for state_id: " + str(state_id))
+        # print("in _get_state, for state_id: " + str(state_id))
         return self.graph.nodes.data("state")[state_id]
 
     def _merge_states(self, equiv_states):
@@ -383,13 +383,16 @@ class PeripheralModel:
 
         # Assumption: We are in correct current state and expect read address to be there
 
-        logger.debug("Reading from: " + str(address))
         if address not in self.current_state[1].model_per_address:
             logger.error(
-                "Could not find model for read address (%s)" % hex(address))
+                "%s: Could not find model for read address (%s)" % (
+                    self.name, hex(address)))
             return -1
-
-        return self.current_state[1].model_per_address[address].read()
+        value = self.current_state[1].model_per_address[address].read()
+        logger.debug("%s: Read from %s value: %s" % (self.name,
+                                                    hex(address),
+                                                    hex(value)))
+        return value
 
     def _update_state(self, new_state, address, value):
         """
@@ -428,8 +431,9 @@ class PeripheralModel:
         //ADD SimpleStorageModel to state if we have never seen write to address
         """
 
-        logger.info(
-            "Writing to: " + str(address) + " with value: " + str(value))
+        logger.debug("%s: Writing to %s with value: %s" % (self.name,
+                                                          hex(address),
+                                                          hex(value)))
         current_state_id = self.current_state[0]
         out_edges = self.graph.edges(current_state_id)
         for edge in out_edges:
@@ -634,10 +638,8 @@ class PeripheralModel:
         :return: False if it fails
         """
 
-
         state = self._get_state(state_id)
         state2 = other_peripheral._get_state(state_id2)
-
 
         if state != state2:
             logger.error("%s != %s" % (state, state2))

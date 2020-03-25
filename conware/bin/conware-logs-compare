@@ -51,7 +51,7 @@ def main(emulated, recorded):
     not_equal_count = 0
     repeat_count = 0
 
-    while idx_emulated < len(recorded_tuples) and idx_emulated < len(
+    while idx_recorded < len(recorded_tuples) and idx_emulated < len(
             emulated_tuples):
         op_emu, addr_emu, value_emu = emulated_tuples[idx_emulated]
 
