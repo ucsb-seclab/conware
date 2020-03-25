@@ -135,9 +135,13 @@ xdg-open firmware/custom/blink/model_optimized_UART.pdf
 
 For example,
 ```bash
-conware-emulate --board-config pretender/configs/due.yaml -s firmware/custom/blink/build/blink.ino.bin  -r firmware/custom/blink -t 30
+conware-emulate -s firmware/custom/blink/build/blink.ino.bin  -r firmware/custom/blink -t 30
 ```
-will run the firmware for 30 seconds in an emulator
+will run a verbatim replay model the firmware for 30 seconds in an emulator.
+Or, run the optimized model with:
+```bash
+conware-emulate -s firmware/custom/blink/build/blink.ino.bin  -r firmware/custom/blink -t 30 -m firmware/custom/blink/model_optimized.pickle 
+```
 
 ## Directory structure
 
