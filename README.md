@@ -99,7 +99,7 @@ conware-model-generate firmware/custom/blink/
 
 This will output a `model.pickle` file in the same directory.  This model is effectively a graph representation of the input file, but represented as a state machine and with memory reads represented as simple models (e.g., storage, pattern, or markov).  It has a lot of room for improvement (i.e., the point of this project)
 
-5. To optimize this model, use:  [IN PROGESS]
+5. To optimize this model, use:
 
     **conware-model-optimize**
 
@@ -125,11 +125,14 @@ conware-model-visualize firmware/custom/blink/model_optimized.pickle
 ```
 
 The current version will dump PDF files, which can be opened to see the state machine. (e.g., _UART.gv.pdf_)
-
-7. Once the model is optmized, it can be used to rehost the firmware
 ```bash
-conware-emulate
+xdg-open firmware/custom/blink/model_optimized_UART.pdf 
 ```
+
+7. Once the model is optmized, it can be used to rehost the firmware using 
+
+     **conware-emulate**
+
 For example,
 ```bash
 conware-emulate --board-config pretender/configs/due.yaml -s firmware/custom/blink/build/blink.ino.bin  -r firmware/custom/blink -t 30
