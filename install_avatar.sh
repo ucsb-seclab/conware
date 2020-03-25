@@ -30,6 +30,7 @@ sudo apt-get install gdb-multiarch
 # install openocd
 cd ../../../../
 cd openocd
+sudo apt-get install -y python-hidapi
 git checkout edb6796
 ./bootstrap
 ./configure --enable-cmsis-dap --enable-jaylink

@@ -20,6 +20,5 @@ __pycache__/
 *.a
 *.a.txt
 *build*
-avatar2-pretender
-pretender
-
+runtime/llvm-7.0.1.obj/
+runtime/llvm-7.0.1.src/
