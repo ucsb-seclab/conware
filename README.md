@@ -27,20 +27,25 @@ To optimize this model, which is the real power of conware, we execute `conware-
 **To install these and setup your environment variables run:**
   
       Be patient: *This will take a looong time...* 
+      If you have an expecially powerful machine, you can remove the **-l** parameter from ninja.  It is currently configured to be gentle on your machine.
     
 ```bash
 ./install_dependencies.sh
 ```
 
+  This will install all of the neccessary dependencies, build LLVM, and setup your local environment properly with *direnv*
+  
   3. We use of Avatar^2 (w/ OpenOCD) for our emulation framework.
 
       **Install this in a [virtualenv](https://virtualenv.pypa.io/en/latest/)**.  
+      
 For example, in fish:
 ```bash
 vf create conware
 ```
 
-      Once virtualenv is installed *and* **conware environment is created**, run:
+Once virtualenv is installed *and* **conware environment is created**, run:
+
 
 ```bash
 ./install_avatar.sh
@@ -69,13 +74,13 @@ vf create conware
    3. Execute the firmware log the data (saved a TSV file in the specified directory).  The device address is the filename in `/dev/` (e.g., ttyACM0)
 
 ```bash
-./conware/bin/conware-recorder -l <device address> <output directory>
+conware-recorder -l <device address> <output directory>
 ```
 
 For example,
 
 ```bash
-./conware/bin/conware-recorder -l ttyACM0 firmware/custom/blink/
+conware-recorder -l ttyACM0 firmware/custom/blink/
 ```
 
 This will result in a `recording.tsv` in the output directory specified.  Every other script assumes these default names.
@@ -88,7 +93,7 @@ Buffer size is defined in '/conware/runtime/arduino-1.8.8/portable/packages/ardu
 
 For example:
 
-  `conware-model-generate- r firmware/custom/blink/`
+  `conware-model-generate firmware/custom/blink/`
 
 This will output a `model.pickle` file in the same directory.  This model is effectively a graph representation of the input file, but represented as a state machine and with memory reads represented as simple models (e.g., storage, pattern, or markov).  It has a lot of room for improvement (i.e., the point of this project)
 
@@ -117,9 +122,9 @@ Or, to run on the optimized model,
 conware-model-visualize firmware/custom/blink/model_optimized.pickle
 ```
 
-The current version will dump SVG files, which can be opened to see the state machine. (e.g., _UART.gv.pdf_)
+The current version will dump PDF files, which can be opened to see the state machine. (e.g., _UART.gv.pdf_)
 
-7. Once the model is optmized, it can be used to rehost the firmware [IN PROGESS]
+7. Once the model is optmized, it can be used to rehost the firmware
 ```bash
 conware-emulate
 ```
