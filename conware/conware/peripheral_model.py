@@ -26,7 +26,7 @@ class PeripheralModel:
         self.addresses = addresses
         self.name = name
         self.current_state = self.create_state(-1, "start", -1)
-        self.start_state = (self.current_state[0], self.current_state[1])
+        self.start_state = self.current_state
         self.equiv_states = []
         self.visited = set()
         self.wildcard_edges = {}
