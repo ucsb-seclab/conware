@@ -1,5 +1,8 @@
 #!/bin/sh
 
+# First, let's get our submodules
+git submodule update --init --recursive
+
 #sudo apt-get install -y llvm>=3.8
 cd runtime 
 
@@ -32,19 +35,21 @@ if [ ! -d llvm-7.0.1.src ]; then
 	wget http://releases.llvm.org/7.0.1/cfe-7.0.1.src.tar.xz
 	tar xf llvm-7.0.1.src.tar.xz
 	tar xf cfe-7.0.1.src.tar.xz
+	rm llvm-7.0.1.src.tar.xz
+	rm llvm-7.0.1.src.tar.xz
 	mv cfe-7.0.1.src llvm-7.0.1.src/tools/clang
 fi
 
 
 mkdir -p llvm-7.0.1.obj
 cd llvm-7.0.1.obj
-cmake -G Ninja -DCMAKE_BUILD_TYPE=Debug ../llvm-7.0.1.src
+cmake -G Ninja ../llvm-7.0.1.src
 
 # This did not work on a multi-core machine (it spawned too many processes)
 #cmake --build .
 
 # capping l to 15 limited the use of multiple cores (to not tap exhaust the RAM)
-ninja -l 15
+ninja -l 1
 
 cd .. # runtime
 cd .. # back where we started
