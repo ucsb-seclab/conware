@@ -35,6 +35,10 @@ To optimize this model, which is the real power of conware, we execute `conware-
   3. We use of Avatar^2 (w/ OpenOCD) for our emulation framework.
 
       **Install this in a [virtualenv](https://virtualenv.pypa.io/en/latest/)**.  
+For example, in fish:
+```bash
+vf create conware
+```
 
       Once virtualenv is installed *and* **conware environment is created**, run:
 
