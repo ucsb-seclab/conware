@@ -93,7 +93,9 @@ Buffer size is defined in '/conware/runtime/arduino-1.8.8/portable/packages/ardu
 
 For example:
 
-  `conware-model-generate firmware/custom/blink/`
+```bash
+conware-model-generate firmware/custom/blink/
+```
 
 This will output a `model.pickle` file in the same directory.  This model is effectively a graph representation of the input file, but represented as a state machine and with memory reads represented as simple models (e.g., storage, pattern, or markov).  It has a lot of room for improvement (i.e., the point of this project)
 
