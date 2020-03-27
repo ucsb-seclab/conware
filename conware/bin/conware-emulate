@@ -52,7 +52,7 @@ def parse_args():
     parser.add_argument("--model", "-m", default=None,
                         help="Model file to load (will default to "
                              "model.pickle in the recording directory).")
-    parser.add_argument("--sample", "-s", default=sample,
+    parser.add_argument("sample", default=sample,
                         help="Binary being analyzed.")
     parser.add_argument("--gdb_port", "-g", default=gdb_port,
                         help="GDB port number.")

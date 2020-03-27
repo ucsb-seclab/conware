@@ -390,8 +390,8 @@ class PeripheralModel:
             return -1
         value = self.current_state[1].model_per_address[address].read()
         logger.debug("%s: Read from %s value: %s" % (self.name,
-                                                    hex(address),
-                                                    hex(value)))
+                                                     hex(address),
+                                                     hex(value)))
         return value
 
     def _update_state(self, new_state, address, value):
@@ -432,8 +432,8 @@ class PeripheralModel:
         """
 
         logger.debug("%s: Writing to %s with value: %s" % (self.name,
-                                                          hex(address),
-                                                          hex(value)))
+                                                           hex(address),
+                                                           hex(value)))
         current_state_id = self.current_state[0]
         out_edges = self.graph.edges(current_state_id)
         for edge in out_edges:
@@ -466,7 +466,7 @@ class PeripheralModel:
                     "simple storage!, writing to address: " + str(address))
                 return True
 
-        logger.info("Was not simple storage, starting BFS/Wildcard")
+        logger.info("%s: Was not simple storage, starting BFS/Wildcard" % self.name)
         # otherwise start BFS
         target_edges = list(
             networkx.edge_bfs(self.graph, source=self.current_state[0]))
@@ -493,7 +493,7 @@ class PeripheralModel:
                 return True
 
         logger.info(
-            "No matching edge!, picking edge with most writes to target addresss")
+            "%s: No matching edge!, picking edge with most writes to target address" % self.name)
         # If we dont find value for address, look at all edges, with writes to that address, pick the one that has it the most times
         picked_edge = ((None, None), 0)  # (edge, addresscount)
         all_edges = self.graph.edges
@@ -505,6 +505,13 @@ class PeripheralModel:
                     addr_count += 1
             if addr_count > picked_edge[1]:
                 picked_edge = (edge, addr_count)
+
+        if picked_edge == ((None, None), 0):
+            logger.error("%s: We could not find any state where this write was seen before (%s, %s)" % (self.name,
+                                                                                                        hex(address),
+                                                                                                        hex(value)))
+            return False
+
         self.current_state = (
             picked_edge[0][1], self.graph.nodes[picked_edge[0][1]]["state"])
         logger.info("Picked edge: " + str(picked_edge[0]))
