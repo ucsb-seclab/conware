@@ -128,6 +128,10 @@ The current version will dump PDF files, which can be opened to see the state ma
 ```bash
 xdg-open firmware/custom/blink/model_optimized_UART.pdf 
 ```
+To view the output files, we use *qpdfview*:
+```bash
+qpdfview firmware/custom/blink/model_optimized*.pdf
+```
 
 7. Once the model is optmized, it can be used to rehost the firmware using 
 
@@ -142,6 +146,22 @@ Or, run the optimized model with:
 ```bash
 conware-emulate -s firmware/custom/blink/build/blink.ino.bin  -r firmware/custom/blink -t 30 -m firmware/custom/blink/model_optimized.pickle 
 ```
+
+Conware also offers the ability *merge* models (before optimization) using
+
+      **conware-model-merge**
+      
+For example,
+```bash
+conware-model-merge firmware/custom/knock/model.pickle firmware/custom/irremote/model.pickle -o merged/merged.pickle
+```
+will create a new model, which is a combination of the two, and save it as merged.pickle.
+This model can then be optimized into a general form as well
+```bash
+conware-model-optimize merged/merged.pickle
+```
+and this merged, optimized model can be used to emulate *either* of the original firmware binaries.
+
 
 ## Directory structure
 
