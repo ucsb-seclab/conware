@@ -83,6 +83,7 @@ VPATH+=$(CMSIS_CHIP_PATH)/source/
 VPATH+=$(CMSIS_CHIP_PATH)/source/gcc
 
 INCLUDES = -I$(PROJECT_BASE_PATH)
+INCLUDES += -I../../../../../../tools/arm-none-eabi-gcc/4.8.3-2014q1/arm-none-eabi/include/
 INCLUDES += -I$(PROJECT_BASE_PATH)/include
 INCLUDES += -I$(CMSIS_ARM_PATH)
 INCLUDES += -I$(CMSIS_ATMEL_PATH)
