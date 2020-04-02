@@ -520,10 +520,11 @@ class PeripheralModel:
         return True
 
         # This address has never been written to, do nothing
+        # TODO: Create a new state on the fly
         logger.error("%s: We couldn't find a transition matching that address "
                      "and value: %s : %s" % (self.name, hex(address),
                                              str(value)))
-        return False
+        return True
 
     def _update_wildcard_edges(self, threshold=5):
         """

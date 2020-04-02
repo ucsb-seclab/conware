@@ -5,6 +5,7 @@ memory_map:
     rom: {"base" : 0x00080000, "size" : 0x00080000,  "forwarded" : false}
     ram: {"base" : 0x20000000, "size" : 0x100000,  "forwarded" : false}
     mmio: {"base" : 0x40000000, "size" : 0x20000000,  "forwarded" : true}
+#    nvic: {"base" : 0xE000E100, "size" : 0x00000008,  "forwarded" : true}
 #    other: {"base" : 0xE0000000, "size" : 0x10000000, "forwarded" : true}
 ignore_irqs: [15]
 uart:

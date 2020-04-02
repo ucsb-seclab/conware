@@ -11,6 +11,7 @@ echo "LLVM passes built successfully!"
 
 cd ./runtime/arduino-1.8.8/portable/packages/arduino/hardware/sam/1.6.11/system/libsam/build_gcc
 make clean
+rm *.i *.s *.bc
 make -f Makefile.clang || { echo 'Failed to build Arduino SAM' ; exit 1; }
 cd $root
 echo "Arduino SAM built successfully!"

@@ -33,7 +33,7 @@ if __name__ == "__main__":
         sys.exit(1)
 
     bin_name = os.path.basename(args.project_path.strip("/")) + ".ino.bin"
-    build_dir = "build"
+    build_dir = "build_instrumented"
     binary_filename = os.path.abspath(os.path.join(args.project_path, build_dir,
                                           bin_name))
     if not os.path.exists(binary_filename):

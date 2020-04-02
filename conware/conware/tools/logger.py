@@ -17,7 +17,9 @@ class LogWriter(PretenderLog):
     Write CSV logs in our standard format
     """
 
-    def __init__(self, filename):
+    def __init__(self, filename, buffer=True):
+        if not buffer:
+            self.csvfile = open(filename, 'wb', 0)  # 0 for no buffer
         self.csvfile = open(filename, 'wb')
         self.writer = csv.writer(self.csvfile, delimiter='\t',
                                  quotechar='|', quoting=csv.QUOTE_MINIMAL)

@@ -82,6 +82,7 @@ class PatternModel(MemoryModel):
 
     def read(self):
         idx = self.count % len(self.read_patterns[self.value][self.index])
+        logger.debug("Read %d of %d" % (idx, len(self.read_patterns[self.value][self.index])))
         self.count += 1
         return self.read_patterns[self.value][self.index][idx]
 

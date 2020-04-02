@@ -11,7 +11,7 @@ SCRIPTPATH=`dirname $SCRIPT`
 INO_PATH=`realpath $1`
 INO_NAME=`basename $1`
 INO_FILE="$INO_PATH/$INO_NAME.ino"
-BUILD_PATH="$INO_PATH/build"
+BUILD_PATH="$INO_PATH/build_instrumented"
 tmpbuild="/tmp/conware_build"
 echo "$tmpbuild $BUILD_PATH"
 echo "Instrumeting $INFO_FILE and storing output in $BUILD_PATH..."
