@@ -32,6 +32,7 @@ namespace Conware {
         Value *writeStr;
         Function *targetPrintFunction;
         Function *targetLogFunction;
+        Function *targetInterruptLogFunction;
 
         /***
          * Get pointer to the print function that should be called.
@@ -39,6 +40,7 @@ namespace Conware {
          */
         Function* getPrintfFunction();
         Function* getLogFunction();
+        Function* getInterruptLogFunction();
 
         /***
          * Get the format string to be used to print reads to the MMIO regions.
@@ -76,6 +78,7 @@ namespace Conware {
             this->writeStr = nullptr;
             this->targetPrintFunction = nullptr;
             this->targetLogFunction = nullptr;
+            this->targetInterruptLogFunction = nullptr;
 
         }
 
@@ -94,6 +97,16 @@ namespace Conware {
          * @return True if everything is fine.
          */
         bool instrumentStore(StoreInst *targetInstr);
+
+        /***
+         * Instrument the interrupt handler function to insert the logging function at the beginning.
+         *
+         * @param intHandlerFunc Interrupt handler function.
+         * @param intNum Interrupt number
+         *
+         * @return Return true if we instrument it.
+         */
+        bool instrumentInterruptHandler(Function *intHandlerFunc, unsigned intNum);
 
         bool instrumentCommonInstr(Instruction *targetInstr);
 

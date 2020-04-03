@@ -7,6 +7,7 @@
 #define STORAGE_SIZE 3000
 #define READ 0
 #define WRITE 1
+#define INTERRUPT 2
 
 unsigned int MAX_REPEATS = 0xefff;
 unsigned int CURRENT_INDEX = 0;
@@ -19,6 +20,8 @@ bool RECORD_OPERATION[STORAGE_SIZE];
 unsigned int RECORD_REPEATED[STORAGE_SIZE];
 
 bool PRINTING = false;
+
+static void conware_common_log(void *address, unsigned int value, unsigned int operation, bool isInt);
 
 /**
  * Print the results out over UART (or whatever the default printf is)
@@ -51,29 +54,37 @@ void conware_print_results()
     // TODO: Re-enabled interrupts
 }
 
-/**
- *  Log read, write, and interrupt access to memory
- * 
- *  Operation:
- *      Read: 0
- *      Write: 1
- *      Interrupt: 2
- * 
- */
-void conware_log(void *address, unsigned int value, unsigned int operation)
-{
-    // Only instrument MMIO
-    if (address < (void *)0x40000000 || address > (void *)(0x40000000 + 0x20000000))
+static void conware_common_log(void *address, unsigned int value, unsigned int operation, bool isInt) {
+    bool print_results = CURRENT_INDEX >= STORAGE_SIZE;
+    if (print_results) {
+        conware_print_results();
+    }
+    // log is full
+    if (CURRENT_INDEX >= STORAGE_SIZE) {
         return;
-
-    // Don't log ourselves when we are printing
-    if (PRINTING)
-        return;
-
-    if (CURRENT_INDEX < STORAGE_SIZE)
-    {
+    }
+    // if this is an interrupt?
+    if (isInt) {
+        int last_entry_idx = CURRENT_INDEX - 1;
+        bool newE = true;
+        if (last_entry_idx >=0) {
+            if (RECORD_ADDRESS[last_entry_idx] == address) {
+                RECORD_REPEATED[last_entry_idx]++;
+                newE = false;
+            }
+        }
+    
+        if (newE) {
+            RECORD_ADDRESS[CURRENT_INDEX] = address;
+            RECORD_VALUE[CURRENT_INDEX] = 1;
+            RECORD_REPEATED[CURRENT_INDEX] = 0;
+            RECORD_OPERATION[CURRENT_INDEX] = operation;
+            CURRENT_INDEX++;
+        }
+    } else {
+        // this is not an interrupt
         // Did we already see this write and just need to update the repeat counter?
-
+    
         // for (int x = LAST_WRITE; x < CURRENT_INDEX; x++)
         if (CURRENT_INDEX > LAST_WRITE)
         {
@@ -105,19 +116,44 @@ void conware_log(void *address, unsigned int value, unsigned int operation)
         RECORD_OPERATION[CURRENT_INDEX] = operation;
         // RECORD_PC[CURRENT_INDEX] = __builtin_return_address(0);
         RECORD_REPEATED[CURRENT_INDEX] = 0;
-
+    
         // Keep track of our last write for optimization
         if (operation == WRITE)
         {
             LAST_WRITE = CURRENT_INDEX;
         }
-
+    
         CURRENT_INDEX++;
     }
-    else
-    {
-        conware_print_results();
-    }
+}
+
+int conware_interrupt_log(unsigned intN) {
+    // Don't log ourselves when we are printing
+    if (PRINTING)
+        return;
+    conware_common_log((void*)intN, 1, INTERRUPT, true);
+}
+
+/**
+ *  Log read, write, and interrupt access to memory
+ * 
+ *  Operation:
+ *      Read: 0
+ *      Write: 1
+ *      Interrupt: 2
+ * 
+ */
+void conware_log(void *address, unsigned int value, unsigned int operation)
+{
+    // Only instrument MMIO
+    if (address < (void *)0x40000000 || address > (void *)(0x40000000 + 0x20000000))
+        return;
+
+    // Don't log ourselves when we are printing
+    if (PRINTING)
+        return;
+        
+    conware_common_log(address, value, operation, false);
 }
 
 void conware_interrupt_enter(unsigned int address, unsigned int value)

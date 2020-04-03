@@ -36,6 +36,21 @@ Function* InstrumentationHelper::getLogFunction() {
     return this->targetLogFunction;
 }
 
+Function* InstrumentationHelper::getInterruptLogFunction() {
+    if(this->targetInterruptLogFunction == nullptr) {
+        FunctionType *conware_int_log_type =
+            TypeBuilder<int(unsigned), false>::get(this->targetCtx);
+
+        Function *func = cast<Function>(this->targetModule.getOrInsertFunction("conware_interrupt_log",
+                                        conware_int_log_type));
+
+        func->setCallingConv(CallingConv::ARM_AAPCS);
+
+        this->targetInterruptLogFunction = func;
+    }
+    return this->targetInterruptLogFunction;
+}
+
 Value* InstrumentationHelper::getReadPrintString() {
     if(this->readStr == nullptr) {
         Constant *strConstant = ConstantDataArray::getString(this->targetCtx, "Read: from MMIO Address");
@@ -131,6 +146,24 @@ bool InstrumentationHelper::instrumentStore(StoreInst *targetInstr) {
     }
     return retVal;
 
+}
+
+bool InstrumentationHelper::instrumentInterruptHandler(Function *intHandlerFunc, unsigned intNum) {
+    bool retVal = true;
+    try{
+        Instruction *lastInstr = intHandlerFunc->getEntryBlock().getTerminator();
+        IRBuilder<> builder(lastInstr);
+        // get the log function
+        Function *intLogFunc = this->getInterruptLogFunction();
+
+        ConstantInt *writeValue = ConstantInt::get(IntegerType::getInt32Ty(this->targetCtx), intNum);
+        builder.CreateCall(intLogFunc, {writeValue});
+    } catch (const std::exception& e) {
+      dbgs() << "[?] Error occurred while trying to instrument interrupt handler:" << e.what()
+             << " at function:" << intHandlerFunc->getName() << "\n";
+      retVal = false;
+    }
+    return retVal;
 }
 
 bool InstrumentationHelper::instrumentCommonInstr(Instruction *targetInstr) {

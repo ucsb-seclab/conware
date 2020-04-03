@@ -67,7 +67,8 @@ namespace Conware {
             {"TWI1_Handler",39},
             {"SPI0_Handler",40},
             {"SSC_Handler",42},
-            {"TC0_Handler",43},
+            // disable logging interrupts for default timers
+            /*{"TC0_Handler",43},
             {"TC1_Handler",44},
             {"TC2_Handler",45},
             {"TC3_Handler",46},
@@ -75,7 +76,7 @@ namespace Conware {
             {"TC5_Handler",48},
             {"TC6_Handler",49},
             {"TC7_Handler",50},
-            {"TC8_Handler",51},
+            {"TC8_Handler",51},*/
             {"PWM_Handler",52},
             {"ADC_Handler",53},
             {"DACC_Handler",54},
@@ -209,6 +210,14 @@ namespace Conware {
             }
 
             if(currFunc.hasName() && currFunc.getName() == "delay" || true) {
+                if (currFunc.hasName()) {
+                    std::string funcName = currFunc.getName();
+                    // is this an ISR function?
+                    if (isrFunctionList.find(funcName) != isrFunctionList.end()) {
+                        // instrument the ISR function
+                        retVal = MMIOLoggerPass::currInstrHelper->instrumentInterruptHandler(&currFunc, isrFunctionList[funcName]) || retVal;
+                    }
+                }
                 for (auto &currBB: currFunc) {
                     for (auto &currIns: currBB) {
                         Instruction *currInstrPtr = &currIns;
