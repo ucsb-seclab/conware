@@ -45,8 +45,6 @@ if __name__ == "__main__":
     model = PretenderModel(filename=args.model_file)
 
     for peripheral in model.peripherals:
-        if peripheral.name != "PIOD":
-            continue
         logger.info("Optimizing %s..." % str(peripheral.name))
 
         peripheral.optimize2()
