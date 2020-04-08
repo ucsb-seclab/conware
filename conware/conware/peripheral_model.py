@@ -263,7 +263,6 @@ class PeripheralModel:
             edges_2 = self.graph.out_edges(state_id_2)
 
             # Figure out any shared edges
-            rtn = True
             for e2 in equiv_edges:
                 e2_labels = self._get_edge_labels(e2)
                 # Check all outgoing edges for node 1
@@ -271,7 +270,9 @@ class PeripheralModel:
                     e1_labels = self._get_edge_labels(e1)
                     # Do we have a duplicate edge (i.e., state transition)
                     if e1_labels & e2_labels:
-                        merge_set.add((e1[1], e2[1]))
+                        # Only add if they haven't already been visited
+                        if e1[1] not in self.visited and e2[1] not in self.visited:
+                            merge_set.add((e1[1], e2[1]))
 
                 # Check all outgoing edges for node 2
                 for e1 in edges_2:
