@@ -46,6 +46,9 @@ class PeripheralModelState:
         # return ":".join([str(x) for x in sorted(self.merged_states)]) + " " + \
         return "#%d " % len(self.merged_states) + ",".join(models)
 
+    def __repr__(self):
+        return self.__str__()
+
     def __ne__(self, other_state):
         """ See if they are NOT equal """
         return not (self == other_state)

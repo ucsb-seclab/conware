@@ -31,6 +31,13 @@ class PeripheralModel:
         self.visited = set()
         self.wildcard_edges = {}
 
+    def __str__(self):
+        """ Return a nice readable string """
+        return "%s: %s" % (self.name, self.current_state)
+
+    def __repr__(self):
+        return self.__str__()
+
     def __eq__(self, other):
         """ determine if two peripherals are the same """
         return self.name == other.name and self.addresses == other.addresses
