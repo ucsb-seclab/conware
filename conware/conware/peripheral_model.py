@@ -299,7 +299,7 @@ class PeripheralModel:
                 for n2 in networkx.dfs_preorder_nodes(self.graph,
                                                       n1):
 
-                    logger.info("Comparing %s and %s" % (str(n1), str(n2)))
+                    logger.info("%s: Comparing %s and %s" % (self.name, str(n1), str(n2)))
                     if n1 == n2:
                         continue
 
@@ -468,7 +468,7 @@ class PeripheralModel:
             if (type(self.current_state[1].model_per_address[
                          address]) is SimpleStorageModel):
                 # if it is a simple storage model then just write to the address
-                self.current_state[1].model_per_address[address].write(value)
+                self.current_state[1].model_per_address[address].write(address, value)
                 logger.info(
                     "simple storage!, writing to address: " + str(address))
                 return True
@@ -523,7 +523,7 @@ class PeripheralModel:
             picked_edge[0][1], self.graph.nodes[picked_edge[0][1]]["state"])
         logger.info("Picked edge: " + str(picked_edge[0]))
         if address in self.current_state[1].model_per_address:
-            self.current_state[1].model_per_address[address].write(value)
+            self.current_state[1].model_per_address[address].write(address, value)
         return True
 
         # This address has never been written to, do nothing

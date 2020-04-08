@@ -21,7 +21,8 @@ class PeripheralModelState:
     def __init__(self, address, operation, value, state_id):
         self.state_id = state_id
         self.name = "%s:%s:%#x" % (operation, hex(address), value)
-        # self.operation = operation
+        self.operation = operation
+        self.address = address
         self.value = value
         self.reads = {}
         self.read_count = {}
@@ -66,19 +67,25 @@ class PeripheralModelState:
         #         return False
         return True
 
-    def _train_model(self, read_log, use_time_domain=True):
+    def _train_model(self, address, read_log, use_time_domain=True):
         if len(read_log) == 0:
             return None
 
         # Check if just storage
+        # Either this is the address that is on the incoming write edge, and the read value is always the write value,
+        # or it always reads the same exact value
         storage = True
+        last_value = None
         for val, pc, size, timestamp in read_log:
-            if int(val) != int(self.value):
+            if self.address == address and int(val) != int(self.value):
                 storage = False
-            else:
-                logger.info("Found Storage!! %d == %d" % (val,
-                                                          self.value))
-        if storage:
+                break
+            if last_value is not None and last_value != int(val):
+                storage = False
+                break
+            last_value = int(val)
+
+        if storage or len(read_log) == 1 :
             m = SimpleStorageModel(self.value)
             m.train(read_log)
             logger.debug("State %s is StorageModel" % self.state_id)
@@ -128,7 +135,7 @@ class PeripheralModelState:
             #     self.model_per_address_ordered[address][read_count] = m
 
             # Set Model for unordered reads
-            m = self._train_model(combined_reads)
+            m = self._train_model(address, combined_reads)
             self.model_per_address[address] = m
 
     def reset(self):
