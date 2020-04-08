@@ -2,7 +2,7 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-#from pretender.models import MemoryModel
+# from pretender.models import MemoryModel
 from conware.models import MemoryModel
 
 
@@ -38,8 +38,8 @@ class SimpleStorageModel(MemoryModel):
             if same_log_merge:
                 if self.init_timestamp > other_model.init_timestamp:
                     self.value = other_model.init_timestamp
-
-            self.value = 0
+            else:
+                self.value = 0
 
         return True
 
@@ -58,6 +58,11 @@ class SimpleStorageModel(MemoryModel):
         :return:
         """
 
+        # If there is only ever a read, let's assume storage
+        # It's safer than pattern, and also more likely to be a register with an initialized value, than a static value
+        # TODO: Potentially parse the entire log
+        if len(log) == 1 and log[0][0] == 'READ':
+            return True
         # If it's only a read/write, let's assume its a storage config register
         if len(log) == 2 and log[0][0] == 'READ' and log[1][0] == 'WRITE':
             return True
