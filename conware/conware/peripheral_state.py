@@ -20,8 +20,12 @@ class PeripheralModelState:
 
     def __init__(self, address, operation, value, state_id):
         self.state_id = state_id
-        self.name = "%s:%s:%#x" % (operation, hex(address), value)
-        # self.operation = operation
+        if address is not None and value is not None:
+            self.name = "%s:%s:%#x" % (operation, hex(address), value)
+        else:
+            self.name = operation
+        self.operation = operation
+        self.address = address
         self.value = value
         self.reads = {}
         self.read_count = {}
@@ -46,6 +50,9 @@ class PeripheralModelState:
         # return ":".join([str(x) for x in sorted(self.merged_states)]) + " " + \
         return "#%d " % len(self.merged_states) + ",".join(models)
 
+    def __repr__(self):
+        return self.__str__()
+
     def __ne__(self, other_state):
         """ See if they are NOT equal """
         return not (self == other_state)
@@ -63,18 +70,24 @@ class PeripheralModelState:
         #         return False
         return True
 
-    def _train_model(self, read_log, use_time_domain=True):
+    def _train_model(self, address, read_log, use_time_domain=True):
         if len(read_log) == 0:
             return None
 
         # Check if just storage
+        # It's storage if the value always equals the write value that created this state,
+        # or this in the "start" state, which has self.value = None
         storage = True
+        last_value = None
         for val, pc, size, timestamp in read_log:
-            if int(val) != int(self.value):
+            if (address != self.address or int(val) != int(self.value)) and self.value is not None:
                 storage = False
-            else:
-                logger.info("Found Storage!! %d == %d" % (val,
-                                                          self.value))
+                break
+            if self.value is None and last_value is not None and last_value != int(val):
+                storage = False
+                break
+            last_value = int(val)
+
         if storage:
             m = SimpleStorageModel(self.value)
             m.train(read_log)
@@ -125,7 +138,7 @@ class PeripheralModelState:
             #     self.model_per_address_ordered[address][read_count] = m
 
             # Set Model for unordered reads
-            m = self._train_model(combined_reads)
+            m = self._train_model(address, combined_reads)
             self.model_per_address[address] = m
 
     def reset(self):
