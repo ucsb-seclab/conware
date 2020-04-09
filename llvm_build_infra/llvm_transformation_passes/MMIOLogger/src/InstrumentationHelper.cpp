@@ -152,7 +152,9 @@ bool InstrumentationHelper::instrumentInterruptHandler(Function *intHandlerFunc,
     bool retVal = true;
     try{
         Instruction *lastInstr = intHandlerFunc->getEntryBlock().getTerminator();
-        IRBuilder<> builder(lastInstr);
+        auto iter = lastInstr->getIterator();
+        iter--;
+        IRBuilder<> builder(iter);
         // get the log function
         Function *intLogFunc = this->getInterruptLogFunction();
 
