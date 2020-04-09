@@ -10,7 +10,6 @@ import sys
 
 from conware.hardware import Arduino
 
-
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.DEBUG)
 
@@ -25,6 +24,8 @@ if __name__ == "__main__":
                         help='Programmer location in /dev (e.g., '
                              'ttyACM0)',
                         default="ttyACM0")
+    parser.add_argument('-c', action='store', dest='count', type=int, default=1,
+                        help="How many dumps do we want to record?")
 
     args = parser.parse_args()
 
@@ -35,7 +36,7 @@ if __name__ == "__main__":
     bin_name = os.path.basename(args.project_path.strip("/")) + ".ino.bin"
     build_dir = "build_instrumented"
     binary_filename = os.path.abspath(os.path.join(args.project_path, build_dir,
-                                          bin_name))
+                                                   bin_name))
     if not os.path.exists(binary_filename):
         print("ERROR: Binary file (%s) does not exist." % binary_filename)
         sys.exit(1)
@@ -43,6 +44,6 @@ if __name__ == "__main__":
     log_filename = os.path.join(args.project_path, "recording.tsv")
     due = Arduino(args.location)
     due.upload_binary(binary_filename)
-    due.log_data(log_filename)
+    due.log_data(log_filename, count=args.count)
 
     print "Done."
