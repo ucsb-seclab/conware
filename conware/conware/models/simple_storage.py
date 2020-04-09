@@ -30,7 +30,7 @@ class SimpleStorageModel(MemoryModel):
 
     def merge(self, other_model, same_log_merge=True):
         if type(other_model) != type(self):
-            logger.debug("Tried to merge two models that aren't the same (%s "
+            logger.error("Tried to merge two models that aren't the same (%s "
                          "!= %s)" % (type(other_model), type(self)))
             return False
 
