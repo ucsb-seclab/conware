@@ -25,11 +25,20 @@ class PeripheralModel:
         self.graph = networkx.DiGraph()
         self.addresses = addresses
         self.name = name
-        self.current_state = self.create_state(-1, "start", -1)
+        self.node_states = {}
+        self.current_state = self.create_state(operation=
+                                               "start")
         self.start_state = self.current_state
         self.equiv_states = []
         self.visited = set()
         self.wildcard_edges = {}
+
+    def __str__(self):
+        """ Return a nice readable string """
+        return "%s: %s" % (self.name, self.current_state)
+
+    def __repr__(self):
+        return self.__str__()
 
     def __eq__(self, other):
         """ determine if two peripherals are the same """
@@ -52,6 +61,7 @@ class PeripheralModel:
             state.state_id = new_state_id
 
         attributes = {new_state_id: {'state': state}}
+        self.node_states[new_state_id] = state
 
         # create state
         # check for state existence?
@@ -127,7 +137,8 @@ class PeripheralModel:
     def _get_state(self, state_id):
         """ Return the state given the state/node id """
         # print("in _get_state, for state_id: " + str(state_id))
-        return self.graph.nodes.data("state")[state_id]
+        return self.node_states[state_id]
+        # return self.graph.nodes[state_id]["state"]
 
     def _merge_states(self, equiv_states):
         """
@@ -177,7 +188,7 @@ class PeripheralModel:
                                        address=address, value=value)
                 else:
                     # Self reference
-                    logger.info("Adding self reference for %d" % new_state_id)
+                    logger.info("%s: Adding self reference for %d" % (self.name, new_state_id))
                     for (address, value) in tuples:
                         self._add_edge(new_state_id, new_state_id,
                                        address=address, value=value)
@@ -256,7 +267,6 @@ class PeripheralModel:
             edges_2 = self.graph.out_edges(state_id_2)
 
             # Figure out any shared edges
-            rtn = True
             for e2 in equiv_edges:
                 e2_labels = self._get_edge_labels(e2)
                 # Check all outgoing edges for node 1
@@ -264,7 +274,9 @@ class PeripheralModel:
                     e1_labels = self._get_edge_labels(e1)
                     # Do we have a duplicate edge (i.e., state transition)
                     if e1_labels & e2_labels:
-                        merge_set.add((e1[1], e2[1]))
+                        # Only add if they haven't already been visited
+                        if e1[1] not in self.visited and e2[1] not in self.visited:
+                            merge_set.add((e1[1], e2[1]))
 
                 # Check all outgoing edges for node 2
                 for e1 in edges_2:
@@ -274,7 +286,7 @@ class PeripheralModel:
                         merge_set.add((e1[1], e2[1]))
             return merge_set
         else:
-            logger.info(
+            logger.debug(
                 "%s and %s not mergable." % (str(state_id_1), str(state_id_2)))
             return False
 
@@ -285,22 +297,33 @@ class PeripheralModel:
         :return:
         """
         merged = True
+
+        # TODO: Do better caching with equivalence classes?
+        checked = set()
         while merged:
             merged = False
+
+            # TODO: Figure out a more efficient way to do this, potentially with some caching of equivalence classes?
             for n1 in networkx.dfs_preorder_nodes(self.graph,
                                                   self.start_state[0]):
                 for n2 in networkx.dfs_preorder_nodes(self.graph,
                                                       n1):
 
-                    logger.info("Comparing %s and %s" % (str(n1), str(n2)))
+                    if (n1, n2) in checked:
+                        continue
+
+                    logger.debug("%s: Comparing %s and %s" % (self.name, str(n1), str(n2)))
                     if n1 == n2:
                         continue
 
                     self.equiv_states = []
                     self.visited = set()
 
+                    # Get a set of all of the nodes that must also be equal
                     merge_set = self._get_merge_constraints(n1, n2)
+                    checked.add((n1, n2))
 
+                    # These two nodes are not even equal to start with, no reason to attempt a merge
                     if merge_set is False:
                         continue
 
@@ -461,7 +484,7 @@ class PeripheralModel:
             if (type(self.current_state[1].model_per_address[
                          address]) is SimpleStorageModel):
                 # if it is a simple storage model then just write to the address
-                self.current_state[1].model_per_address[address].write(value)
+                self.current_state[1].model_per_address[address].write(address, value)
                 logger.info(
                     "simple storage!, writing to address: " + str(address))
                 return True
@@ -510,17 +533,18 @@ class PeripheralModel:
             logger.error("%s: We could not find any state where this write was seen before (%s, %s)" % (self.name,
                                                                                                         hex(address),
                                                                                                         hex(value)))
-            return False
+            # TODO: Do something smarter, create a new state on the fly?
+            return True
 
         self.current_state = (
             picked_edge[0][1], self.graph.nodes[picked_edge[0][1]]["state"])
         logger.info("Picked edge: " + str(picked_edge[0]))
         if address in self.current_state[1].model_per_address:
-            self.current_state[1].model_per_address[address].write(value)
+            self.current_state[1].model_per_address[address].write(address, value)
         return True
 
         # This address has never been written to, do nothing
-        # TODO: Create a new state on the fly
+        # TODO: Do something smarter, Create a new state on the fly?
         logger.error("%s: We couldn't find a transition matching that address "
                      "and value: %s : %s" % (self.name, hex(address),
                                              str(value)))

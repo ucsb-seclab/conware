@@ -4,21 +4,24 @@
 #include <stdio.h>
 #include <stdbool.h>
 
-#define STORAGE_SIZE 3000
+#define STORAGE_SIZE 5000
 #define READ 0
 #define WRITE 1
+#define INTERRUPT 2
 
 unsigned int MAX_REPEATS = 0xefff;
 unsigned int CURRENT_INDEX = 0;
 unsigned int LAST_WRITE = 0;
 // unsigned int *RECORD_TIME[STORAGE_SIZE];
 void *RECORD_ADDRESS[STORAGE_SIZE];
-// void *RECORD_PC[STORAGE_SIZE];
+void *RECORD_PC[STORAGE_SIZE];
 unsigned int RECORD_VALUE[STORAGE_SIZE];
-bool RECORD_OPERATION[STORAGE_SIZE];
+unsigned char RECORD_OPERATION[STORAGE_SIZE];
 unsigned int RECORD_REPEATED[STORAGE_SIZE];
 
 bool PRINTING = false;
+
+static void conware_common_log(void *address, unsigned int value, unsigned int operation);
 
 /**
  * Print the results out over UART (or whatever the default printf is)
@@ -35,12 +38,12 @@ void conware_print_results()
     {
         //        iprintf("%d\t%d\t%d\t%08X\t%08x\n\r", x, RECORD_TIME[x], RECORD_OPERATION[x], RECORD_ADDRESS[x], RECORD_VALUE[x]);
         //format: ['Operation', 'Seqn', 'Address', 'Value', 'Value (Model)', 'PC', 'Size', 'Timestamp', 'Model']
-        iprintf("%d\t%d\t%08x\t%08x\t\t0\t4\t0\t\t%d\n\r",
+        iprintf("%d\t%d\t%08p\t%08x\t\t%08p\t4\t0\t\t%d\n\r",
                 RECORD_OPERATION[x],
                 x,
                 RECORD_ADDRESS[x],
                 RECORD_VALUE[x],
-                //RECORD_PC[x],
+                RECORD_PC[x],
                 //RECORD_TIME[x],
                 RECORD_REPEATED[x]);
     }
@@ -51,33 +54,52 @@ void conware_print_results()
     // TODO: Re-enabled interrupts
 }
 
-/**
- *  Log read, write, and interrupt access to memory
- * 
- *  Operation:
- *      Read: 0
- *      Write: 1
- *      Interrupt: 2
- * 
- */
-void conware_log(void *address, unsigned int value, unsigned int operation)
+static void conware_common_log(void *address, unsigned int value, unsigned int operation)
 {
-    // Only instrument MMIO
-    if (address < (void *)0x40000000 || address > (void *)(0x40000000 + 0x20000000))
-        return;
-
-    // Don't log ourselves when we are printing
-    if (PRINTING)
-        return;
-
-    if (CURRENT_INDEX < STORAGE_SIZE)
+    bool print_results = CURRENT_INDEX >= STORAGE_SIZE;
+    if (print_results)
     {
+        conware_print_results();
+    }
+    // log is full
+    if (CURRENT_INDEX >= STORAGE_SIZE)
+    {
+        return;
+    }
+    // if this is an interrupt?
+    if (operation == INTERRUPT)
+    {
+        int last_entry_idx = CURRENT_INDEX - 1;
+        bool newE = true;
+        if (last_entry_idx >= 0)
+        {
+            if (RECORD_ADDRESS[last_entry_idx] == address &&
+                RECORD_OPERATION[last_entry_idx] == operation)
+            {
+                RECORD_REPEATED[last_entry_idx]++;
+                newE = false;
+            }
+        }
+
+        if (newE)
+        {
+            RECORD_ADDRESS[CURRENT_INDEX] = address;
+            RECORD_VALUE[CURRENT_INDEX] = value;
+            RECORD_REPEATED[CURRENT_INDEX] = 0;
+            RECORD_OPERATION[CURRENT_INDEX] = operation;
+            RECORD_PC[CURRENT_INDEX] = __builtin_return_address(0);
+            CURRENT_INDEX++;
+        }
+    }
+    else
+    {
+        // this is not an interrupt
         // Did we already see this write and just need to update the repeat counter?
 
         // for (int x = LAST_WRITE; x < CURRENT_INDEX; x++)
-        if (CURRENT_INDEX > LAST_WRITE)
+        if (CURRENT_INDEX > LAST_WRITE && operation == READ)
         {
-            for (int x = CURRENT_INDEX - 1; x >= LAST_WRITE && x > 0; x--)
+            for (unsigned int x = CURRENT_INDEX - 1; x >= LAST_WRITE && x > 0; x--)
             {
                 if (RECORD_ADDRESS[x] == address &&
                     RECORD_VALUE[x] != value &&
@@ -103,7 +125,7 @@ void conware_log(void *address, unsigned int value, unsigned int operation)
         RECORD_ADDRESS[CURRENT_INDEX] = address;
         RECORD_VALUE[CURRENT_INDEX] = value;
         RECORD_OPERATION[CURRENT_INDEX] = operation;
-        // RECORD_PC[CURRENT_INDEX] = __builtin_return_address(0);
+        RECORD_PC[CURRENT_INDEX] = __builtin_return_address(0);
         RECORD_REPEATED[CURRENT_INDEX] = 0;
 
         // Keep track of our last write for optimization
@@ -114,22 +136,34 @@ void conware_log(void *address, unsigned int value, unsigned int operation)
 
         CURRENT_INDEX++;
     }
-    else
-    {
-        conware_print_results();
-    }
 }
 
-void conware_interrupt_enter(unsigned int address, unsigned int value)
+void conware_interrupt_log(unsigned intN)
 {
+    // Don't log ourselves when we are printing
     if (PRINTING)
         return;
-    printf("int enter");
+    conware_common_log(0, intN, INTERRUPT);
 }
 
-void conware_interrupt_exit(unsigned int address, unsigned int value)
+/**
+ *  Log read, write, and interrupt access to memory
+ * 
+ *  Operation:
+ *      Read: 0
+ *      Write: 1
+ *      Interrupt: 2
+ * 
+ */
+void conware_log(void *address, unsigned int value, unsigned int operation)
 {
+    // Only instrument MMIO
+    if (address < (void *)0x40000000 || address > (void *)(0x40000000 + 0x20000000))
+        return;
+
+    // Don't log ourselves when we are printing
     if (PRINTING)
         return;
-    printf("int exit");
+
+    conware_common_log(address, value, operation);
 }

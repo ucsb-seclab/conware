@@ -22,44 +22,48 @@ class Arduino:
               "-e", "-w", "-v", "-b",
               binary_filename, "-R"])
 
-    def log_data(self, output_filename):
+    def log_data(self, output_filename, count=1):
         ser = serial.Serial('/dev/%s' % self.device_location)
 
         dumping = False
         data_log = LogWriter(output_filename)
         dump_count = 0
         logger.info("Waiting for data to dump...")
-        while True:
-            try:
-                line = ser.readline().strip("\r").strip("\n")
-                if "CONWAREDUMP_START" in line:
-                    logger.info("Dumping recording...")
-                    dumping = True
-                elif "CONWAREDUMP_END" in line:
-                    logger.info("Dump done (%d events recorded)." % dump_count)
-                    break
-                elif dumping:
-                    data = line.split("\t")
-                    if data[0] == "1":
-                        data[0] = "WRITE"
-                    elif data[0] == "0":
-                        data[0] = "READ"
-                    else:
-                        logger.error("Got an operation that we don't "
-                                     "recognize! (%s)" % data[0])
+        for x in range(count):
+            while True:
+                try:
+                    line = ser.readline().strip("\r").strip("\n")
+                    if "CONWAREDUMP_START" in line:
+                        logger.info("Dumping recording...")
+                        dumping = True
+                    elif "CONWAREDUMP_END" in line:
+                        logger.info("Dump done (%d events recorded)." % dump_count)
+                        break
+                    elif dumping:
+                        data = line.split("\t")
+                        logger.debug(data)
+                        if data[0] == "1":
+                            data[0] = "WRITE"
+                        elif data[0] == "0":
+                            data[0] = "READ"
+                        elif data[0] == "2":
+                            data[0] = "INTERRUPT"
+                        else:
+                            logger.error("Got an operation that we don't "
+                                         "recognize! (%s)" % data[0])
 
-                    logger.debug(data)
-                    data_log.write_row(data[:-1])
-
-                    repeated = int(data[-1])
-                    if repeated > 0:
-                        logger.debug("Repeating %d times..." % repeated)
-                    for x in xrange(repeated):
+                        logger.debug(data)
                         data_log.write_row(data[:-1])
-                    dump_count += 1
-                else:
-                    print line
-            except KeyboardInterrupt:
-                break
+
+                        repeated = int(data[-1])
+                        if repeated > 0:
+                            logger.debug("Repeating %d times..." % repeated)
+                        for y in xrange(repeated):
+                            data_log.write_row(data[:-1])
+                        dump_count += 1
+                    else:
+                        print line
+                except KeyboardInterrupt:
+                    break
         data_log.close()
         ser.close()
