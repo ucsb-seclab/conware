@@ -8,10 +8,12 @@
 
 using namespace Conware;
 
-Function* InstrumentationHelper::getPrintfFunction() {
-    if(this->targetPrintFunction == nullptr) {
+Function *InstrumentationHelper::getPrintfFunction()
+{
+    if (this->targetPrintFunction == nullptr)
+    {
         FunctionType *printf_type =
-                TypeBuilder<int(char *, ...), false>::get(this->targetCtx);
+            TypeBuilder<int(char *, ...), false>::get(this->targetCtx);
 
         Function *func = cast<Function>(this->targetModule.getOrInsertFunction("iprintf", printf_type));
 
@@ -22,10 +24,12 @@ Function* InstrumentationHelper::getPrintfFunction() {
     return this->targetPrintFunction;
 }
 
-Function* InstrumentationHelper::getLogFunction() {
-    if(this->targetLogFunction == nullptr) {
+Function *InstrumentationHelper::getLogFunction()
+{
+    if (this->targetLogFunction == nullptr)
+    {
         FunctionType *conware_log_type =
-                TypeBuilder<int(void *, unsigned, unsigned), false>::get(this->targetCtx);
+            TypeBuilder<int(void *, unsigned, unsigned), false>::get(this->targetCtx);
 
         Function *func = cast<Function>(this->targetModule.getOrInsertFunction("conware_log", conware_log_type));
 
@@ -36,13 +40,15 @@ Function* InstrumentationHelper::getLogFunction() {
     return this->targetLogFunction;
 }
 
-Function* InstrumentationHelper::getInterruptLogFunction() {
-    if(this->targetInterruptLogFunction == nullptr) {
+Function *InstrumentationHelper::getInterruptLogFunction()
+{
+    if (this->targetInterruptLogFunction == nullptr)
+    {
         FunctionType *conware_int_log_type =
             TypeBuilder<int(unsigned), false>::get(this->targetCtx);
 
         Function *func = cast<Function>(this->targetModule.getOrInsertFunction("conware_interrupt_log",
-                                        conware_int_log_type));
+                                                                               conware_int_log_type));
 
         func->setCallingConv(CallingConv::ARM_AAPCS);
 
@@ -51,12 +57,14 @@ Function* InstrumentationHelper::getInterruptLogFunction() {
     return this->targetInterruptLogFunction;
 }
 
-Value* InstrumentationHelper::getReadPrintString() {
-    if(this->readStr == nullptr) {
+Value *InstrumentationHelper::getReadPrintString()
+{
+    if (this->readStr == nullptr)
+    {
         Constant *strConstant = ConstantDataArray::getString(this->targetCtx, "Read: from MMIO Address");
         GlobalVariable *GVStr =
-                new GlobalVariable(this->targetModule, strConstant->getType(), true,
-                                   GlobalValue::InternalLinkage, strConstant);
+            new GlobalVariable(this->targetModule, strConstant->getType(), true,
+                               GlobalValue::InternalLinkage, strConstant);
         Constant *zero = Constant::getNullValue(IntegerType::getInt32Ty(this->targetCtx));
         Constant *indices[] = {zero, zero};
         Constant *strVal = ConstantExpr::getGetElementPtr(strConstant->getType(), GVStr, indices, true);
@@ -65,12 +73,14 @@ Value* InstrumentationHelper::getReadPrintString() {
     return this->readStr;
 }
 
-Value* InstrumentationHelper::getWritePrintString() {
-    if(this->writeStr == nullptr) {
+Value *InstrumentationHelper::getWritePrintString()
+{
+    if (this->writeStr == nullptr)
+    {
         Constant *strConstant = ConstantDataArray::getString(this->targetCtx, "Wrote: to MMIO Address");
         GlobalVariable *GVStr =
-                new GlobalVariable(this->targetModule, strConstant->getType(), true,
-                                   GlobalValue::InternalLinkage, strConstant);
+            new GlobalVariable(this->targetModule, strConstant->getType(), true,
+                               GlobalValue::InternalLinkage, strConstant);
         Constant *zero = Constant::getNullValue(IntegerType::getInt32Ty(this->targetCtx));
         Constant *indices[] = {zero, zero};
         Constant *strVal = ConstantExpr::getGetElementPtr(strConstant->getType(), GVStr, indices, true);
@@ -79,21 +89,26 @@ Value* InstrumentationHelper::getWritePrintString() {
     return this->writeStr;
 }
 
-Value* InstrumentationHelper::createPointerToVoidPtrCast(IRBuilder<> &targetBuilder, Value *pointerOp) {
+Value *InstrumentationHelper::createPointerToVoidPtrCast(IRBuilder<> &targetBuilder, Value *pointerOp)
+{
     return targetBuilder.CreatePointerCast(pointerOp, IntegerType::getInt8PtrTy(this->targetCtx));
 }
 
-Value* InstrumentationHelper::createValueToUnsignedIntCast(IRBuilder<> &targetBuilder, Value *valueOp) {
-    if(valueOp->getType()->isPointerTy()) {
+Value *InstrumentationHelper::createValueToUnsignedIntCast(IRBuilder<> &targetBuilder, Value *valueOp)
+{
+    if (valueOp->getType()->isPointerTy())
+    {
         valueOp = targetBuilder.CreatePtrToInt(valueOp, IntegerType::getInt32Ty(this->targetCtx));
     }
     return targetBuilder.CreateIntCast(valueOp, IntegerType::getInt32Ty(this->targetCtx), false);
 }
 
-bool InstrumentationHelper::instrumentLoad(LoadInst *targetInstr) {
+bool InstrumentationHelper::instrumentLoad(LoadInst *targetInstr)
+{
     bool retVal = true;
 
-    try {
+    try
+    {
         // set the insertion point to be after the load instruction.
         auto targetInsertPoint = targetInstr->getIterator();
         targetInsertPoint++;
@@ -109,19 +124,23 @@ bool InstrumentationHelper::instrumentLoad(LoadInst *targetInstr) {
         address = this->createPointerToVoidPtrCast(builder, address);
         targetValue = this->createValueToUnsignedIntCast(builder, targetValue);
 
-//        ConstantInt *readValue = ConstantInt::get(IntegerType::getInt32Ty(this->targetCtx), 1);
+        //        ConstantInt *readValue = ConstantInt::get(IntegerType::getInt32Ty(this->targetCtx), 1);
         Constant *readValue = Constant::getNullValue(IntegerType::getInt32Ty(this->targetCtx));
         builder.CreateCall(targetLogFunction, {address, targetValue, readValue});
-    } catch (const std::exception& e) {
+    }
+    catch (const std::exception &e)
+    {
         dbgs() << "[?] Error occurred while trying to instrument load instruction:" << e.what() << "\n";
         retVal = false;
     }
     return retVal;
 }
 
-bool InstrumentationHelper::instrumentStore(StoreInst *targetInstr) {
+bool InstrumentationHelper::instrumentStore(StoreInst *targetInstr)
+{
     bool retVal = true;
-    try {
+    try
+    {
         // set the insertion point to be after the store instruction.
         auto targetInsertPoint = targetInstr->getIterator();
         targetInsertPoint++;
@@ -138,39 +157,47 @@ bool InstrumentationHelper::instrumentStore(StoreInst *targetInstr) {
         targetValue = this->createValueToUnsignedIntCast(builder, targetValue);
 
         ConstantInt *writeValue = ConstantInt::get(IntegerType::getInt32Ty(this->targetCtx), 1);
-//        Constant *zero = Constant::getNullValue(IntegerType::getInt32Ty(this->targetCtx));
+        //        Constant *zero = Constant::getNullValue(IntegerType::getInt32Ty(this->targetCtx));
         builder.CreateCall(targetLogFunction, {address, targetValue, writeValue});
-    } catch (const std::exception& e) {
+    }
+    catch (const std::exception &e)
+    {
         dbgs() << "[?] Error occurred while trying to instrument store instruction:" << e.what() << "\n";
         retVal = false;
     }
     return retVal;
-
 }
 
-bool InstrumentationHelper::instrumentInterruptHandler(Function *intHandlerFunc, unsigned intNum) {
+bool InstrumentationHelper::instrumentInterruptHandler(Function *intHandlerFunc, unsigned intNum)
+{
     bool retVal = true;
-    try{
-        Instruction *lastInstr = intHandlerFunc->getEntryBlock().getTerminator();
-        auto iter = lastInstr->getIterator();
-        iter--;
-        IRBuilder<> builder(iter);
+    try
+    {
+        // Instruction *lastInstr
+        auto iter = intHandlerFunc->getEntryBlock().getFirstInsertionPt();
+        // auto iter = lastInstr->getIterator();
+        // iter--;
+        IRBuilder<> builder(cast<Instruction>(iter));
         // get the log function
         Function *intLogFunc = this->getInterruptLogFunction();
 
         ConstantInt *writeValue = ConstantInt::get(IntegerType::getInt32Ty(this->targetCtx), intNum);
         builder.CreateCall(intLogFunc, {writeValue});
-    } catch (const std::exception& e) {
-      dbgs() << "[?] Error occurred while trying to instrument interrupt handler:" << e.what()
-             << " at function:" << intHandlerFunc->getName() << "\n";
-      retVal = false;
+    }
+    catch (const std::exception &e)
+    {
+        dbgs() << "[?] Error occurred while trying to instrument interrupt handler:" << e.what()
+               << " at function:" << intHandlerFunc->getName() << "\n";
+        retVal = false;
     }
     return retVal;
 }
 
-bool InstrumentationHelper::instrumentCommonInstr(Instruction *targetInstr) {
+bool InstrumentationHelper::instrumentCommonInstr(Instruction *targetInstr)
+{
     bool retVal = true;
-    try {
+    try
+    {
         // set the insertion point to be after the store instruction.
         auto targetInsertPoint = targetInstr->getIterator();
         targetInsertPoint++;
@@ -179,11 +206,12 @@ bool InstrumentationHelper::instrumentCommonInstr(Instruction *targetInstr) {
         // get the log function
         Function *targetLogFunction = this->getLogFunction();
 
-//        builder.CreateCall(targetPrintFunc, {formatString});
+        //        builder.CreateCall(targetPrintFunc, {formatString});
         Constant *zero = Constant::getNullValue(IntegerType::getInt32Ty(this->targetCtx));
         //builder.CreateCall(targetLogFunction, {zero, zero, zero});
-
-    } catch (const std::exception& e) {
+    }
+    catch (const std::exception &e)
+    {
         dbgs() << "[?] Error occurred while trying to instrument store instruction:" << e.what() << "\n";
         retVal = false;
     }

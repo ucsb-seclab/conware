@@ -16,12 +16,12 @@ unsigned int LAST_WRITE = 0;
 void *RECORD_ADDRESS[STORAGE_SIZE];
 void *RECORD_PC[STORAGE_SIZE];
 unsigned int RECORD_VALUE[STORAGE_SIZE];
-bool RECORD_OPERATION[STORAGE_SIZE];
+unsigned char RECORD_OPERATION[STORAGE_SIZE];
 unsigned int RECORD_REPEATED[STORAGE_SIZE];
 
 bool PRINTING = false;
 
-static void conware_common_log(void *address, unsigned int value, unsigned int operation, bool isInt);
+static void conware_common_log(void *address, unsigned int value, unsigned int operation);
 
 /**
  * Print the results out over UART (or whatever the default printf is)
@@ -38,7 +38,7 @@ void conware_print_results()
     {
         //        iprintf("%d\t%d\t%d\t%08X\t%08x\n\r", x, RECORD_TIME[x], RECORD_OPERATION[x], RECORD_ADDRESS[x], RECORD_VALUE[x]);
         //format: ['Operation', 'Seqn', 'Address', 'Value', 'Value (Model)', 'PC', 'Size', 'Timestamp', 'Model']
-        iprintf("%d\t%d\t%08x\t%08x\t\t%08x\t4\t0\t\t%d\n\r",
+        iprintf("%d\t%d\t%08p\t%08x\t\t%08p\t4\t0\t\t%d\n\r",
                 RECORD_OPERATION[x],
                 x,
                 RECORD_ADDRESS[x],
@@ -54,41 +54,52 @@ void conware_print_results()
     // TODO: Re-enabled interrupts
 }
 
-static void conware_common_log(void *address, unsigned int value, unsigned int operation, bool isInt) {
+static void conware_common_log(void *address, unsigned int value, unsigned int operation)
+{
     bool print_results = CURRENT_INDEX >= STORAGE_SIZE;
-    if (print_results) {
+    if (print_results)
+    {
         conware_print_results();
     }
     // log is full
-    if (CURRENT_INDEX >= STORAGE_SIZE) {
+    if (CURRENT_INDEX >= STORAGE_SIZE)
+    {
         return;
     }
     // if this is an interrupt?
-    if (isInt) {
+    if (operation == INTERRUPT)
+    {
         int last_entry_idx = CURRENT_INDEX - 1;
         bool newE = true;
-        if (last_entry_idx >=0) {
-            if (RECORD_ADDRESS[last_entry_idx] == address) {
+        if (last_entry_idx >= 0)
+        {
+            if (RECORD_ADDRESS[last_entry_idx] == address &&
+                RECORD_OPERATION[last_entry_idx] == operation)
+            {
                 RECORD_REPEATED[last_entry_idx]++;
                 newE = false;
             }
         }
-    
-        if (newE) {
+
+        if (newE)
+        {
             RECORD_ADDRESS[CURRENT_INDEX] = address;
-            RECORD_VALUE[CURRENT_INDEX] = 1;
+            RECORD_VALUE[CURRENT_INDEX] = value;
             RECORD_REPEATED[CURRENT_INDEX] = 0;
             RECORD_OPERATION[CURRENT_INDEX] = operation;
+            RECORD_PC[CURRENT_INDEX] = __builtin_return_address(0);
             CURRENT_INDEX++;
         }
-    } else {
+    }
+    else
+    {
         // this is not an interrupt
         // Did we already see this write and just need to update the repeat counter?
-    
+
         // for (int x = LAST_WRITE; x < CURRENT_INDEX; x++)
-        if (CURRENT_INDEX > LAST_WRITE && operation != WRITE)
+        if (CURRENT_INDEX > LAST_WRITE && operation == READ)
         {
-            for (int x = CURRENT_INDEX - 1; x >= LAST_WRITE && x > 0; x--)
+            for (unsigned int x = CURRENT_INDEX - 1; x >= LAST_WRITE && x > 0; x--)
             {
                 if (RECORD_ADDRESS[x] == address &&
                     RECORD_VALUE[x] != value &&
@@ -116,22 +127,23 @@ static void conware_common_log(void *address, unsigned int value, unsigned int o
         RECORD_OPERATION[CURRENT_INDEX] = operation;
         RECORD_PC[CURRENT_INDEX] = __builtin_return_address(0);
         RECORD_REPEATED[CURRENT_INDEX] = 0;
-    
+
         // Keep track of our last write for optimization
         if (operation == WRITE)
         {
             LAST_WRITE = CURRENT_INDEX;
         }
-    
+
         CURRENT_INDEX++;
     }
 }
 
-int conware_interrupt_log(unsigned intN) {
+void conware_interrupt_log(unsigned intN)
+{
     // Don't log ourselves when we are printing
     if (PRINTING)
         return;
-    conware_common_log((void*)intN, 1, INTERRUPT, true);
+    conware_common_log(0, intN, INTERRUPT);
 }
 
 /**
@@ -152,20 +164,6 @@ void conware_log(void *address, unsigned int value, unsigned int operation)
     // Don't log ourselves when we are printing
     if (PRINTING)
         return;
-        
-    conware_common_log(address, value, operation, false);
-}
 
-void conware_interrupt_enter(unsigned int address, unsigned int value)
-{
-    if (PRINTING)
-        return;
-    printf("int enter");
-}
-
-void conware_interrupt_exit(unsigned int address, unsigned int value)
-{
-    if (PRINTING)
-        return;
-    printf("int exit");
+    conware_common_log(address, value, operation);
 }

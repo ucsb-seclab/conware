@@ -41,10 +41,13 @@ class Arduino:
                         break
                     elif dumping:
                         data = line.split("\t")
+                        logger.debug(data)
                         if data[0] == "1":
                             data[0] = "WRITE"
                         elif data[0] == "0":
                             data[0] = "READ"
+                        elif data[0] == "2":
+                            data[0] = "INTERRUPT"
                         else:
                             logger.error("Got an operation that we don't "
                                          "recognize! (%s)" % data[0])
@@ -55,7 +58,7 @@ class Arduino:
                         repeated = int(data[-1])
                         if repeated > 0:
                             logger.debug("Repeating %d times..." % repeated)
-                        for x in xrange(repeated):
+                        for y in xrange(repeated):
                             data_log.write_row(data[:-1])
                         dump_count += 1
                     else:
