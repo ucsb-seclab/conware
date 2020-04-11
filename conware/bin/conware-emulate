@@ -167,7 +167,7 @@ def emulate_read_after(avatar, message, **kwargs):
 class Interrupter(Thread):
     host = None
 
-    def __init__(self, irq_num, rate, host):
+    def __init__(self, irq_num, host, rate=.01, count=None):
         """
 
         :param irq_num: IRQ # in QEMU
@@ -176,6 +176,7 @@ class Interrupter(Thread):
         self.irq_num = irq_num
         self.interrupt_rate = rate
         self.host = host
+        self.count = count
         self._shutdown = Event()
         logger.debug("Creating Interrupter for IRQ %d" % self.irq_num)
         Thread.__init__(self)
@@ -187,16 +188,22 @@ class Interrupter(Thread):
         ignored = False
         self.host.protocols.interrupts.ignore_interrupt_return(
             self.irq_num)
-        while not self._shutdown.is_set():
-            # if not ignored:
-            #     logger.info(
-            #         "Ignoring interrupt returns for IRQ %d" % self.irq_num)
-            #     self.host.protocols.interrupts.ignore_interrupt_return(
-            #         self.irq_num)
-            #     ignored = True
-            logger.debug("Sending IRQ %d (interval: %d s)" % (self.irq_num, self.interrupt_rate))
-            self.host.protocols.interrupts.inject_interrupt(self.irq_num)
-            time.sleep(self.interrupt_rate)
+        if self.count is None:
+            while not self._shutdown.is_set():
+                # if not ignored:
+                #     logger.info(
+                #         "Ignoring interrupt returns for IRQ %d" % self.irq_num)
+                #     self.host.protocols.interrupts.ignore_interrupt_return(
+                #         self.irq_num)
+                #     ignored = True
+                logger.debug("Sending IRQ %d (interval: %d s)" % (self.irq_num, self.interrupt_rate))
+                self.host.protocols.interrupts.inject_interrupt(self.irq_num)
+                time.sleep(self.interrupt_rate)
+        else:
+            for x in xrange(self.count):
+                logger.debug("Sending IRQ %d (interval: %d s)" % (self.irq_num, self.interrupt_rate))
+                self.host.protocols.interrupts.inject_interrupt(self.irq_num)
+                time.sleep(self.interrupt_rate)
 
 
 def emulate_write_after(avatar, message, **kwargs):
@@ -210,6 +217,27 @@ def emulate_write_after(avatar, message, **kwargs):
 
     val = message.value
     model_val = 0
+
+    # Do we have interrupts to throw?
+    interrupts = {}
+    if message.dst is not None:
+        interrupts = message.dst.forwarded_to.model.get_interrupts(message.address)
+        for irq_num in interrupts:
+            i = Interrupter(irq_num, message.origin, count=interrupts[irq_num])
+            i.start()
+
+    # Is this an NVIC interrupt (e.g., TC1-5?)
+    if message.address == 0xe000e100 or message.address == 0xe000e104:
+        logger.info("NVIC WRITE DETECTED %s %s" % (hex(message.address), hex(message.value)))
+    if message.address == 0xe000e104:
+        # logger.error("SAW AN NVIC WRITE!!")
+        # logger.error(message.dst)
+        if message.value == 0x1:
+            logger.info("Enabling interrupter")
+            i = Interrupter(48, message.origin, .0001)
+            i.start()
+        # message.origin.protocols.interrupts.inject_interrupt(48)
+        # message.origin.protocols.interrupts.inject_interrupt(48)
 
     try:
         model_name = message.dst.forwarded_to.model.get_model(message.address)
@@ -235,19 +263,6 @@ def emulate_write_after(avatar, message, **kwargs):
              "%08x" % model_val,
              "0x%x" % message.pc,
              message.size, time.time() - time_start, model_name])
-
-    # Start the appropriate
-    if message.address == 0xe000e100 or message.address == 0xe000e104:
-        logger.info("NVIC WRITE DETECTED %s %s" % (hex(message.address), hex(message.value)))
-    if message.address == 0xe000e104:
-        # logger.error("SAW AN NVIC WRITE!!")
-        # logger.error(message.dst)
-        if message.value == 0x1:
-            logger.info("Enabling interrupter")
-            i = Interrupter(48, .0001, message.origin)
-            i.start()
-        # message.origin.protocols.interrupts.inject_interrupt(48)
-        # message.origin.protocols.interrupts.inject_interrupt(48)
 
     if message.address == UART['tx']:
         dest = [0] * 4
