@@ -89,6 +89,16 @@ class PeripheralModel:
         self._add_edge(old_state[0], self.current_state[0],
                        address=address, value=value)
 
+    def train_interrupt(self, irq_num, timestamp):
+        """
+        Make sure all observed interrupts are logged appropriately
+        :param irq_num:
+        :param timestamp:
+        :return:
+        """
+        logger.info("got interrupt %d", irq_num)
+        self.current_state[1].append_interrupt(irq_num)
+
     def train(self):
         for idx, state in enumerate(self.all_states):
             state.train()
@@ -137,16 +147,37 @@ class PeripheralModel:
     def _get_state(self, state_id):
         """ Return the state given the state/node id """
         # print("in _get_state, for state_id: " + str(state_id))
-        return self.node_states[state_id]
-        # return self.graph.nodes[state_id]["state"]
+        # return self.node_states[state_id]
+        return self.graph.nodes[state_id]["state"]
 
-    def _merge_states(self, equiv_states):
+    def _merge_states(self, equiv_states, skip_check=False):
         """
-        merge state 2 into state 1
+            Given a list of tuples of equivalent states, this find their equivalence classes, and make a single node for
+             each equivalence class.
+
+             Since our equality is non-transitive, we first do a check to make sure all of the merges will succeed.
+             This can be skipped with the `skip_check` argument
+
         """
         graph = networkx.Graph(equiv_states)
         equiv_classes = [tuple(c) for c in networkx.connected_components(graph)]
 
+        # First, we need to make sure that every node is truly equal to every other node.
+        # Since we permit merging of states with no overlapping reads, our equality is not transitive
+        # the case where A = B and B = C but A merge B != C is possible
+        # e.g., A:[read 0:Storage], B:[read 1:Pattern], C:[read 0:Storage]
+        if not skip_check:
+            for equiv_set in equiv_classes:
+                for state_id1 in equiv_set:
+                    for state_id2 in equiv_set:
+                        state1 = self._get_state(state_id1)
+                        state2 = self._get_state(state_id2)
+                        if state1 != state2:
+                            logger.warning("Lack of transitivity in equality bit us, aborting merge")
+                            logger.warning("%s != %s" % (state1, state2))
+                            return False
+
+        # Merge all of the equivalent nodes
         for equiv_set in equiv_classes:
             in_edges = set()
             out_edges = set()
@@ -157,7 +188,10 @@ class PeripheralModel:
                 if state is None:
                     state = self._get_state(state_id)
                 else:
-                    state.merge(self._get_state(state_id))
+                    if not state.merge(self._get_state(state_id)):
+                        import traceback
+                        traceback.print_exc()
+                        logger.exception("A merge failed!  This should impossible!")
 
             # Create a new state
             new_state_id, new_state = self.create_state(state=state)
@@ -199,6 +233,7 @@ class PeripheralModel:
                 self.graph.remove_node(state_id)
                 if state_id == self.start_state[0]:
                     self.start_state = (new_state_id, new_state)
+        return True
 
     def _label_nodes(self):
         """ Add labels to all of our nodes """
@@ -240,7 +275,6 @@ class PeripheralModel:
             self.equiv_states.append((state_id_1, state_id_2))
             # If these states are already accounted for, we don't need to
             # keep traversing
-            self.equiv_states.append((state_id_1, state_id_2))
             if state_id_1 in self.visited and state_id_2 in self.visited:
                 return merge_set
 
@@ -296,10 +330,24 @@ class PeripheralModel:
         states.
         :return:
         """
-        merged = True
+
+        # First get rid of all of empty nodes (i.e., no reads were observed) by just merging them into the next non-empty node
+        last_node = None
+        empty_merges = []
+        for n in networkx.dfs_preorder_nodes(self.graph,
+                                             self.start_state[0]):
+            # Check if our last_visited node was empty
+            if last_node is not None:
+                state_last = self._get_state(last_node)
+                if state_last.is_empty():
+                    empty_merges.append((last_node, n))
+                    logger.info("Merged an empty state")
+            last_node = n
+        self._merge_states(empty_merges, skip_check=True)
 
         # TODO: Do better caching with equivalence classes?
         checked = set()
+        merged = True
         while merged:
             merged = False
 
@@ -344,9 +392,9 @@ class PeripheralModel:
                         logger.info("Merging States: %s and %s" % (str(n1),
                                                                    str(n2)))
                         logger.debug("Equivalent nodes: %s" % self.equiv_states)
-                        self._merge_states(self.equiv_states)
-                        merged = True
-                        break
+                        if self._merge_states(self.equiv_states):
+                            merged = True
+                            break
 
                 if merged:
                     break
@@ -380,8 +428,7 @@ class PeripheralModel:
         self_edge_attr = self._get_edge_labels(
             (state1["state"].state_id, state2["state"].state_id))
         self.graph.add_edge(state1["state"].state_id, state1["state"].state_id,
-                            address=self_edge_attr[0], value=self_edge_attr[
-                1])
+                            address=self_edge_attr[0], value=self_edge_attr[1])
 
         # merge state2 into state2
         # since state 2 has no reads we shouldnt actually have to do anything, just delete it
@@ -439,6 +486,13 @@ class PeripheralModel:
             for addr in self.current_state[1].model_per_address:
                 self.current_state[1].model_per_address[addr].write(
                     address, value)
+
+    def get_interrupts(self):
+        """
+        After every write we need to check and see if we have any interrupts to fire
+        :return: a dictionary of interrupt numbers with their counts { irq_num: count }
+        """
+        return self.current_state[1].interrupts
 
     def write(self, address, size, value):
         """
@@ -603,16 +657,24 @@ class PeripheralModel:
 
     def append_states(self, append_str):
         """ append str to every node id """
+        new_states = {}
         # Update our states
         for n in self.graph.nodes:
             state = self._get_state(n)
             state.state_id = str(n) + append_str
+
+            # Update our state mapping
+            self.node_states[state.state_id] = state
+            new_states[state.state_id] = state
+
         # Update start state
         self.start_state = (str(self.start_state[0]) + append_str,
                             self.start_state[1])
         # Update nodes in the graph
         self.graph = networkx.relabel_nodes(self.graph,
                                             lambda x: str(x) + append_str)
+
+        return new_states
 
     def merge(self, other_peripheral):
         """
@@ -622,7 +684,12 @@ class PeripheralModel:
         :return:
         """
 
-        other_peripheral.append_states("_2")
+        # Make sure our keys for the nodes do not overlap
+        # TODO: Change this support more than 2 model merges
+        suffix = "_2"
+        other_states = other_peripheral.append_states(suffix)
+        self.node_states.update(other_states)
+
         self._merge_map = {}
         if self._recursive_merge(self.start_state[0],
                                  other_peripheral.start_state[0],
@@ -684,7 +751,6 @@ class PeripheralModel:
             else:
                 return False
 
-        # state.merge(state2)
         self._merge_map[state_id2] = state_id
 
         edges = self.graph.out_edges(state_id)
@@ -700,5 +766,6 @@ class PeripheralModel:
                 if e_labels & e2_labels:
                     rtn &= self._recursive_merge(e[1], e2[1], other_peripheral)
                 new_edges = e2_labels - e_labels
+                # TODO: Why is this variable set?  Is this an error that we don't use it?
 
         return rtn
