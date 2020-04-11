@@ -34,6 +34,7 @@ class PeripheralModelState:
 
         self.merged_states = set()
         self.merged_states.add(state_id)
+        self.interrupts = {}
 
         # state number imported from old state model, not sure if we need it
         # was used for visualization purposes, i haven't dove very deep into all
@@ -48,7 +49,10 @@ class PeripheralModelState:
                 "0x%08X: %s" % (address, self.model_per_address[address]))
 
         # return ":".join([str(x) for x in sorted(self.merged_states)]) + " " + \
-        return "#%d " % len(self.merged_states) + ",".join(models)
+        interrupts = ""
+        if len(self.interrupts.keys()) > 0:
+            interrupts = " | " + str(self.interrupts)
+        return "#%d " % len(self.merged_states) + ",".join(models) + interrupts
 
     def __repr__(self):
         return self.__str__()
@@ -58,17 +62,33 @@ class PeripheralModelState:
         return not (self == other_state)
 
     def __eq__(self, other_state):
+
+        # Do not consider an empty node equal to a non-empty node
+        # Otherwise, merging nodes with different reads is fine
+        if (len(self.model_per_address.keys()) == 0 and len(other_state.model_per_address.keys()) != 0) or \
+                (len(other_state.model_per_address.keys()) == 0 and len(self.model_per_address.keys()) != 0):
+            return False
+
+        # Make sure all of our read models are equivalent
         for address in self.model_per_address:
             if address in other_state.model_per_address:
                 if self.model_per_address[address] != \
                         other_state.model_per_address[address]:
                     return False
+
+        # Make sure that we have the same interrupt numbers
+        if set(self.interrupts.keys()) != set(other_state.interrupts.keys()):
+            return False
+
         # for address in self.model_per_address_ordered:
         #     if address in other_state.model_per_address_ordered and \
         #             self.model_per_address_ordered[address] != \
         #             other_state.model_per_address_ordered[address]:
         #         return False
         return True
+
+    def is_empty(self):
+        return len(self.model_per_address) == 0
 
     def _train_model(self, address, read_log, use_time_domain=True):
         if len(read_log) == 0:
@@ -122,6 +142,19 @@ class PeripheralModelState:
             (value, pc, size, timestamp))
 
         self.read_count[address] += 1
+
+    def append_interrupt(self, irq_num):
+        """
+        add an interrupt to fire once this state is entered
+
+        If the same interrupt is added multiple times
+        :param irq_num: Number of IRQ to fire
+        :return:
+        """
+        if irq_num not in self.interrupts:
+            self.interrupts[irq_num] = 1
+        else:
+            self.interrupts[irq_num] += 1
 
     def train(self):
         for address in self.reads:
@@ -177,5 +210,10 @@ class PeripheralModelState:
         #         self.model_per_address_ordered[address] = \
         #             other.model_per_address_ordered[address]
 
+        # Merge any interrupts (if each state had 1 interrupt, we'd now to initiate 2)
+        for irq_num in self.interrupts:
+            self.interrupts[irq_num] = max(self.interrupts[irq_num],
+                                           other.interrupts[irq_num])
         self.merged_states |= other.merged_states
+
         return True
