@@ -178,6 +178,17 @@ class PretenderModel:
             return repr(self.model_per_address[address])
         else:
             return None
+        
+    def get_interrupts(self, address):
+        """
+        Return a dictionary of all of the interrupts in the current state, with their counts
+        :param address: Address that return the interrupts for the current state for
+        :return: 
+        """
+        if address in self.model_per_address:
+            return self.model_per_address[address].get_interrupts()
+        else:
+            return None
 
     def write_memory(self, address, size, value):
         """
