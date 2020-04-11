@@ -148,6 +148,11 @@ class PretenderModel:
         l.next()
 
         # First, lets just build all of our states
+
+        # Keep track of the last write seen, so that we can associate our interrupt with that write
+        # While this may be the wrong state, we are hoping that triggering the interrupt based on write transitions
+        # will be a close enough approximation to their asynchronous nature
+        last_write_addr = None
         for line in l:
             # Extract our values form the log
             try:
@@ -167,10 +172,12 @@ class PretenderModel:
             if op in ["1", "WRITE"]:
                 # state = self._create_state(addr, "write", val)
                 self.model_per_address[addr].train_write(addr, val)
-
+                last_write_addr = addr
             elif op in ["0", "READ"]:
                 self.model_per_address[addr].train_read(addr, val, pc, size,
                                                         timestamp)
+            elif op in ["2", "INTERRUPT"]:
+                self.model_per_address[last_write_addr].train_interrupt(val, timestamp)
 
             else:
                 logger.error("Saw an unrecognized operation (%s)!" % op)
