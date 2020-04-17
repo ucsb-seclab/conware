@@ -4,7 +4,7 @@
 #include <stdio.h>
 #include <stdbool.h>
 
-#define STORAGE_SIZE 5000
+#define STORAGE_SIZE 2000
 #define READ 0
 #define WRITE 1
 #define INTERRUPT 2
@@ -15,8 +15,8 @@ unsigned int LAST_WRITE = 0;
 // unsigned int *RECORD_TIME[STORAGE_SIZE];
 void *RECORD_ADDRESS[STORAGE_SIZE];
 void *RECORD_PC[STORAGE_SIZE];
-unsigned int RECORD_VALUE[STORAGE_SIZE];
 unsigned char RECORD_OPERATION[STORAGE_SIZE];
+unsigned int RECORD_VALUE[STORAGE_SIZE];
 unsigned int RECORD_REPEATED[STORAGE_SIZE];
 
 bool PRINTING = false;

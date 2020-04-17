@@ -30,7 +30,7 @@ class PeripheralModel:
                                                "start")
         self.start_state = self.current_state
         self.equiv_states = []
-        self.visited = set()
+        self.visited = []
         self.wildcard_edges = {}
 
     def __str__(self):
@@ -275,12 +275,14 @@ class PeripheralModel:
             self.equiv_states.append((state_id_1, state_id_2))
             # If these states are already accounted for, we don't need to
             # keep traversing
-            if state_id_1 in self.visited and state_id_2 in self.visited:
+            # if state_id_1 in self.visited and state_id_2 in self.visited:
+            if set([state_id_1, state_id_2]) in self.visited:
                 return merge_set
 
             # Marked the nodes as visited
-            self.visited.add(state_id_1)
-            self.visited.add(state_id_2)
+            self.visited.append(set([state_id_1, state_id_2]))
+            # self.visited.add(state_id_1)
+            # self.visited.add(state_id_2)
 
             # Compress our existing nodes into equivalence classes to group
             # edges
@@ -309,7 +311,8 @@ class PeripheralModel:
                     # Do we have a duplicate edge (i.e., state transition)
                     if e1_labels & e2_labels:
                         # Only add if they haven't already been visited
-                        if e1[1] not in self.visited and e2[1] not in self.visited:
+                        # if e1[1] not in self.visited and e2[1] not in self.visited:
+                        if set([e1[1], e2[1]]) not in self.visited:
                             merge_set.add((e1[1], e2[1]))
 
                 # Check all outgoing edges for node 2
@@ -341,7 +344,7 @@ class PeripheralModel:
                 state_last = self._get_state(last_node)
                 if state_last.is_empty():
                     empty_merges.append((last_node, n))
-                    logger.info("Merged an empty state")
+                    logger.debug("Merged an empty state")
             last_node = n
         self._merge_states(empty_merges, skip_check=True)
 
@@ -365,7 +368,7 @@ class PeripheralModel:
                         continue
 
                     self.equiv_states = []
-                    self.visited = set()
+                    self.visited = []
 
                     # Get a set of all of the nodes that must also be equal
                     merge_set = self._get_merge_constraints(n1, n2)
@@ -543,7 +546,7 @@ class PeripheralModel:
                     "simple storage!, writing to address: " + str(address))
                 return True
 
-        logger.info("%s: Was not simple storage, starting BFS/Wildcard" % self.name)
+        logger.info("%s: Was not simple storage, starting BFS/Wildcard (0x%08X, %X)" % (self.name, address, value))
         # otherwise start BFS
         target_edges = list(
             networkx.edge_bfs(self.graph, source=self.current_state[0]))
@@ -552,13 +555,14 @@ class PeripheralModel:
 
             edge_tuple = list(self.graph[edge[0]][edge[1]]['tuples'])
 
-            if ((address, value) in edge_tuple):
+            logger.info("%s: Checking tuple (%d,%d): %s" % (self.name, edge[0], edge[1], edge_tuple))
+            if (address, value) in edge_tuple:
                 self.current_state = (
                     edge[1], self.graph.nodes[edge[1]]["state"])
                 if address in self.current_state[1].model_per_address:
                     self.current_state[1].model_per_address[address].write(
                         value)
-                    logger.info("BFS Edge: " + str(edge) + " selected")
+                logger.info("%s: BFS selected %s: %s" % (self.name, str(edge), str(self.graph.nodes[edge[1]]["state"])))
                 return True
             elif (edge, address) in self.wildcard_edges:
                 self.current_state = (
@@ -566,22 +570,24 @@ class PeripheralModel:
                 if address in self.current_state[1].model_per_address:
                     self.current_state[1].model_per_address[address].write(
                         value)
-                    logger.info("Wildcard Edge: " + str(edge) + " selected")
+                logger.info("%s: Wildcard selected %s: %s" % (self.name, str(edge),
+                            str(self.graph.nodes[edge[1]]["state"])))
                 return True
 
         logger.info(
             "%s: No matching edge!, picking edge with most writes to target address" % self.name)
-        # If we dont find value for address, look at all edges, with writes to that address, pick the one that has it the most times
+        # If we dont find value for address, look at all edges, with writes to that address, pick the one that has it
+        # the most times
         picked_edge = ((None, None), 0)  # (edge, addresscount)
         all_edges = self.graph.edges
         for edge in all_edges:
-            addr_count = 0
+            address_count = 0
             label = self._get_edge_labels(edge)
-            for tuple in label:
-                if tuple[0] == address:
-                    addr_count += 1
-            if addr_count > picked_edge[1]:
-                picked_edge = (edge, addr_count)
+            for label_tuple in label:
+                if label_tuple[0] == address:
+                    address_count += 1
+            if address_count > picked_edge[1]:
+                picked_edge = (edge, address_count)
 
         if picked_edge == ((None, None), 0):
             logger.error("%s: We could not find any state where this write was seen before (%s, %s)" % (self.name,

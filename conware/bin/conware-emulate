@@ -167,7 +167,7 @@ def emulate_read_after(avatar, message, **kwargs):
 class Interrupter(Thread):
     host = None
 
-    def __init__(self, irq_num, host, rate=.01, count=None):
+    def __init__(self, irq_num, host, rate=.01, count=-1):
         """
 
         :param irq_num: IRQ # in QEMU
@@ -181,14 +181,25 @@ class Interrupter(Thread):
         logger.debug("Creating Interrupter for IRQ %d" % self.irq_num)
         Thread.__init__(self)
 
+    def _send_irq(self):
+        logger.debug("Sending IRQ %d (interval: %d s)" % (self.irq_num, self.interrupt_rate))
+        self.host.protocols.interrupts.inject_interrupt(self.irq_num)
+        # OUTPUT_TSV.write_row(
+        #     ['INTERRUPT', seq,
+        #      "%08x" % 0,
+        #      "%08x" % self.irq_num,
+        #      "%08x" % 0,
+        #      "0x%x" % 0,
+        #      0, time.time() - time_start, "???"])
+
     def run(self):
-        logger.info("Starting Stateful Interrupter for IRQ %d" % self.irq_num)
+        logger.info("Starting Stateful Interrupter for IRQ %d (count: %d)" % (self.irq_num, self.count))
         if not self.host:
             raise RuntimeError("Must set host first")
         ignored = False
-        self.host.protocols.interrupts.ignore_interrupt_return(
-            self.irq_num)
-        if self.count is None:
+        # self.host.protocols.interrupts.ignore_interrupt_return(
+        #     self.irq_num)
+        if self.count == -1:
             while not self._shutdown.is_set():
                 # if not ignored:
                 #     logger.info(
@@ -196,13 +207,11 @@ class Interrupter(Thread):
                 #     self.host.protocols.interrupts.ignore_interrupt_return(
                 #         self.irq_num)
                 #     ignored = True
-                logger.debug("Sending IRQ %d (interval: %d s)" % (self.irq_num, self.interrupt_rate))
-                self.host.protocols.interrupts.inject_interrupt(self.irq_num)
+                self._send_irq()
                 time.sleep(self.interrupt_rate)
         else:
             for x in xrange(self.count):
-                logger.debug("Sending IRQ %d (interval: %d s)" % (self.irq_num, self.interrupt_rate))
-                self.host.protocols.interrupts.inject_interrupt(self.irq_num)
+                self._send_irq
                 time.sleep(self.interrupt_rate)
 
 

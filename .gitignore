@@ -22,3 +22,5 @@ __pycache__/
 *build*
 runtime/llvm-7.0.1.obj/
 runtime/llvm-7.0.1.src/
+emulate_logs/
+emulated_output.csv

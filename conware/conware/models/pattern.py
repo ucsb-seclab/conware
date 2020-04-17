@@ -89,7 +89,12 @@ class PatternModel(MemoryModel):
     def merge(self, other_model):
         if other_model != self:
             logger.error("Tried to merge two models that aren't the same (%s "
-                         "!= %s)" % (type(other_model), type(self)))
+                         "!= %s)" % (str(other_model), str(self)))
+            import traceback
+            traceback.print_stack()
+            logger.exception("A merge failed!  This should impossible!")
+            import IPython
+            IPython.embed()
             return False
 
         for value in other_model.read_patterns:
