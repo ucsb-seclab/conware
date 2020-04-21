@@ -146,7 +146,7 @@ def emulate_read_after(avatar, message, **kwargs):
         # logger.info("MODEL: %s, %s" % (hex(message.address), model_val))
         OUTPUT_TSV.write_row(
             ['READ', seq,
-             "%08x" % message.address,
+             "0x%08x" % message.address,
              "%08x" % val,
              "%08x" % model_val,
              "0x%x" % message.pc,
@@ -183,14 +183,17 @@ class Interrupter(Thread):
 
     def _send_irq(self):
         logger.debug("Sending IRQ %d (interval: %d s)" % (self.irq_num, self.interrupt_rate))
+        # try:
         self.host.protocols.interrupts.inject_interrupt(self.irq_num)
-        # OUTPUT_TSV.write_row(
-        #     ['INTERRUPT', seq,
-        #      "%08x" % 0,
-        #      "%08x" % self.irq_num,
-        #      "%08x" % 0,
-        #      "0x%x" % 0,
-        #      0, time.time() - time_start, "???"])
+        # except:
+        #     logger.exception("Error injecting interrupt.")
+        OUTPUT_TSV.write_row(
+            ['INTERRUPT', seq,
+             "0x%08x" % 0,
+             "%08x" % self.irq_num,
+             "%08x" % 0,
+             "0x%x" % 0,
+             0, time.time() - time_start, "???"])
 
     def run(self):
         logger.info("Starting Stateful Interrupter for IRQ %d (count: %d)" % (self.irq_num, self.count))
@@ -211,7 +214,7 @@ class Interrupter(Thread):
                 time.sleep(self.interrupt_rate)
         else:
             for x in xrange(self.count):
-                self._send_irq
+                self._send_irq()
                 time.sleep(self.interrupt_rate)
 
 
@@ -267,7 +270,7 @@ def emulate_write_after(avatar, message, **kwargs):
                                                     model_val, hex(message.pc)))
         OUTPUT_TSV.write_row(
             ['WRITE', seq,
-             "%08x" % message.address,
+             "0x%08x" % message.address,
              "%08x" % val,
              "%08x" % model_val,
              "0x%x" % message.pc,

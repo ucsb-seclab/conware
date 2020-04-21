@@ -44,6 +44,7 @@ class PretenderModel:
                  filename=None, **kwargs):
         self.peripherals = []
         self.model_per_address = {}
+        self.model_per_interrupt = {}
         self.peripheral_clusters = {}
         self.log_per_cluster = {}
         self.accessed_addresses = set()
@@ -141,6 +142,10 @@ class PretenderModel:
             for addr in addrs:
                 self.model_per_address[addr] = peripheral
 
+            if periph_name in peripheral_memory_map.interrupt_map:
+                for irq in peripheral_memory_map.interrupt_map[periph_name]:
+                    self.model_per_interrupt[irq] = peripheral
+
         # Now add all of our observed accesses
         l = LogReader(filename)
 
@@ -177,7 +182,12 @@ class PretenderModel:
                 self.model_per_address[addr].train_read(addr, val, pc, size,
                                                         timestamp)
             elif op in ["2", "INTERRUPT"]:
-                self.model_per_address[last_write_addr].train_interrupt(val, timestamp)
+                # Do we know which peripheral this goes with?
+                if val in self.model_per_interrupt:
+                    self.model_per_interrupt[irq].train_interrupt(val, timestamp)
+                else:
+                    logger.warning("Got interrupt %s and it is not mapped to a peripheral! " % str(irq))
+                    self.model_per_address[last_write_addr].train_interrupt(val, timestamp)
 
             else:
                 logger.error("Saw an unrecognized operation (%s)!" % op)

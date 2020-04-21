@@ -52,7 +52,7 @@ class PeripheralModelState:
         interrupts = ""
         if len(self.interrupts.keys()) > 0:
             interrupts = " | " + str(self.interrupts)
-        return "#%d " % len(self.merged_states) + ",".join(models) + interrupts
+        return "%s, #%d " % (str(self.state_id), len(self.merged_states)) + ",".join(models) + interrupts
 
     def __repr__(self):
         return self.__str__()

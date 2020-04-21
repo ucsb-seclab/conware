@@ -56,7 +56,11 @@ class PeripheralMemoryMap:
     peripheral_memory['Reserved2'] = [0x400E1AB0, 0x400E2600]
     peripheral_memory['Reserved3'] = [0x400E2600, 0x60000000]
 
-    def get_peripheral(self, address):
+    # Keep track of our interrupts
+    interrupt_map = OrderedDict()
+    interrupt_map['UART'] = [0x18]
+
+    def get_peripheral(self, address, value=0):
         """
         Lookup a given memory address and return the peripheral that it
         belongs to.
@@ -65,10 +69,16 @@ class PeripheralMemoryMap:
         :return: (peripheral name, [periphal range])
         """
 
-        for periph in self.peripheral_memory:
-            if self.peripheral_memory[periph][0] <= address < \
-                    self.peripheral_memory[periph][1]:
-                return periph, self.peripheral_memory[periph]
+        # Is it an interrupts?
+        if address == 0:
+            for periph in self.interrupt_map:
+                if value in self.interrupt_map[periph]:
+                    return periph, self.interrupt_map[periph]
+        else:
+            for periph in self.peripheral_memory:
+                if self.peripheral_memory[periph][0] <= address < \
+                        self.peripheral_memory[periph][1]:
+                    return periph, self.peripheral_memory[periph]
 
         return None
 
@@ -81,7 +91,7 @@ class PeripheralMemoryMap:
         """
         for periph in self.peripheral_memory:
             if start_address >= self.peripheral_memory[periph][0] and \
-                            end_address < self.peripheral_memory[periph][1]:
+                    end_address < self.peripheral_memory[periph][1]:
                 return periph
 
         return None

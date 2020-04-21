@@ -313,14 +313,16 @@ class PeripheralModel:
                         # Only add if they haven't already been visited
                         # if e1[1] not in self.visited and e2[1] not in self.visited:
                         if set([e1[1], e2[1]]) not in self.visited:
-                            merge_set.add((e1[1], e2[1]))
+                            if (e2[1], e1[1]) not in merge_set:
+                                merge_set.add((e1[1], e2[1]))
 
                 # Check all outgoing edges for node 2
                 for e1 in edges_2:
                     e1_labels = self._get_edge_labels(e1)
                     # Do we have a duplicate edge (i.e., state transition)
                     if e1_labels & e2_labels:
-                        merge_set.add((e1[1], e2[1]))
+                        if (e2[1], e1[1]) not in merge_set:
+                            merge_set.add((e1[1], e2[1]))
             return merge_set
         else:
             logger.debug(
@@ -334,7 +336,8 @@ class PeripheralModel:
         :return:
         """
 
-        # First get rid of all of empty nodes (i.e., no reads were observed) by just merging them into the next non-empty node
+        # First get rid of all of empty nodes (i.e., no reads were observed) by just merging them into the next
+        # non-empty node
         last_node = None
         empty_merges = []
         for n in networkx.dfs_preorder_nodes(self.graph,
@@ -360,10 +363,10 @@ class PeripheralModel:
                 for n2 in networkx.dfs_preorder_nodes(self.graph,
                                                       n1):
 
-                    if (n1, n2) in checked:
+                    if (n1, n2) in checked or (n2, n1) in checked:
                         continue
 
-                    logger.debug("%s: Comparing %s and %s" % (self.name, str(n1), str(n2)))
+                    logger.info("%s: Comparing %s and %s" % (self.name, str(n1), str(n2)))
                     if n1 == n2:
                         continue
 
@@ -380,10 +383,16 @@ class PeripheralModel:
 
                     # Ensure that all shared outgoing edges are also mergable
                     mergable = True
+                    checked2 = set()  # Cache so we don't keep re-checking the same values
                     while len(merge_set) != 0:
                         x, y = merge_set.pop()
+                        logger.info("\t* Comparing %s and %s" % (str(x), str(y)))
+
+                        if (x, y) in checked2 or (y, x) in checked2:
+                            continue
 
                         set2 = self._get_merge_constraints(x, y)
+                        checked2.add((x, y))
                         if set2 is False:
                             mergable = False
                             break
@@ -555,23 +564,25 @@ class PeripheralModel:
 
             edge_tuple = list(self.graph[edge[0]][edge[1]]['tuples'])
 
-            logger.info("%s: Checking tuple (%d,%d): %s" % (self.name, edge[0], edge[1], edge_tuple))
+            logger.info("%s: Checking tuple (%s,%s): %s" % (self.name, str(edge[0]), str(edge[1]), edge_tuple))
             if (address, value) in edge_tuple:
-                self.current_state = (
-                    edge[1], self.graph.nodes[edge[1]]["state"])
-                if address in self.current_state[1].model_per_address:
-                    self.current_state[1].model_per_address[address].write(
-                        value)
+                self._update_state(edge[1], address, value)
+                # self.current_state = (
+                #     edge[1], self.graph.nodes[edge[1]]["state"])
+                # if address in self.current_state[1].model_per_address:
+                #     self.current_state[1].model_per_address[address].write(
+                #         value)
                 logger.info("%s: BFS selected %s: %s" % (self.name, str(edge), str(self.graph.nodes[edge[1]]["state"])))
                 return True
             elif (edge, address) in self.wildcard_edges:
-                self.current_state = (
-                    edge[1], self.graph.nodes[edge[1]]["state"])
-                if address in self.current_state[1].model_per_address:
-                    self.current_state[1].model_per_address[address].write(
-                        value)
+                self._update_state(edge[1], address, value)
+                # self.current_state = (
+                #     edge[1], self.graph.nodes[edge[1]]["state"])
+                # if address in self.current_state[1].model_per_address:
+                #     self.current_state[1].model_per_address[address].write(
+                #         value)
                 logger.info("%s: Wildcard selected %s: %s" % (self.name, str(edge),
-                            str(self.graph.nodes[edge[1]]["state"])))
+                                                              str(self.graph.nodes[edge[1]]["state"])))
                 return True
 
         logger.info(
@@ -596,11 +607,13 @@ class PeripheralModel:
             # TODO: Do something smarter, create a new state on the fly?
             return True
 
-        self.current_state = (
-            picked_edge[0][1], self.graph.nodes[picked_edge[0][1]]["state"])
-        logger.info("Picked edge: " + str(picked_edge[0]))
-        if address in self.current_state[1].model_per_address:
-            self.current_state[1].model_per_address[address].write(address, value)
+        self._update_state(picked_edge[0][1], address, value)
+
+        # self.current_state = (
+        #     picked_edge[0][1], self.graph.nodes[picked_edge[0][1]]["state"])
+        # logger.info("Picked edge: " + str(picked_edge[0]))
+        # if address in self.current_state[1].model_per_address:
+        #     self.current_state[1].model_per_address[address].write(address, value)
         return True
 
         # This address has never been written to, do nothing
@@ -696,6 +709,8 @@ class PeripheralModel:
         other_states = other_peripheral.append_states(suffix)
         self.node_states.update(other_states)
 
+        # create a new empty start state
+
         self._merge_map = {}
         if self._recursive_merge(self.start_state[0],
                                  other_peripheral.start_state[0],
@@ -774,4 +789,5 @@ class PeripheralModel:
                 new_edges = e2_labels - e_labels
                 # TODO: Why is this variable set?  Is this an error that we don't use it?
 
-        return rtn
+        # If we got to this point, we at least merged the two initial nodes
+        return True

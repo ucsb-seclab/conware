@@ -58,7 +58,8 @@ if __name__ == "__main__":
         for peripheral in model.peripherals:
             if peripheral == peripheral2:
                 logger.info("Merging %s..." % str(peripheral.name))
-                peripheral.merge(peripheral2)
+                if not peripheral.merge(peripheral2):
+                    logger.error("Failed to merge %s!" % str(peripheral.name))
 
         # Is this a new peripheral that we need to add?
         if peripheral2 not in model:

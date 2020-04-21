@@ -20,9 +20,9 @@ void loop() {
   // put your main code here, to run repeatedly:
   if (irrecv.decode(&results)) {
     Serial.println(results.value, HEX);
-    digitalWrite(RELAY_PIN, HIGH);
-    delay(100);
-    digitalWrite(RELAY_PIN, LOW);
+     digitalWrite(RELAY_PIN, HIGH);
+     delay(100);
+     digitalWrite(RELAY_PIN, LOW);
     irrecv.resume();
 
   }

@@ -6,6 +6,8 @@ import csv
 import logging
 import pandas as pd
 
+from conware.model import peripheral_memory_map
+
 logger = logging.getLogger(__name__)
 # emulated log: Operation Seqn	Address	Value	Value (Model)	PC	Size	Timestamp	Model /////////This is a tsv file
 # recorded log: Operation	Seqn	Address	Value	Value (Model)	PC	Size	Timestamp	Model ///////// this is listed as a csv file but it is a tsv file
@@ -26,24 +28,46 @@ def main(emulated, recorded):
     emulated_csv = csv.reader(emulated_log, dialect=csv.excel_tab)
     recorded_csv = csv.reader(recorded_log, dialect=csv.excel_tab)
 
-    recorded_tuples = []
-    emulated_tuples = []
+    # Skip headers
+    next(emulated_csv)
+    next(recorded_csv)
+
+    recorded_dict = {k: [] for k in peripheral_memory_map.peripheral_memory}
+    emulated_dict = {k: [] for k in peripheral_memory_map.peripheral_memory}
 
     # Read relevant tuples from recording
     for row in recorded_csv:
-        recorded_tuples.append((row[0], row[2], row[3]))
-        if row[0] == 'READ':
-            recorded_reads.append([row[2], row[3], row[6]])
-        elif row[0] == 'WRITE':
-            recorded_writes.append([row[2], row[3], row[6]])
+        operation, address, value = (row[i] for i in (0, 2, 3))
+        address = int(address, 16)
+        value = int(value, 16)
+        peripheral_name = peripheral_memory_map.get_peripheral(address,value)
+        if peripheral_name is None:
+            logger.warning("Found address with no mapped peripheral! (%s)" % (address, value))
+            continue
+        else:
+            peripheral_name = peripheral_name[0]
+        recorded_dict[peripheral_name].append((operation, address, value))
+        # if row[0] == 'READ':
+        #     recorded_reads.append([row[2], row[3], row[6]])
+        # elif row[0] == 'WRITE':
+        #     recorded_writes.append([row[2], row[3], row[6]])
 
     # Read relevant tuples from emulated output
     for row in emulated_csv:
-        emulated_tuples.append((row[0], row[2], row[3]))
-        if row[0] == 'READ':
-            emulated_reads.append([row[2], row[3], row[6]])
-        elif row[0] == 'WRITE':
-            emulated_writes.append([row[2], row[3], row[6]])
+        operation, address, value = (row[i] for i in (0, 2, 3))
+        address = int(address, 16)
+        value = int(value, 16)
+        peripheral_name = peripheral_memory_map.get_peripheral(address, value)
+        if peripheral_name is None:
+            logger.warning("Found address with no mapped peripheral! (%s, %s)" % (address, value))
+            continue
+        else:
+            peripheral_name = peripheral_name[0]
+        emulated_dict[peripheral_name].append((operation, address, value))
+        # if row[0] == 'READ':
+        #     emulated_reads.append([row[2], row[3], row[6]])
+        # elif row[0] == 'WRITE':
+        #     emulated_writes.append([row[2], row[3], row[6]])
 
     idx_emulated = 0
     idx_recorded = 0
@@ -51,105 +75,115 @@ def main(emulated, recorded):
     not_equal_count = 0
     repeat_count = 0
 
-    while idx_recorded < len(recorded_tuples) and idx_emulated < len(
-            emulated_tuples):
-        op_emu, addr_emu, value_emu = emulated_tuples[idx_emulated]
+    for peripheral_name in peripheral_memory_map.peripheral_memory:
+        print("*Checking %s (%d entries vs %d entries)..." % (peripheral_name,
+                                                              len(emulated_dict[peripheral_name]),
+                                                              len(recorded_dict[peripheral_name])
+                                                              ))
+        if peripheral_name != "UART":
+            continue
+        emulated_tuples = emulated_dict[peripheral_name]
+        recorded_tuples = recorded_dict[peripheral_name]
+        while idx_recorded < len(recorded_tuples) and \
+                idx_emulated < len(emulated_tuples):
+            op_emu, addr_emu, value_emu = emulated_tuples[idx_emulated]
 
-        op_rec, addr_rec, value_rec = recorded_tuples[idx_recorded]
-        if op_rec == op_emu and addr_rec == addr_emu:
-            if value_emu != value_rec:
-                # Let's check to see if we have any duplicate values (e.g.,
-                # status registers)
+            op_rec, addr_rec, value_rec = recorded_tuples[idx_recorded]
 
-                # Check to see if emulated keeps repeating
-                idx_tmp = idx_emulated
-                while idx_tmp < len(emulated_tuples) and emulated_tuples[
-                    idx_tmp] == (op_emu, addr_emu, value_emu):
-                    idx_tmp += 1
-                if idx_tmp == len(emulated_tuples):
-                    logger.info(
-                        "Hit end of emulated log (%d early)" % (idx_tmp -
-                                                                idx_emulated))
-                    break
-                # Looks like we just had a long repeat
-                if recorded_tuples[idx_recorded] == emulated_tuples[idx_tmp]:
-                    logger.debug("Skipped %d lines in emulated output." %
-                                 (idx_tmp - idx_emulated))
-                    repeat_count += idx_tmp - idx_emulated
-                    idx_emulated = idx_tmp
-                    continue
+            if op_rec == op_emu and addr_rec == addr_emu:
+                if value_emu != value_rec:
+                    # Let's check to see if we have any duplicate values (e.g.,
+                    # status registers)
 
-                # Check to see if the recording keeps repeating
-                idx_tmp = idx_recorded
-                while idx_tmp < len(recorded_tuples) and recorded_tuples[
-                    idx_tmp] == (op_rec, addr_rec, value_rec):
-                    idx_tmp += 1
-                # Looks like we just had a few repeats
-                if idx_tmp == len(recorded_tuples):
-                    logger.info(
-                        "Hit end of recorded log (%d early)" % (idx_tmp -
-                                                                idx_recorded))
-                    break
-                if recorded_tuples[idx_recorded] == emulated_tuples[idx_tmp]:
-                    logger.debug("Skipped %d lines in recorded output." %
-                                 (idx_tmp - idx_recorded))
-                    repeat_count += idx_tmp - idx_recorded
-                    idx_recorded = idx_tmp
-                    continue
+                    # Check to see if emulated keeps repeating
+                    idx_tmp = idx_emulated
+                    while idx_tmp < len(emulated_tuples) and emulated_tuples[
+                        idx_tmp] == (op_emu, addr_emu, value_emu):
+                        idx_tmp += 1
+                    if idx_tmp == len(emulated_tuples):
+                        logger.info(
+                            "Hit end of emulated log (%d early)" % (idx_tmp -
+                                                                    idx_emulated))
+                        break
+                    # Looks like we just had a long repeat
+                    if recorded_tuples[idx_recorded] == emulated_tuples[idx_tmp]:
+                        logger.debug("Skipped %d lines in emulated output." %
+                                     (idx_tmp - idx_emulated))
+                        repeat_count += idx_tmp - idx_emulated
+                        idx_emulated = idx_tmp
+                        continue
 
-                # Hum... they never synced up?
-                not_equal_count += 1
-                idx_emulated += 1
-                idx_recorded += 1
-                logger.warning("Found unequal rows %s != %s" % (
-                    recorded_tuples[idx_recorded],
-                    emulated_tuples[idx_emulated]))
-            else:
-                # Equal!
-                idx_emulated += 1
-                idx_recorded += 1
-                continue
-        else:
-            # Let's advance until they sync up again
-            next_emu = idx_emulated
-            next_rec = idx_recorded
+                    # Check to see if the recording keeps repeating
+                    idx_tmp = idx_recorded
+                    while idx_tmp < len(recorded_tuples) and recorded_tuples[
+                        idx_tmp] == (op_rec, addr_rec, value_rec):
+                        idx_tmp += 1
+                    # Looks like we just had a few repeats
+                    if idx_tmp == len(recorded_tuples):
+                        logger.info(
+                            "Hit end of recorded log (%d early)" % (idx_tmp -
+                                                                    idx_recorded))
+                        break
+                    if recorded_tuples[idx_recorded] == emulated_tuples[idx_tmp]:
+                        logger.debug("Skipped %d lines in recorded output." %
+                                     (idx_tmp - idx_recorded))
+                        repeat_count += idx_tmp - idx_recorded
+                        idx_recorded = idx_tmp
+                        continue
 
-            # Find the next index in each that makes them both equal
-            while next_emu < len(emulated_tuples) and \
-                    emulated_tuples[next_emu] != recorded_tuples[idx_recorded]:
-                next_emu += 1
-
-            while next_rec < len(recorded_tuples) and \
-                    recorded_tuples[next_rec] != emulated_tuples[idx_emulated]:
-                next_rec += 1
-
-            # Increment the smallest jump in the sequence
-            if (next_rec - idx_recorded) < (next_emu - idx_emulated):
-                logger.warning("%d lines missing from emulated @ %d." % (
-                    next_rec - idx_recorded, idx_emulated))
-
-                not_equal_count += next_rec - idx_recorded
-                while idx_recorded < next_rec:
-                    print("%d: %s %s %s" % ((idx_recorded + 1,
-                                             ) + recorded_tuples[idx_recorded]))
-                    idx_recorded += 1
-                continue
-            else:
-                logger.warning("%d lines missing from recording. @ %d" % (
-                    next_emu - idx_emulated, idx_recorded))
-                not_equal_count = next_emu - idx_emulated
-                while idx_emulated < next_emu:
-                    print("%d: %s %s %s" % (
-                            (idx_emulated + 1,) + emulated_tuples[
-                        idx_emulated]))
+                    # Hum... they never synced up?
+                    not_equal_count += 1
                     idx_emulated += 1
-                continue
+                    idx_recorded += 1
+                    logger.warning("Found unequal rows %s != %s" % (
+                        recorded_tuples[idx_recorded],
+                        emulated_tuples[idx_emulated]))
+                else:
+                    # Equal!
+                    idx_emulated += 1
+                    idx_recorded += 1
+                    continue
+            else:
+                # Let's advance until they sync up again
+                next_emu = idx_emulated
+                next_rec = idx_recorded
 
-        logger.error("Pretty sure this should never happen...")
-        not_equal_count += 1
-        idx_emulated += 1
-        idx_recorded += 1
-        continue
+                # Find the next index in each that makes them both equal
+                while next_emu < len(emulated_tuples) and \
+                        emulated_tuples[next_emu] != recorded_tuples[idx_recorded]:
+                    next_emu += 1
+
+                while next_rec < len(recorded_tuples) and \
+                        recorded_tuples[next_rec] != emulated_tuples[idx_emulated]:
+                    next_rec += 1
+
+                # Increment the smallest jump in the sequence
+                if (next_rec - idx_recorded) < (next_emu - idx_emulated):
+                    logger.warning("%d lines missing from emulated @ %d." % (
+                        next_rec - idx_recorded, idx_emulated))
+
+                    not_equal_count += next_rec - idx_recorded
+                    while idx_recorded < next_rec:
+                        print("%d: %s 0x%08X 0x%08X" % ((idx_recorded + 1,
+                                                 ) + recorded_tuples[idx_recorded]))
+                        idx_recorded += 1
+                    continue
+                else:
+                    logger.warning("%d lines missing from recording. @ %d" % (
+                        next_emu - idx_emulated, idx_recorded))
+                    not_equal_count = next_emu - idx_emulated
+                    while idx_emulated < next_emu:
+                        print("%d: %s 0x%08X 0x%08X" % (
+                                (idx_emulated + 1,) + emulated_tuples[
+                            idx_emulated]))
+                        idx_emulated += 1
+                    continue
+
+            logger.error("Pretty sure this should never happen...")
+            not_equal_count += 1
+            idx_emulated += 1
+            idx_recorded += 1
+            continue
 
 
 if __name__ == "__main__":

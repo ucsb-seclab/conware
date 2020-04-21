@@ -22,11 +22,12 @@ class Arduino:
               "-e", "-w", "-v", "-b",
               binary_filename, "-R"])
 
-    def log_data(self, output_filename, count=1):
+    def log_data(self, output_filename, uart_filename, count=1):
         ser = serial.Serial('/dev/%s' % self.device_location)
 
         dumping = False
         data_log = LogWriter(output_filename)
+        uart_log = open(uart_filename, "w+", 0)
         dump_count = 0
         logger.info("Waiting for data to dump...")
         for x in range(count):
@@ -63,7 +64,9 @@ class Arduino:
                         dump_count += 1
                     else:
                         print line
+                        uart_log.write(line)
                 except KeyboardInterrupt:
                     break
+        uart_log.close()
         data_log.close()
         ser.close()
