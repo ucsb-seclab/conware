@@ -3,6 +3,8 @@
 //
 #include <stdio.h>
 #include <stdbool.h>
+#include <stdint.h>
+#include <sam3.h>
 
 #define STORAGE_SIZE 2000
 #define READ 0
@@ -22,6 +24,18 @@ unsigned int RECORD_REPEATED[STORAGE_SIZE];
 bool PRINTING = false;
 
 static void conware_common_log(void *address, unsigned int value, unsigned int operation);
+
+inline uint32_t saveIRQState(void)
+{
+    uint32_t pmask = __get_PRIMASK() & 1;
+    __set_PRIMASK(1);
+    return pmask;
+}
+
+inline void restoreIRQState(uint32_t pmask)
+{
+    __set_PRIMASK(pmask);
+}
 
 /**
  * Print the results out over UART (or whatever the default printf is)
@@ -66,6 +80,11 @@ static void conware_common_log(void *address, unsigned int value, unsigned int o
     {
         return;
     }
+
+    // Disable interrupts
+    uint32_t irq_state = saveIRQState();
+    __disable_irq();
+
     // if this is an interrupt?
     if (operation == INTERRUPT)
     {
@@ -116,6 +135,7 @@ static void conware_common_log(void *address, unsigned int value, unsigned int o
                     {
                         RECORD_REPEATED[x]++;
                     }
+                    restoreIRQState(irq_state);
                     return;
                 }
             }
@@ -136,6 +156,8 @@ static void conware_common_log(void *address, unsigned int value, unsigned int o
 
         CURRENT_INDEX++;
     }
+    restoreIRQState(irq_state);
+    __enable_irq();
 }
 
 void conware_interrupt_log(unsigned intN)
@@ -158,7 +180,7 @@ void conware_interrupt_log(unsigned intN)
 void conware_log(void *address, unsigned int value, unsigned int operation)
 {
     // Only instrument MMIO
-    if (address < (void *)0x40000000 || address > (void *)(0x40000000 + 0x20000000))
+    if (address <= (void *)0x40000000 || address >= (void *)(0x40000000 + 0x20000000))
         return;
 
     // Don't log ourselves when we are printing
