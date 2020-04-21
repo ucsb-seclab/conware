@@ -25,6 +25,7 @@ bool PRINTING = false;
 
 static void conware_common_log(void *address, unsigned int value, unsigned int operation);
 
+// https://forum.arduino.cc/index.php?topic=421181.0
 inline uint32_t saveIRQState(void)
 {
     uint32_t pmask = __get_PRIMASK() & 1;
