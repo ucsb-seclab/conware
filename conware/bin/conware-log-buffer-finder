@@ -1,0 +1,159 @@
+#!/usr/bin/env python
+import fnmatch
+import itertools
+import json
+import os
+import pickle
+import sys
+import argparse
+import csv
+import logging
+import pandas as pd
+
+from conware import RECORDING_EXTENSION, INTERRUPT_MAP
+from conware.model import peripheral_memory_map
+
+logger = logging.getLogger(__name__)
+# emulated log: Operation Seqn	Address	Value	Value (Model)	PC	Size	Timestamp	Model /////////This is a tsv file
+# recorded log: Operation	Seqn	Address	Value	Value (Model)	PC	Size	Timestamp	Model ///////// this is listed as a csv file but it is a tsv file
+
+recorded_reads = []
+recorded_reads_referecne = {}
+recorded_writes = []
+recorded_writes_reference = {}
+emulated_reads = []
+emulated_writes = []
+count = 0
+
+
+def main(log):
+    log_file = file(log, 'r')
+    log_csv = csv.reader(log_file, dialect=csv.excel_tab)
+
+
+    interrupt_map = {}
+
+    # Skip headers
+    next(log_csv)
+
+    log_dict = {}
+    # Read relevant tuples from recording
+    for row in log_csv:
+        operation, address, value = (row[i] for i in (0, 2, 3))
+        address = int(address, 16)
+        value = int(value, 16)
+        peripheral_name = peripheral_memory_map.get_peripheral(address, value)
+        if peripheral_name is None:
+            logger.warning("Found address with no mapped peripheral! (%s)" % (address, value))
+            continue
+        else:
+            peripheral_name = peripheral_name[0]
+
+        if peripheral_name not in log_dict:
+            log_dict[peripheral_name] = []
+        log_dict[peripheral_name].append((operation, address, value))
+
+    # Let's look for cases where we see the same number of writes, followed by the same number interrupts
+    for peripheral_name in log_dict:
+        print("*Checking %s ..." % (peripheral_name))
+        last_write = None
+        last_write_count = 0
+
+        interrupt_count = {}
+        interrupt_target = {}
+
+        candidate_matches = []
+        for op, addr, value in log_dict[peripheral_name]:
+
+            if op == "WRITE":
+                if (addr, value) == last_write:
+                    last_write_count += 1
+                else:
+                    last_write = (addr, value)
+                    last_write_count = 0
+
+            if op == "INTERRUPT":
+                if value not in interrupt_count:
+                    interrupt_count[value] = 0
+                    interrupt_target[value] = (last_write, last_write_count)
+                else:
+                    interrupt_count[value] += 1
+
+                if interrupt_count[value] == interrupt_target[value][1]:
+                    match_pair = (interrupt_target[value][0], value)
+                    logger.info("Found equal interrupts! %s " % str(match_pair))
+                    candidate_matches.append(match_pair)
+
+        # Once we have the candidates we have to assure that they are "always" the same
+        for write_tuple, interrupt_num in candidate_matches:
+            last_write_count = 0
+            interrupt_count = 0
+            perfect_mapping = True
+            for op, addr, value in log_dict[peripheral_name]:
+                if op == "WRITE":
+                    if (addr, value) == write_tuple:
+                        last_write_count += 1
+
+                if op == "INTERRUPT":
+                    if value == interrupt_num:
+                        interrupt_count += 1
+
+                    # Must be +1 because the last interrupt would be used to disable the interrupt
+                    if interrupt_count == last_write_count+1:
+                        interrupt_count = 0
+                        last_write_count = 0
+
+                if interrupt_count > last_write_count:
+                    logger.error("%d interrupts and only %d writes observed" % (interrupt_count, last_write_count))
+                    perfect_mapping = False
+                    break
+
+            if perfect_mapping:
+                print "%s is correlated to interrupt %s" % (write_tuple, interrupt_num)
+                interrupt_map[write_tuple] = interrupt_num
+                interrupt_map[interrupt_num] = write_tuple
+
+    return interrupt_map
+
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    # Get user input
+    parser = argparse.ArgumentParser()
+    parser.add_argument("recording_dir", default="recording",
+                        help="Directory containing all of the log files")
+    parser.add_argument("--debug", "-d", default=False, action='store_true',
+                        help="Enable debug output.")
+    args = parser.parse_args()
+
+    if not os.path.exists(args.recording_dir):
+        parser.print_help()
+        sys.exit(0)
+
+    # Setup Logging
+    if args.debug:
+        logging.basicConfig(level=logging.DEBUG)
+    else:
+        logging.basicConfig(level=logging.INFO)
+
+    # First, let's just read our log into a nice internal structure
+    files = fnmatch.filter(os.listdir(args.recording_dir),
+                           "*.%s" % RECORDING_EXTENSION)
+
+    if len(files) != 1:
+        logger.error("It looks like there is less than or more than 1 "
+                     "recording "
+                     "in the given directory!")
+        parser.print_help()
+        sys.exit(0)
+
+    log_file = os.path.join(args.recording_dir, files[0])
+    output_file = os.path.join(args.recording_dir, INTERRUPT_MAP)
+
+    logging.basicConfig(level=logging.INFO)
+    interrupt_map = main(log_file)
+    with open(output_file, "w+") as f:
+        pickle.dump(interrupt_map, f)
+
+    print("* Saved to %s" % output_file)
+

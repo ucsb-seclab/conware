@@ -21,6 +21,7 @@ import conware.globals as G
 from conware.ground_truth.arduino_due import PeripheralMemoryMap
 
 # from pretender.logger import LogReader
+from conware.interrupts import Interrupter
 from conware.tools.logger import LogReader
 
 # from pretender.cluster_peripherals import cluster_peripherals
@@ -50,6 +51,8 @@ class PretenderModel:
         self.accessed_addresses = set()
         # filename = kwargs['kwargs']['filename'] if kwargs else None
 
+        self.interrupt_map = kwargs['interrupt_map'] if kwargs and 'interrupt_map' in kwargs else {}
+
         # Load from disk?
         if filename is not None:
             self.__dict__ = pickle.load(open(filename, "rb"))
@@ -58,15 +61,18 @@ class PretenderModel:
                 p.reset()
             # pprint.pprint(self.model_per_address)
 
-        host = kwargs['host'] if kwargs and 'host' in kwargs else None
-        if host:
-            self.send_interrupts_to(host)
-        serial = kwargs['serial'] if kwargs and 'serial' in kwargs else None
-        if serial:
-            logger.info("Attaching virtual serial port")
-            uart = NucleoUSART('serial', 0x40004400, size=32)
-            self.model_per_address[0x40004400] = uart
-            self.model_per_address[0x40004404] = uart
+        if "interrupt_map" not in self.__dict__:
+            self.interrupt_map = {}
+
+        self.host = kwargs['host'] if kwargs and 'host' in kwargs else None
+        # if host:
+        #     self.send_interrupts_to(host)
+        # serial = kwargs['serial'] if kwargs and 'serial' in kwargs else None
+        # if serial:
+        #     logger.info("Attaching virtual serial port")
+        #     uart = NucleoUSART('serial', 0x40004400, size=32)
+        #     self.model_per_address[0x40004400] = uart
+        #     self.model_per_address[0x40004404] = uart
 
     def __del__(self):
         self.shutdown()
@@ -182,8 +188,14 @@ class PretenderModel:
                 self.model_per_address[addr].train_read(addr, val, pc, size,
                                                         timestamp)
             elif op in ["2", "INTERRUPT"]:
+
+                # If it's a mapping we have, ignore it, we already know when to trigger it
+                if val in self.interrupt_map:
+                    logger.debug("Found mapped interrupt (0x%08X), skipping" % val)
+                    continue
                 # Do we know which peripheral this goes with?
-                if val in self.model_per_interrupt:
+                elif val in self.model_per_interrupt:
+                    logger.info("Trained interrupt (%s)" % str(irq))
                     self.model_per_interrupt[irq].train_interrupt(val, timestamp)
                 else:
                     logger.warning("Got interrupt %s and it is not mapped to a peripheral! " % str(irq))
@@ -213,6 +225,19 @@ class PretenderModel:
         else:
             return None
 
+    def get_interrupts(self, address):
+        """"
+            Return a dictionary of all of the interrupts in the current state, with their counts
+            :param address: Address that return the interrupts for the current state for
+            :return:
+        """
+        if address in self.model_per_address:
+            if isinstance(self.model_per_address[address], SimpleStorageModel):
+                return None
+            return self.model_per_address[address].get_interrupts()
+        else:
+            return None
+
     def write_memory(self, address, size, value):
         """
         On a write, we need to check if this value affects any other address
@@ -230,13 +255,23 @@ class PretenderModel:
                 "No model found for %s, using SimpleStorageModel...",
                 hex(address))
             self.model_per_address[address] = SimpleStorageModel()
-            return True
+            rtn = True
         else:
             if isinstance(self.model_per_address[address], PeripheralModel):
-                return self.model_per_address[address].write(address, size,
-                                                             value)
+                rtn = self.model_per_address[address].write(address, size,
+                                                            value)
             else:
-                return self.model_per_address[address].write(value)
+                rtn = self.model_per_address[address].write(value)
+
+        # Inject an interrupt?
+        if (address, value) in self.interrupt_map:
+            logger.info("Injecting interrupt!")
+            logger.info(self.host)
+            irq_num = self.interrupt_map[(address, value)]
+            i = Interrupter(irq_num, self.host, count=1)
+            i.start()
+
+        return rtn
 
     def read_memory(self, address, size):
         """

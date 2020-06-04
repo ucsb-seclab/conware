@@ -4,6 +4,7 @@
 import argparse
 import fnmatch
 import os
+import pickle
 import sys
 import logging
 
@@ -43,9 +44,21 @@ if __name__ == "__main__":
         parser.print_help()
         sys.exit(0)
 
+    # Do we already know how certain interrupts work?
+    interrupt_file = os.path.join(args.recording_dir, INTERRUPT_MAP)
+    interrupt_map = {}
+    # if os.path.exists(interrupt_file):
+    #     logger.info("Found interrupt map file, loading..")
+    #     with open(interrupt_file, "r") as f:
+    #         interrupt_map = pickle.load(f)
+    # interrupt_map = {
+    #     24: (1074661384, 2),
+    #     (1074661384, 2): 24
+    # }
+
     for f in files:
         logger.info("Opening %s..." % f)
-        p = PretenderModel()
+        p = PretenderModel(interrupt_map=interrupt_map)
         p.train(os.path.join(args.recording_dir, f))
         output_model = os.path.join(args.recording_dir, MODEL_FILE)
         print "Saving model (%s)..." % output_model

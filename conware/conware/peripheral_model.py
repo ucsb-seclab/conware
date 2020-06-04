@@ -386,7 +386,7 @@ class PeripheralModel:
                     checked2 = set()  # Cache so we don't keep re-checking the same values
                     while len(merge_set) != 0:
                         x, y = merge_set.pop()
-                        logger.info("\t* Comparing %s and %s" % (str(x), str(y)))
+                        logger.debug("\t* Comparing %s and %s" % (str(x), str(y)))
 
                         if (x, y) in checked2 or (y, x) in checked2:
                             continue
@@ -623,7 +623,7 @@ class PeripheralModel:
                                              str(value)))
         return True
 
-    def _update_wildcard_edges(self, threshold=5):
+    def _update_wildcard_edges(self, threshold=3):
         """
         Annotate any edges that have more than **threshold** writes to accept
         any value as a transition (i.e., a wildcard)
@@ -713,8 +713,7 @@ class PeripheralModel:
 
         self._merge_map = {}
         if self._recursive_merge(self.start_state[0],
-                                 other_peripheral.start_state[0],
-                                 other_peripheral):
+                                 other_peripheral.start_state[0], other_peripheral):
             # Rename our nodes to be equivalent
             other_peripheral.graph = networkx.relabel_nodes(
                 other_peripheral.graph,

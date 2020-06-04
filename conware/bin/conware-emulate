@@ -12,6 +12,7 @@ from avatar2 import *
 
 import logging
 
+from conware.interrupts import Interrupter
 from conware.peripherals import Pretender
 
 from conware.tools.logger import LogWriter
@@ -19,12 +20,12 @@ from conware.tools.bin_parser import M3Parser
 from conware.tools.coverage import get_hit_blocks
 
 # Conware
-from conware.pretender_model import PretenderModel
+from conware.model import PretenderModel
 from conware import *
 
 logger = logging.getLogger(__name__)
 seq = 0
-time_start = 0;
+time_start = 0
 
 UART = {
     'rx': None,
@@ -162,60 +163,6 @@ def emulate_read_after(avatar, message, **kwargs):
     # mem_log.write_row(
     #     ['READ', message.id, message.address, val, message.pc, message.size])
     # pprint.pprint(kwargs)
-
-
-class Interrupter(Thread):
-    host = None
-
-    def __init__(self, irq_num, host, rate=.01, count=-1):
-        """
-
-        :param irq_num: IRQ # in QEMU
-        :param rate:
-        """
-        self.irq_num = irq_num
-        self.interrupt_rate = rate
-        self.host = host
-        self.count = count
-        self._shutdown = Event()
-        logger.debug("Creating Interrupter for IRQ %d" % self.irq_num)
-        Thread.__init__(self)
-
-    def _send_irq(self):
-        logger.debug("Sending IRQ %d (interval: %d s)" % (self.irq_num, self.interrupt_rate))
-        # try:
-        self.host.protocols.interrupts.inject_interrupt(self.irq_num)
-        # except:
-        #     logger.exception("Error injecting interrupt.")
-        OUTPUT_TSV.write_row(
-            ['INTERRUPT', seq,
-             "0x%08x" % 0,
-             "%08x" % self.irq_num,
-             "%08x" % 0,
-             "0x%x" % 0,
-             0, time.time() - time_start, "???"])
-
-    def run(self):
-        logger.info("Starting Stateful Interrupter for IRQ %d (count: %d)" % (self.irq_num, self.count))
-        if not self.host:
-            raise RuntimeError("Must set host first")
-        ignored = False
-        # self.host.protocols.interrupts.ignore_interrupt_return(
-        #     self.irq_num)
-        if self.count == -1:
-            while not self._shutdown.is_set():
-                # if not ignored:
-                #     logger.info(
-                #         "Ignoring interrupt returns for IRQ %d" % self.irq_num)
-                #     self.host.protocols.interrupts.ignore_interrupt_return(
-                #         self.irq_num)
-                #     ignored = True
-                self._send_irq()
-                time.sleep(self.interrupt_rate)
-        else:
-            for x in xrange(self.count):
-                self._send_irq()
-                time.sleep(self.interrupt_rate)
 
 
 def emulate_write_after(avatar, message, **kwargs):
@@ -371,17 +318,7 @@ if __name__ == '__main__':
         logger.info("Using board configuration from %s " % args.board_config)
         with open(args.board_config) as f:
             config = yaml.load(f)
-    # Load our model
-    if args.model is None:
-        model_file = os.path.join(args.output_dir, MODEL_FILE)
-    else:
-        model_file = args.model
-    if not os.path.exists(model_file):
-        logger.error("Could not find model file (%s)." % model_file)
-        sys.exit()
-    else:
-        logger.info("Loading model file (%s)..." % model_file)
-    pretender_model = PretenderModel(filename=model_file)
+
     # Let's setup avatar
     logger.info("Creating Avatar instance...")
     avatar_dir = os.path.join(args.output_dir, "emulate_logs")
@@ -393,6 +330,7 @@ if __name__ == '__main__':
     avatar.load_plugin('instruction_forwarder')
     avatar.load_plugin('assembler')
     avatar.load_plugin('disassembler')
+
 
     # UART Output
     uart_tx_file = os.path.join(avatar_dir, "uart_tx.txt")
@@ -421,6 +359,21 @@ if __name__ == '__main__':
     if "uart" in config:
         UART['tx'] = config['uart']['tx']
         UART['rx'] = config['uart']['rx']
+
+
+
+    # Load our model
+    if args.model is None:
+        model_file = os.path.join(args.output_dir, MODEL_FILE)
+    else:
+        model_file = args.model
+    if not os.path.exists(model_file):
+        logger.error("Could not find model file (%s)." % model_file)
+        sys.exit()
+    else:
+        logger.info("Loading model file (%s)..." % model_file)
+    pretender_model = PretenderModel(filename=model_file,
+                                     host=qemu)
 
     # Define our memory map for this board
     logger.info("Configuring memory layout...")
