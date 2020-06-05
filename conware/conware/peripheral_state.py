@@ -65,10 +65,10 @@ class PeripheralModelState:
 
         # Do not consider an empty node equal to a non-empty node
         # Otherwise, merging nodes with different reads is fine
-        if (len(self.model_per_address.keys()) == 0 and len(other_state.model_per_address.keys()) != 0) or \
-                (len(other_state.model_per_address.keys()) == 0 and len(self.model_per_address.keys()) != 0):
-
-            return False
+        # if (len(self.model_per_address.keys()) == 0 and len(other_state.model_per_address.keys()) != 0) or \
+        #         (len(other_state.model_per_address.keys()) == 0 and len(self.model_per_address.keys()) != 0):
+        #
+        #     return False
 
         # Make sure all of our read models are equivalent
         for address in self.model_per_address:
