@@ -236,7 +236,7 @@ class PretenderModel:
                 return None
             return self.model_per_address[address].get_interrupts()
         else:
-            return None
+            return {}
 
     def write_memory(self, address, size, value):
         """
