@@ -233,7 +233,7 @@ class PretenderModel:
         """
         if address in self.model_per_address:
             if isinstance(self.model_per_address[address], SimpleStorageModel):
-                return None
+                return {}
             return self.model_per_address[address].get_interrupts()
         else:
             return {}
