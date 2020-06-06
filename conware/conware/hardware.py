@@ -9,7 +9,7 @@ logger = logging.getLogger(__name__)
 
 
 class Arduino:
-    def __init__(self, device_location="ttyACM1"):
+    def __init__(self, device_location="ttyACM0"):
         self.device_location = device_location
 
     def upload_binary(self, binary_filename):

@@ -32,6 +32,7 @@ class PeripheralModel:
         self.equiv_states = []
         self.visited = []
         self.wildcard_edges = {}
+        self.merge_count = 1
 
     def __str__(self):
         """ Return a nice readable string """
@@ -705,7 +706,8 @@ class PeripheralModel:
 
         # Make sure our keys for the nodes do not overlap
         # TODO: Change this support more than 2 model merges
-        suffix = "_2"
+        suffix = "_%d" % self.merge_count
+        self.merge_count += 1
         other_states = other_peripheral.append_states(suffix)
         self.node_states.update(other_states)
 
