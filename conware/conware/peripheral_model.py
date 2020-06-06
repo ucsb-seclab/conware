@@ -470,7 +470,7 @@ class PeripheralModel:
             logger.error(
                 "%s: Could not find model for read address (%s)" % (
                     self.name, hex(address)))
-            return -1
+            return 0
         value = self.current_state[1].model_per_address[address].read()
         logger.debug("%s: Read from %s value: %s" % (self.name,
                                                      hex(address),
