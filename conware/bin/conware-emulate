@@ -177,27 +177,7 @@ def emulate_write_after(avatar, message, **kwargs):
     val = message.value
     model_val = 0
 
-    # Do we have interrupts to throw?
-    interrupts = {}
-    if message.dst is not None:
-        interrupts = message.dst.forwarded_to.model.get_interrupts(message.address)
-        for irq_num in interrupts:
-            i = Interrupter(irq_num, message.origin, count=interrupts[irq_num])
-            i.start()
-
-    # Is this an NVIC interrupt (e.g., TC1-5?)
-    if message.address == 0xe000e100 or message.address == 0xe000e104:
-        logger.info("NVIC WRITE DETECTED %s %s" % (hex(message.address), hex(message.value)))
-    if message.address == 0xe000e104:
-        # logger.error("SAW AN NVIC WRITE!!")
-        # logger.error(message.dst)
-        if message.value == 0x1:
-            logger.info("Enabling interrupter")
-            i = Interrupter(48, message.origin, .0001)
-            i.start()
-        # message.origin.protocols.interrupts.inject_interrupt(48)
-        # message.origin.protocols.interrupts.inject_interrupt(48)
-
+    # Get the model name
     try:
         model_name = message.dst.forwarded_to.model.get_model(message.address)
     except:
@@ -222,6 +202,36 @@ def emulate_write_after(avatar, message, **kwargs):
              "%08x" % model_val,
              "0x%x" % message.pc,
              message.size, time.time() - time_start, model_name])
+
+    # Do we have interrupts to throw?
+    interrupts = {}
+    if message.dst is not None:
+        interrupts = message.dst.forwarded_to.model.get_interrupts(message.address)
+        for irq_num in interrupts:
+            OUTPUT_TSV.write_row(
+                ['INTERRUPT', seq,
+                 "0x%08x" % 0,
+                 "%08x" % irq_num,
+                 "%08x" % 0,
+                 "0x%x" % message.pc,
+                 message.size, time.time() - time_start, model_name])
+            i = Interrupter(irq_num, message.origin, count=interrupts[irq_num])
+            i.start()
+
+    # Is this an NVIC interrupt (e.g., TC1-5?)
+    if message.address == 0xe000e100 or message.address == 0xe000e104:
+        logger.info("NVIC WRITE DETECTED %s %s" % (hex(message.address), hex(message.value)))
+    if message.address == 0xe000e104:
+        # logger.error("SAW AN NVIC WRITE!!")
+        # logger.error(message.dst)
+        if message.value == 0x1:
+            logger.info("Enabling interrupter")
+            i = Interrupter(48, message.origin, .0001)
+            i.start()
+        # message.origin.protocols.interrupts.inject_interrupt(48)
+        # message.origin.protocols.interrupts.inject_interrupt(48)
+
+
 
     if message.address == UART['tx']:
         dest = [0] * 4

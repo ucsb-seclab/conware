@@ -243,8 +243,9 @@ def get_log_diff(emulated, recorded, output_file):
                     logger.warning("Found unequal rows %s != %s" % (
                         recorded_tuples[idx_recorded],
                         emulated_tuples[idx_emulated]))
-                    logger.warning("%d\t%s\t%d\t%s\n" % (idx_emulated, emulated_tuples[idx_emulated],
-                                                         idx_recorded, recorded_tuples[idx_recorded]))
+                    logger.warning("%d\t%s\t%d\t%s\n" % (idx_recorded, recorded_tuples[idx_recorded],
+                                                         idx_emulated, emulated_tuples[idx_emulated]))
+
                     conflicts += 1
                     if out is not None:
                         out.write("%d\t%s\t%d\t%s\n" % (idx_emulated, emulated_tuples[idx_emulated],
