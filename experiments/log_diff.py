@@ -17,7 +17,9 @@ def print_results(results):
                                       100.0*results[name]['missing_emulated']/results[name]['total']))
         out_dict.append("%d (%.03f)" % (results[name]['missing_emulated'],
                                       100.0*results[name]['missing_emulated']/results[name]['total']))
-        out_dict.append('{:,}'.format(results[name]['total']))
+        # out_dict.append('{:,}'.format(results[name]['total']))
+        out_dict.append('{:,}'.format(results[name]['total_emulated']))
+        out_dict.append('{:,}'.format(results[name]['total_recorded']))
         print(" & ".join(out_dict) + "\\\\")
 
 

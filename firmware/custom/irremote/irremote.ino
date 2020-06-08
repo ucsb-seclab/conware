@@ -1,30 +1,31 @@
+/*
+ * IRremote: IRrecvDemo - demonstrates receiving IR codes with IRrecv
+ * An IR detector/demodulator must be connected to the input RECV_PIN.
+ * Version 0.1 July, 2009
+ * Copyright 2009 Ken Shirriff
+ * http://arcfn.com
+ */
+
 #include <IRremote2.h>
 
 int RECV_PIN = 11;
-int RELAY_PIN = 4;
 
 IRrecv irrecv(RECV_PIN);
+
 decode_results results;
 
-void setup() {
-  // put your setup code here, to run once:
-  pinMode(RELAY_PIN, OUTPUT);
-  pinMode(13, OUTPUT);
+void setup()
+{
   Serial.begin(9600);
-  irrecv.enableIRIn();
-
+  irrecv.enableIRIn(); // Start the receiver
 }
-
 
 void loop() {
-  // put your main code here, to run repeatedly:
   if (irrecv.decode(&results)) {
     Serial.println(results.value, HEX);
-     digitalWrite(RELAY_PIN, HIGH);
-     delay(100);
-     digitalWrite(RELAY_PIN, LOW);
-    irrecv.resume();
-
+    irrecv.resume(); // Receive the next value
   }
-
 }
+
+
+

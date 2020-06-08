@@ -37,10 +37,10 @@
 LiquidCrystal lcd(7, 8, 9, 10, 11, 12);
 
 void setup() {
-    Serial.begin(9600);
-    Serial.println("Sanity Check");
   // set up the LCD's number of columns and rows:
+  Serial.begin(9600);       // use the serial port
   lcd.begin(16, 1);
+  lcd.print("hello, world!");
   // Print a message to the LCD.
 }
 

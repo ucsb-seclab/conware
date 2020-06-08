@@ -119,6 +119,8 @@ def get_log_diff(emulated, recorded, output_file):
     emulated_reads = []
     emulated_writes = []
     count = 0
+    total_emulated = 0
+    total_recorded = 0
 
     if output_file is not None:
         out = open(output_file, "w+")
@@ -150,6 +152,7 @@ def get_log_diff(emulated, recorded, output_file):
         else:
             peripheral_name = peripheral_name[0]
         recorded_dict[peripheral_name].append((operation, address, value))
+        total_recorded += 1
         # if row[0] == 'READ':
         #     recorded_reads.append([row[2], row[3], row[6]])
         # elif row[0] == 'WRITE':
@@ -168,6 +171,7 @@ def get_log_diff(emulated, recorded, output_file):
         else:
             peripheral_name = peripheral_name[0]
         emulated_dict[peripheral_name].append((operation, address, value))
+        total_emulated += 1
         # if row[0] == 'READ':
         #     emulated_reads.append([row[2], row[3], row[6]])
         # elif row[0] == 'WRITE':
@@ -239,6 +243,8 @@ def get_log_diff(emulated, recorded, output_file):
                     logger.warning("Found unequal rows %s != %s" % (
                         recorded_tuples[idx_recorded],
                         emulated_tuples[idx_emulated]))
+                    logger.warning("%d\t%s\t%d\t%s\n" % (idx_emulated, emulated_tuples[idx_emulated],
+                                                         idx_recorded, recorded_tuples[idx_recorded]))
                     conflicts += 1
                     if out is not None:
                         out.write("%d\t%s\t%d\t%s\n" % (idx_emulated, emulated_tuples[idx_emulated],
@@ -303,4 +309,6 @@ def get_log_diff(emulated, recorded, output_file):
     return {'total': total_compared,
             'conflicts': conflicts,
             'missing_emulated': missing_emulated,
-            'missing_recorded': missing_recorded}
+            'missing_recorded': missing_recorded,
+            'total_emulated': total_emulated,
+            'total_recorded': total_recorded}
