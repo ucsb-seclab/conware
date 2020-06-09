@@ -1,6 +1,57 @@
 {
   "packages": [
     {
+      "name": "arduino-beta",
+      "maintainer": "Arduino",
+      "websiteURL": "http://www.arduino.cc/",
+      "email": "packages@arduino.cc",
+      "help": {
+        "online": "http://www.arduino.cc/en/Reference/HomePage"
+      },
+      "platforms": [
+        {
+          "name": "Arduino mbed-enabled Boards",
+          "architecture": "mbed",
+          "version": "1.2.0",
+          "category": "Contributed",
+          "url": "http://downloads.arduino.cc/cores/ArduinoCore-mbed-1.2.0.tar.bz2",
+          "archiveFileName": "ArduinoCore-mbed-1.2.0.tar.bz2",
+          "checksum": "SHA-256:9a96514fabdc6f8428c3f2f34e147e80140a2697c21c551ee5d6e2048ea4a995",
+          "size": "78486787",
+          "help": {
+            "online": "https://github.com/arduino/ArduinoCore-mbed/issues"
+          },
+          "boards": [
+            {
+              "name": "Arduino Portenta H7"
+            }
+          ],
+          "toolsDependencies": [
+            {
+              "packager": "arduino",
+              "name": "openocd",
+              "version": "0.10.0-arduino12"
+            },
+            {
+              "packager": "arduino",
+              "name": "arm-none-eabi-gcc",
+              "version": "7-2017q4"
+            },
+            {
+              "packager": "arduino",
+              "name": "bossac",
+              "version": "1.9.1-arduino1"
+            },
+            {
+              "packager": "arduino",
+              "version": "0.9.0-arduino2",
+              "name": "dfu-util"
+            }
+          ]
+        }
+      ]
+    },
+    {
       "name": "arduino",
       "maintainer": "Arduino",
       "websiteURL": "http://www.arduino.cc/",

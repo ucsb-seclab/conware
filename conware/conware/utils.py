@@ -233,7 +233,7 @@ def get_log_diff(emulated, recorded, output_file):
                             "Hit end of recorded log (%d early)" % (idx_tmp -
                                                                     idx_recorded))
                         break
-                    if recorded_tuples[idx_recorded] == emulated_tuples[idx_tmp]:
+                    if recorded_tuples[idx_tmp] == emulated_tuples[idx_emulated]:
                         logger.debug("Skipped %d lines in recorded output." %
                                      (idx_tmp - idx_recorded))
                         repeat_count += idx_tmp - idx_recorded

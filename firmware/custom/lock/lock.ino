@@ -97,6 +97,7 @@ void loop()   /*----( LOOP: RUNS CONSTANTLY )----*/
     //Serial.println(results.value, HEX);  //UN Comment to see raw values
     if ( results.value == 0xFFA857)
     {
+      Serial.print("Knock detector");
       knockDetector();
       irrecv.resume(); // receive the next value
     }
@@ -107,6 +108,7 @@ void loop()   /*----( LOOP: RUNS CONSTANTLY )----*/
     // }
     else if (results.value == 0xFFC23D)
     {
+      Serial.print("Color passcode");
       colorPasscode();
       irrecv.resume(); // receive the next value
     }

@@ -12,8 +12,15 @@ if __name__ == "__main__":
     parser.add_argument('recorded_log')
     parser.add_argument("--output_file", "-o", default=None,
                         help="Save the results a file")
+    parser.add_argument("--debug", "-d", default=False, action='store_true',
+                        help="Enable debug output.")
 
     args = parser.parse_args()
 
-    logging.basicConfig(level=logging.INFO)
+    # Setup Logging
+    if args.debug:
+        logging.basicConfig(level=logging.DEBUG)
+    else:
+        logging.basicConfig(level=logging.INFO)
+
     get_log_diff(args.emulated_log, args.recorded_log, args.output_file)

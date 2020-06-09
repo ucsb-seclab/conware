@@ -1,3 +1,5 @@
+import time
+
 import serial
 
 import logging
@@ -16,11 +18,28 @@ class Arduino:
         ser = serial.Serial('/dev/%s' % self.device_location, baudrate=1200)
         ser.close()
 
-        from subprocess import call
-        call(["bossac", "-i", "-d",
-              "--port=%s" % self.device_location, "-U", "false",
-              "-e", "-w", "-v", "-b",
-              binary_filename, "-R"])
+        # from subprocess import call
+        # call(["bossac", "-i", "-d",
+        #       "--port=%s" % self.device_location, "-U", "false",
+        #       "-e", "-w", "-v", "-b",
+        #       binary_filename, "-R"])
+
+        from subprocess import Popen, PIPE
+        rc = -1
+        while rc != 0:
+            if rc > 0:
+                logger.info("* Trying again...")
+                time.sleep(1)
+            logger.info("Flashing firmware (%s) to board (%s)..." % (binary_filename, self.device_location))
+            p = Popen(["bossac", "-i", "-d",
+                  "--port=%s" % self.device_location, "-U", "false",
+                  "-e", "-w", "-v", "-b",
+                  binary_filename, "-R"], stdin=PIPE, stdout=PIPE, stderr=PIPE)
+            output, err = p.communicate()
+            logger.info(output)
+            logger.error(err)
+            rc = p.returncode
+
 
     def log_data(self, output_filename, uart_filename, count=1):
         ser = serial.Serial('/dev/%s' % self.device_location)

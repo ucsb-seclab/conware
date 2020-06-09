@@ -13,8 +13,8 @@ def print_results(results):
         out_dict = ["\\texttt{%s}" % name]
         out_dict.append("%d (%.03f)" % (results[name]['conflicts'],
                                       100.0*results[name]['conflicts']/results[name]['total']))
-        out_dict.append("%d (%.03f)" % (results[name]['missing_emulated'],
-                                      100.0*results[name]['missing_emulated']/results[name]['total']))
+        out_dict.append("%d (%.03f)" % (results[name]['missing_recorded'],
+                                      100.0*results[name]['missing_recorded']/results[name]['total']))
         out_dict.append("%d (%.03f)" % (results[name]['missing_emulated'],
                                       100.0*results[name]['missing_emulated']/results[name]['total']))
         # out_dict.append('{:,}'.format(results[name]['total']))
