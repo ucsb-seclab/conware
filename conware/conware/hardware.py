@@ -58,6 +58,7 @@ class Arduino:
                         dumping = True
                     elif "CONWAREDUMP_END" in line:
                         logger.info("Dump done (%d events recorded)." % dump_count)
+                        dumping = False
                         break
                     elif dumping:
                         data = line.split("\t")

@@ -12,7 +12,7 @@ from networkx.drawing.nx_agraph import to_agraph
 
 import logging
 
-from conware.model import PretenderModel
+from conware.model import ConwareModel
 import conware.globals as G
 
 logger = logging.getLogger(__name__)
@@ -78,10 +78,10 @@ if __name__ == "__main__":
             continue
 
         logger.info("Importing model file (%s)..." % model_file)
-        model = PretenderModel(filename=model_file)
+        model = ConwareModel(filename=model_file)
         results[os.path.basename(dir)] = get_stats(model)
         logger.info("Importing model file (%s)..." % model_file_optimized)
-        model = PretenderModel(filename=model_file_optimized)
+        model = ConwareModel(filename=model_file_optimized)
         results_optimized[os.path.basename(dir)] = get_stats(model)
 
     pprint.pprint(results)

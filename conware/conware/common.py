@@ -10,10 +10,10 @@ from avatar2.targets.jlink_target import JLinkTarget
 from conware.hooks import *
 
 #from pretender.model import PretenderModel
-from conware.model import PretenderModel
+from conware.model import ConwareModel
 
 #from pretender.peripherals import NullModel, Pretender
-from conware.peripherals import NullModel, Pretender
+from conware.peripherals import NullModel, Conware
 
 #from pretender import globals as G
 from conware import globals as G
@@ -183,7 +183,7 @@ def add_partial_model(avatar, emulator, hardware, model_fn, base=0x40000000,
                 mdl.min_addr(), mdl.min_addr() + mdl_size))
             modeled = avatar.add_memory_range(mdl.min_addr(), mdl_size,
                                               name='model%d' % count,
-                                              emulate=PretenderModel,
+                                              emulate=ConwareModel,
                                               kwargs=model_kwargs)
             count += 1
             cur_addr = mdl.min_addr() + mdl_size
@@ -244,7 +244,7 @@ def set_memory_map(avatar, args, model=False, pretender_model=None):
 
                     mmio = avatar.add_memory_range(base, size, name='mmio',
                                                    forwarded=True,
-                                                   forwarded_to=Pretender(
+                                                   forwarded_to=Conware(
                                                        "Pretender", base,
                                                        size,
                                                        pretender_model))

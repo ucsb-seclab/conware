@@ -9,7 +9,7 @@ import logging
 
 from conware.common import build_avatar, build_qemu_emulator, set_memory_map, load_config, build_hardware
 from conware.tools.logger import LogWriter
-from conware.model import PretenderModel
+from conware.model import ConwareModel
 from conware.bin_parser import M3Parser
 import conware.globals as G
 
@@ -183,7 +183,7 @@ if __name__ == "__main__":
         sys.exit()
 
     # Setup our models
-    pretender_model = PretenderModel(filename=model_file)
+    pretender_model = ConwareModel(filename=model_file)
 
     # Load our args
     args = load_config(args)

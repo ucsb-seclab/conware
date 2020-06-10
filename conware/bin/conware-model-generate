@@ -9,7 +9,7 @@ import sys
 import logging
 
 # Conware
-from conware.model import PretenderModel
+from conware.model import ConwareModel
 from conware import *
 
 logger = logging.getLogger(__name__)
@@ -58,7 +58,7 @@ if __name__ == "__main__":
 
     for f in files:
         logger.info("Opening %s..." % f)
-        p = PretenderModel(interrupt_map=interrupt_map)
+        p = ConwareModel(interrupt_map=interrupt_map)
         p.train(os.path.join(args.recording_dir, f))
         output_model = os.path.join(args.recording_dir, MODEL_FILE)
         print "Saving model (%s)..." % output_model

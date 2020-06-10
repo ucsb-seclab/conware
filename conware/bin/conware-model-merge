@@ -9,7 +9,7 @@ import logging
 # Conware
 import time
 
-from conware.model import PretenderModel
+from conware.model import ConwareModel
 from conware import *
 
 logger = logging.getLogger(__name__)
@@ -47,9 +47,9 @@ if __name__ == "__main__":
         sys.exit(0)
 
     logger.info("Importing model file (%s)..." % args.model)
-    model = PretenderModel(filename=args.model)
+    model = ConwareModel(filename=args.model)
     logger.info("Importing model file (%s)..." % args.merge_model)
-    merge_model = PretenderModel(filename=args.merge_model)
+    merge_model = ConwareModel(filename=args.merge_model)
 
     start_time = time.time()
     for peripheral2 in merge_model.peripherals:

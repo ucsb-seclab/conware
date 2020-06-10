@@ -40,7 +40,7 @@ class NullModel(AvatarPeripheral):
         return 0
 
 
-class Pretender(AvatarPeripheral):
+class Conware(AvatarPeripheral):
     def __init__(self, name, address, size, pretender_model, random_seed=None):
         """
 

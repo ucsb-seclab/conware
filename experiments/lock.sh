@@ -16,6 +16,8 @@ conware-model-optimize experiments/lock/model.pickle
 
 conware-model-visualize experiments/lock/model.pickle
 conware-model-visualize experiments/lock/model_optimized.pickle
+
+# Disable buffering in UART
 python experiments uart_hack.py experiments/lock/model_optimized.pickle
 conware-model-visualize experiments/lock/model_optimized_optimized_hacked.pickle
 

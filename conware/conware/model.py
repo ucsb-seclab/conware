@@ -1,37 +1,14 @@
 # Native
 import logging
 import os
-import pprint
 import pickle
-import sys
-from collections import defaultdict
 
-# Numpy
-import numpy
-
-# Avatar 2
-
-# from avatar2.peripherals.nucleo_usart import NucleoUSART
-
-# Pretender
-# import pretender.globals as G
+# Conware
 import conware.globals as G
 
-# from pretender.ground_truth.arduino_due import PeripheralMemoryMap
 from conware.ground_truth.arduino_due import PeripheralMemoryMap
-
-# from pretender.logger import LogReader
 from conware.interrupts import Interrupter
 from conware.tools.logger import LogReader
-
-# from pretender.cluster_peripherals import cluster_peripherals
-from conware.cluster_peripherals import cluster_peripherals
-
-# from pretender.models.increasing import IncreasingModel
-# from pretender.models.pattern import PatternModel
-
-
-# from pretender.models.simple_storage import SimpleStorageModel
 from conware.models.simple_storage import SimpleStorageModel
 from conware.peripheral_model import PeripheralModel
 
@@ -40,7 +17,7 @@ logger = logging.getLogger(__name__)
 peripheral_memory_map = PeripheralMemoryMap()
 
 
-class PretenderModel:
+class ConwareModel:
     def __init__(self, name=None, address=None, size=None,
                  filename=None, **kwargs):
         self.peripherals = []
@@ -49,6 +26,13 @@ class PretenderModel:
         self.peripheral_clusters = {}
         self.log_per_cluster = {}
         self.accessed_addresses = set()
+        self.stats = {
+            'missed_reads': 0,
+            'missed_writes': 0,
+            'total_reads': 0,
+            'total_writes': 0,
+            'interrupts': 0
+        }
         # filename = kwargs['kwargs']['filename'] if kwargs else None
 
         self.interrupt_map = kwargs['interrupt_map'] if kwargs and 'interrupt_map' in kwargs else {}
@@ -65,14 +49,6 @@ class PretenderModel:
             self.interrupt_map = {}
 
         self.host = kwargs['host'] if kwargs and 'host' in kwargs else None
-        # if host:
-        #     self.send_interrupts_to(host)
-        # serial = kwargs['serial'] if kwargs and 'serial' in kwargs else None
-        # if serial:
-        #     logger.info("Attaching virtual serial port")
-        #     uart = NucleoUSART('serial', 0x40004400, size=32)
-        #     self.model_per_address[0x40004400] = uart
-        #     self.model_per_address[0x40004404] = uart
 
     def __del__(self):
         self.shutdown()
@@ -80,6 +56,11 @@ class PretenderModel:
     def __contains__(self, peripheral):
         """ Check to see if the given peripheral is in this model """
         return peripheral in self.peripherals
+
+    def get_runtime_stats(self):
+        for p in self.peripherals:
+            self.stats[p.name] = p.stats
+        return self.stats
 
     def add_peripheral(self, peripheral):
         """ Add a peripiheral to our list"""
@@ -249,8 +230,10 @@ class PretenderModel:
         :return:
         """
         logger.debug("Write %s %s %s" % (address, size, value))
+        self.stats['total_writes'] += 1
 
         if address not in self.model_per_address:
+            self.stats['missed_writes'] += 1
             logger.debug(
                 "No model found for %s, using SimpleStorageModel...",
                 hex(address))
@@ -265,6 +248,7 @@ class PretenderModel:
 
         # Inject an interrupt?
         if (address, value) in self.interrupt_map:
+            self.stats['interrupts'] += 1
             logger.info("Injecting interrupt!")
             logger.info(self.host)
             irq_num = self.interrupt_map[(address, value)]
@@ -282,8 +266,10 @@ class PretenderModel:
         :return:
         """
         logger.debug("Read %s %s" % (address, size))
+        self.stats['total_reads'] += 1
 
         if address not in self.model_per_address:
+            self.stats['missed_reads'] += 1
             logger.debug(
                 "No model found for %s, using SimpleStorageModel...",
                 hex(address))

@@ -13,14 +13,14 @@ from avatar2 import *
 import logging
 
 from conware.interrupts import Interrupter
-from conware.peripherals import Pretender
+from conware.peripherals import Conware
 
 from conware.tools.logger import LogWriter
 from conware.tools.bin_parser import M3Parser
 from conware.tools.coverage import get_hit_blocks
 
 # Conware
-from conware.model import PretenderModel
+from conware.model import ConwareModel
 from conware import *
 
 logger = logging.getLogger(__name__)
@@ -231,8 +231,6 @@ def emulate_write_after(avatar, message, **kwargs):
         # message.origin.protocols.interrupts.inject_interrupt(48)
         # message.origin.protocols.interrupts.inject_interrupt(48)
 
-
-
     if message.address == UART['tx']:
         dest = [0] * 4
         l = message.value
@@ -341,7 +339,6 @@ if __name__ == '__main__':
     avatar.load_plugin('assembler')
     avatar.load_plugin('disassembler')
 
-
     # UART Output
     uart_tx_file = os.path.join(avatar_dir, "uart_tx.txt")
     uart_rx_file = os.path.join(avatar_dir, "uart_rx.txt")
@@ -370,8 +367,6 @@ if __name__ == '__main__':
         UART['tx'] = config['uart']['tx']
         UART['rx'] = config['uart']['rx']
 
-
-
     # Load our model
     if args.model is None:
         model_file = os.path.join(args.output_dir, MODEL_FILE)
@@ -382,8 +377,10 @@ if __name__ == '__main__':
         sys.exit()
     else:
         logger.info("Loading model file (%s)..." % model_file)
-    pretender_model = PretenderModel(filename=model_file,
-                                     host=qemu)
+    conware_model = ConwareModel(filename=model_file,
+                                 host=qemu)
+
+    mmio = None
 
     # Define our memory map for this board
     logger.info("Configuring memory layout...")
@@ -398,10 +395,10 @@ if __name__ == '__main__':
 
             mmio = avatar.add_memory_range(base, size, name='mmio',
                                            forwarded=True,
-                                           forwarded_to=Pretender(
+                                           forwarded_to=Conware(
                                                "Pretender", base,
                                                size,
-                                               pretender_model))
+                                               conware_model))
 
         # If this is the ROM, we need to put the actual firmware in!
         elif region == 'rom':
@@ -472,6 +469,16 @@ if __name__ == '__main__':
     avatar.shutdown()
     UART['tx_file'].close()
     UART['rx_file'].close()
+
+    print("Dumping model statistics...")
+    if conware_model is not None:
+        stats = conware_model.get_runtime_stats()
+        stats_filename = os.path.join(avatar_dir, "stats.txt")
+        print("Saving stats file (%s)..." % stats_filename)
+        stats_file = open(stats_filename, "w+", 0)  # unbuffered
+        stats_file.write(json.dumps(stats))
+        stats_file.close()
+
     if args.coverage:
         blocks = get_hit_blocks(COVERAGE_LOG)
         print "Hit blocks:", repr(blocks)

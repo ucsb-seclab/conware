@@ -11,7 +11,7 @@ from networkx.drawing.nx_agraph import to_agraph
 
 import logging
 
-from conware.model import PretenderModel
+from conware.model import ConwareModel
 
 logger = logging.getLogger(__name__)
 
@@ -51,7 +51,7 @@ if __name__ == "__main__":
         sys.exit(0)
 
     logger.info("Importing model file (%s)..." % args.model_filename)
-    model = PretenderModel(filename=args.model_filename)
+    model = ConwareModel(filename=args.model_filename)
 
     for peripheral in model.peripherals:
         # logger.info("Graphing %s..." % str(peripheral.name))

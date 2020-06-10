@@ -34,6 +34,14 @@ class PeripheralModel:
         self.wildcard_edges = {}
         self.merge_count = 1
 
+        self.stats = {'reads': [],
+                      'writes': [],
+                      'interrupts': [],
+                      'wildcard': 0,
+                      'bfs': 0,
+                      'long_jump': 0,
+                      'failed': 0}
+
     def __str__(self):
         """ Return a nice readable string """
         return "%s: %s" % (self.name, self.current_state)
@@ -505,6 +513,8 @@ class PeripheralModel:
         After every write we need to check and see if we have any interrupts to fire
         :return: a dictionary of interrupt numbers with their counts { irq_num: count }
         """
+        if len(self.current_state[1].interrupts) > 0:
+            self.stats['interrupts'].append(self.current_state[1].interrupts)
         return self.current_state[1].interrupts
 
     def write(self, address, size, value):
@@ -524,6 +534,8 @@ class PeripheralModel:
         logger.debug("%s: Writing to %s with value: %s" % (self.name,
                                                            hex(address),
                                                            hex(value)))
+        self.stats['writes'].append((address, value))
+
         current_state_id = self.current_state[0]
         out_edges = self.graph.edges(current_state_id)
         for edge in out_edges:
@@ -538,6 +550,7 @@ class PeripheralModel:
                 logger.info("%s/%d Taking wildcard edge (%08X, %d)!" % (
                     self.name, self.current_state[0],
                     address, value))
+                self.stats['wildcard'] += 1
                 self._update_state(edge[1], address, value)
                 return True
 
@@ -574,6 +587,7 @@ class PeripheralModel:
                 #     self.current_state[1].model_per_address[address].write(
                 #         value)
                 logger.info("%s: BFS selected %s: %s" % (self.name, str(edge), str(self.graph.nodes[edge[1]]["state"])))
+                self.stats['bfs'] += 1
                 return True
             elif (edge, address) in self.wildcard_edges:
                 self._update_state(edge[1], address, value)
@@ -584,6 +598,8 @@ class PeripheralModel:
                 #         value)
                 logger.info("%s: Wildcard selected %s: %s" % (self.name, str(edge),
                                                               str(self.graph.nodes[edge[1]]["state"])))
+                self.stats['bfs'] += 1
+                self.stats['wildcard'] += 1
                 return True
 
         logger.info(
@@ -606,8 +622,10 @@ class PeripheralModel:
                                                                                                         hex(address),
                                                                                                         hex(value)))
             # TODO: Do something smarter, create a new state on the fly?
+            self.stats['failed'] += 1
             return True
 
+        self.stats['long_jump'] += 1
         self._update_state(picked_edge[0][1], address, value)
 
         # self.current_state = (

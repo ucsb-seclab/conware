@@ -9,7 +9,7 @@ import sys
 
 import logging
 
-from conware.model import PretenderModel
+from conware.model import ConwareModel
 from conware import *
 import pickle
 
@@ -42,7 +42,7 @@ if __name__ == "__main__":
         sys.exit(0)
 
     logger.info("Importing model file (%s)..." % args.model_file)
-    model = PretenderModel(filename=args.model_file)
+    model = ConwareModel(filename=args.model_file)
 
     for peripheral in model.peripherals:
         logger.info("Optimizing %s..." % str(peripheral.name))
