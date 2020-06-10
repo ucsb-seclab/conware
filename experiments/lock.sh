@@ -9,9 +9,9 @@ conware-model-generate firmware/custom/servo/
 conware-model-generate firmware/custom/blink2/
 
 conware-model-merge firmware/custom/knock/model.pickle firmware/custom/irremote/model.pickle -o experiments/lock/knock_ir.pickle
-conware-model-merge firmware/custom/color_sensor/model.pickle experiments/lock/knock_ir.pickle -o experiments/lock/knock_ir_color.pickle
-conware-model-merge firmware/custom/servo/model.pickle experiments/lock/knock_ir_color.pickle -o experiments/lock/knock_ir_color_servo.pickle
-conware-model-merge firmware/custom/blink2/model.pickle experiments/lock/knock_ir_color_servo.pickle -o experiments/lock/model.pickle
+conware-model-merge experiments/lock/knock_ir.pickle firmware/custom/color_sensor/model.pickle -o experiments/lock/knock_ir_color.pickle
+conware-model-merge experiments/lock/knock_ir_color.pickle firmware/custom/servo/model.pickle -o experiments/lock/knock_ir_color_servo.pickle
+conware-model-merge experiments/lock/knock_ir_color_servo.pickle firmware/custom/blink2/model.pickle -o experiments/lock/model.pickle
 conware-model-optimize experiments/lock/model.pickle
 
 conware-model-visualize experiments/lock/model.pickle

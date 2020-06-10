@@ -1,5 +1,6 @@
 # Native
 import logging
+import threading
 
 # 3rd Party
 import networkx
@@ -7,6 +8,8 @@ import networkx
 # Conware
 from conware.models.simple_storage import SimpleStorageModel
 from conware.peripheral_state import PeripheralModelState
+
+conware_rlock = threading.RLock()
 
 logger = logging.getLogger(__name__)
 
@@ -20,6 +23,7 @@ class PeripheralModel:
     global_nodeID = 0
 
     def __init__(self, addresses, name=None):
+        self.pending_interrupts = {}
         self.all_states = []
         self.nodeID = 0
         self.graph = networkx.DiGraph()
@@ -487,12 +491,13 @@ class PeripheralModel:
 
     def _update_state(self, new_state, address, value):
         """
-
+        Update our the current state that we are in and queue any interrupts
         :param new_state:
         :return:
         """
         self.current_state = (
             new_state, self.graph.nodes[new_state]["state"])
+        self._queue_interrupts(self.current_state[1].interrupts)
 
         # Write our value to the model (e.g., SimpleStorage)
         if address in self.current_state[1].model_per_address:
@@ -508,14 +513,36 @@ class PeripheralModel:
                 self.current_state[1].model_per_address[addr].write(
                     address, value)
 
+    def _queue_interrupts(self, interrupt_dict):
+        """
+        Queue our interrupt to be fired when `get_interrupts` is triggered
+        :param irq_num: 
+        :return: 
+        """
+        with conware_rlock:
+            for irq_num in interrupt_dict:
+                if irq_num not in self.pending_interrupts:
+                    self.pending_interrupts[irq_num] = interrupt_dict[irq_num]
+                else:
+                    self.pending_interrupts[irq_num] += interrupt_dict[irq]
+
     def get_interrupts(self):
         """
         After every write we need to check and see if we have any interrupts to fire
         :return: a dictionary of interrupt numbers with their counts { irq_num: count }
         """
-        if len(self.current_state[1].interrupts) > 0:
-            self.stats['interrupts'].append(self.current_state[1].interrupts)
-        return self.current_state[1].interrupts
+        with conware_rlock:
+            # Store our interrupts and reset the queue
+            tmp_interrupts = self.pending_interrupts
+            self.pending_interrupts = {}
+
+            if len(tmp_interrupts) > 0:
+                self.stats['interrupts'].append(tmp_interrupts)
+            return tmp_interrupts
+
+            # if len(self.current_state[1].interrupts) > 0:
+            #     self.stats['interrupts'].append(self.current_state[1].interrupts)
+            # return self.current_state[1].interrupts
 
     def write(self, address, size, value):
         """
@@ -542,6 +569,7 @@ class PeripheralModel:
             edge_tuple = list(self.graph[edge[0]][edge[1]]['tuples'])
 
             if (address, value) in edge_tuple:
+
                 self._update_state(edge[1], address, value)
                 return True
 
@@ -740,7 +768,8 @@ class PeripheralModel:
                 self._merge_map)
 
             # Merge our graphs
-            self.graph = networkx.compose(self.graph, other_peripheral.graph)
+            # Ref: https://networkx.github.io/documentation/networkx-1.10/reference/generated/networkx.algorithms.operators.binary.compose.html
+            self.graph = networkx.compose(other_peripheral.graph, self.graph)
 
             # Merge the nodes and edges
             for merge_node in self._merge_map:
@@ -749,6 +778,7 @@ class PeripheralModel:
                 # Merge the states
                 state = self._get_state(state_id)
                 state2 = other_peripheral._get_state(state_id)
+                logger.info("Merged %s and %s" % (state_id, merge_node))
                 state.merge(state2)
 
                 # add all edges
@@ -759,13 +789,14 @@ class PeripheralModel:
                         self._add_edge(e2[0], e2[1], address, value)
         else:
             logger.error("Failed to merge %s and %s" % (self, other_peripheral))
+            return False
 
         # Update labels
         self._label_nodes()
 
         # Update any wildcard edges
         self._update_wildcard_edges()
-        pass
+        return True
 
     def _recursive_merge(self, state_id, state_id2, other_peripheral):
         """

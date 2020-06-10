@@ -219,13 +219,32 @@ def emulate_write_after(avatar, message, **kwargs):
             i.start()
 
     # Is this an NVIC interrupt (e.g., TC1-5?)
-    if message.address == 0xe000e100 or message.address == 0xe000e104:
+    if message.address == 0xe000e100:
+        # TODO: Finish implementing the other interrupts if needed
         logger.info("NVIC WRITE DETECTED %s %s" % (hex(message.address), hex(message.value)))
+        if message.value == 0x10000000:
+            logger.info("Enabling interrupter (TC1)")
+            i = Interrupter(44, message.origin, .0001)
+            i.start()
+        if message.value == 0x20000000:
+            logger.info("Enabling interrupter (TC2)")
+            i = Interrupter(45, message.origin, .0001)
+            i.start()
+        if message.value == 0x40000000:
+            logger.info("Enabling interrupter (TC3)")
+            i = Interrupter(46, message.origin, .0001)
+            i.start()
+        if message.value == 0x80000000:
+            logger.info("Enabling interrupter (TC4)")
+            i = Interrupter(47, message.origin, .0001)
+            i.start()
+
     if message.address == 0xe000e104:
+        logger.info("NVIC WRITE DETECTED %s %s" % (hex(message.address), hex(message.value)))
         # logger.error("SAW AN NVIC WRITE!!")
         # logger.error(message.dst)
         if message.value == 0x1:
-            logger.info("Enabling interrupter")
+            logger.info("Enabling interrupter (TC5)")
             i = Interrupter(48, message.origin, .0001)
             i.start()
         # message.origin.protocols.interrupts.inject_interrupt(48)

@@ -188,7 +188,7 @@ class PeripheralModelState:
         logger.debug("Merging %s into %s" % (other, self))
         # Are they the same state?
         if self.state_id == other.state_id:
-            logger.warn("Tried to merge identical states!")
+            logger.warn("Tried to merge identical states! (%s == %s)" % (str(self.state_id), str(other.state_id)))
             return False
 
         # merge any duplicate address
