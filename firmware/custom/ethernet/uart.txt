@@ -1,0 +1,1 @@
+Chat server address:192.168.1.177We have a new client
