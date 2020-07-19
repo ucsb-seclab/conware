@@ -73,11 +73,13 @@ def get_log_stats(recording_filename):
             if val not in interrupts:
                 interrupts[val] = 0
 
-            interrupts += 1
+            interrupts[val] += 1
 
     peripherals = set()
     for a in addresses:
-        peripherals.add(peripheral_memory_map.get_peripheral(int(a, 16))[0])
+        periph = peripheral_memory_map.get_peripheral(int(a, 16))
+        if periph is not None:
+            peripherals.add(periph[0])
 
     print "Peripherals: ", len(peripherals), peripherals
     print "Addresses: ", len(addresses)
@@ -101,6 +103,51 @@ def get_log_stats(recording_filename):
             'total_lines': total,
             'total_reads': total_read,
             'total_writes': total_write}
+
+
+def get_log_heatmap(recording_filename):
+    """
+    Get a 3D array with address, value, count
+    :param recording_filename:
+    :return:
+    """
+    recording = file(recording_filename, 'r')
+
+    recording_csv = csv.reader(recording, dialect=csv.excel_tab)
+
+    # Skip headers
+    recording_csv.next()
+
+    addresses = {}
+
+    reads = {}
+    writes = {}
+    for line in recording_csv:
+        # print line
+        op, id, addr, val, val_model, pc, size, timestamp, model = line
+
+        addr = int(addr, 16)
+        val = int(val, 16)
+
+        # Writes
+        if op in ["1", "WRITE"]:
+            if addr not in writes:
+                writes[addr] = {}
+            if val not in writes[addr]:
+                writes[addr][val] = 0
+            writes[addr][val] += 1
+
+
+        elif op in ["0", "READ"]:
+            if addr not in reads:
+                reads[addr] = {}
+            if val not in reads[addr]:
+                reads[addr][val] = 0
+            reads[addr][val] += 1
+
+        # elif op in ["2", "INTERRUPT"]:
+
+    return reads, writes
 
 
 def get_log_diff(emulated, recorded, output_file):

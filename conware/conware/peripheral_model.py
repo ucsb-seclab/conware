@@ -477,12 +477,51 @@ class PeripheralModel:
         """
 
         # Assumption: We are in correct current state and expect read address to be there
+        self.stats['reads'].append(address)
 
         if address not in self.current_state[1].model_per_address:
-            logger.error(
-                "%s: Could not find model for read address (%s)" % (
-                    self.name, hex(address)))
-            return 0
+            logger.debug("%s: starting BFS search for read (0x%08X" % (self.name, address))
+            # otherwise start BFS
+            target_edges = list(
+                networkx.edge_bfs(self.graph, source=self.current_state[0]))
+
+            found = False
+            for edge in target_edges:
+
+                state = self._get_state(edge[1])
+                logger.debug("%s: Checking node %s: %s" % (self.name, str(edge[1]), state))
+                if address in state.model_per_address:
+                    logger.debug(
+                        "%s: BFS selected %s: %s" % (self.name, str(edge), str(self.graph.nodes[edge[1]]["state"])))
+                    self.stats['bfs'] += 1
+                    self.current_state = (
+                        edge[1], self.graph.nodes[edge[1]]["state"])
+                    self._queue_interrupts(self.current_state[1].interrupts)
+                    found = True
+                    break
+
+            logger.warn(
+                "%s: No matching states!  Finding an node that has this address (0x%08X)" % (self.name, address))
+            # BFS failed, let's just find a node anywhere!
+            for n in self.graph.nodes:
+                state = self._get_state(n)
+                logger.debug("%s: Checking node %s: %s" % (self.name, str(n), state))
+                if address in state.model_per_address:
+                    logger.debug(
+                        "%s: Long jump selected %s: %s" % (self.name, str(n), str(self.graph.nodes[n]["state"])))
+                    self.stats['long_jump'] += 1
+                    self.current_state = (
+                        n, self.graph.nodes[n]["state"])
+                    self._queue_interrupts(self.current_state[1].interrupts)
+                    found = True
+
+            if not found:
+                logger.error(
+                    "%s: Could not find model for read address (%s)" % (
+                        self.name, hex(address)))
+                self.stats['failed'] += 1
+                return 0
+
         value = self.current_state[1].model_per_address[address].read()
         logger.debug("%s: Read from %s value: %s" % (self.name,
                                                      hex(address),
@@ -524,7 +563,7 @@ class PeripheralModel:
                 if irq_num not in self.pending_interrupts:
                     self.pending_interrupts[irq_num] = interrupt_dict[irq_num]
                 else:
-                    self.pending_interrupts[irq_num] += interrupt_dict[irq]
+                    self.pending_interrupts[irq_num] += interrupt_dict[irq_num]
 
     def get_interrupts(self):
         """
@@ -575,7 +614,7 @@ class PeripheralModel:
 
             elif edge in self.wildcard_edges and address in \
                     self.wildcard_edges[edge]:
-                logger.info("%s/%d Taking wildcard edge (%08X, %d)!" % (
+                logger.debug("%s/%d Taking wildcard edge (%08X, %d)!" % (
                     self.name, self.current_state[0],
                     address, value))
                 self.stats['wildcard'] += 1
@@ -597,7 +636,7 @@ class PeripheralModel:
                     "simple storage!, writing to address: " + str(address))
                 return True
 
-        logger.info("%s: Was not simple storage, starting BFS/Wildcard (0x%08X, %X)" % (self.name, address, value))
+        logger.debug("%s: Was not simple storage, starting BFS/Wildcard (0x%08X, %X)" % (self.name, address, value))
         # otherwise start BFS
         target_edges = list(
             networkx.edge_bfs(self.graph, source=self.current_state[0]))
@@ -606,7 +645,7 @@ class PeripheralModel:
 
             edge_tuple = list(self.graph[edge[0]][edge[1]]['tuples'])
 
-            logger.info("%s: Checking tuple (%s,%s): %s" % (self.name, str(edge[0]), str(edge[1]), edge_tuple))
+            logger.debug("%s: Checking tuple (%s,%s): %s" % (self.name, str(edge[0]), str(edge[1]), edge_tuple))
             if (address, value) in edge_tuple:
                 self._update_state(edge[1], address, value)
                 # self.current_state = (
@@ -614,7 +653,8 @@ class PeripheralModel:
                 # if address in self.current_state[1].model_per_address:
                 #     self.current_state[1].model_per_address[address].write(
                 #         value)
-                logger.info("%s: BFS selected %s: %s" % (self.name, str(edge), str(self.graph.nodes[edge[1]]["state"])))
+                logger.debug(
+                    "%s: BFS selected %s: %s" % (self.name, str(edge), str(self.graph.nodes[edge[1]]["state"])))
                 self.stats['bfs'] += 1
                 return True
             elif (edge, address) in self.wildcard_edges:
@@ -624,13 +664,13 @@ class PeripheralModel:
                 # if address in self.current_state[1].model_per_address:
                 #     self.current_state[1].model_per_address[address].write(
                 #         value)
-                logger.info("%s: Wildcard selected %s: %s" % (self.name, str(edge),
-                                                              str(self.graph.nodes[edge[1]]["state"])))
+                logger.debug("%s: Wildcard selected %s: %s" % (self.name, str(edge),
+                                                               str(self.graph.nodes[edge[1]]["state"])))
                 self.stats['bfs'] += 1
                 self.stats['wildcard'] += 1
                 return True
 
-        logger.info(
+        logger.warn(
             "%s: No matching edge!, picking edge with most writes to target address" % self.name)
         # If we dont find value for address, look at all edges, with writes to that address, pick the one that has it
         # the most times

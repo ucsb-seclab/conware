@@ -84,7 +84,7 @@ class ConwareModel:
         Train our model, potentially using a specific training model
         :return:
         """
-        logger.info("Training hardware pretender (%s)" % filename)
+        logger.info("Training peripheral model (%s)" % filename)
 
         l = LogReader(filename)
 

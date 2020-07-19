@@ -89,7 +89,6 @@ void setup()   /*----( SETUP: RUNS ONCE )----*/
 void loop()   /*----( LOOP: RUNS CONSTANTLY )----*/
 {
 
-  digitalWrite(greenLED, LOW);
   if (irrecv.decode(&results)) // have we received an IR signal?
 
   {
@@ -115,6 +114,7 @@ void loop()   /*----( LOOP: RUNS CONSTANTLY )----*/
 
     remotePasscode();
     irrecv.resume(); // receive the next value
+    digitalWrite(greenLED, LOW);
   }
 }/* --(end main loop )-- */
 
